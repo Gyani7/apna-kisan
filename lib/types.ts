@@ -1,15 +1,28 @@
 export interface Post {
   id: string;
   userId: string;
+
   farmerName: string;
   farmerAvatar: string | null;
+
   location: string;
+  distance?: string;
+
+  verified?: boolean;
+  badge?: string;
+  trustScore?: number;
+
+  crop?: string;
+
   content: string;
   imageUrl: string | null;
+
   likesCount: number;
   commentsCount: number;
+
   isLiked: boolean;
   createdAt: string;
+
   tags?: string[];
 }
 
@@ -18,8 +31,17 @@ export interface Profile {
   username: string;
   fullName: string | null;
   avatarUrl: string | null;
+
   location: string | null;
+
   bio: string | null;
+
+  points?: number;
+  badge?: string;
+  trustScore?: number;
+
+  followers?: number;
+  following?: number;
 }
 
 export interface NavItem {
