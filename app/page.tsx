@@ -1,110 +1,85 @@
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
+import LeftSidebar from '@/components/LeftSidebar';
+import RightSidebar from '@/components/RightSidebar';
 import CreatePostCard from '@/components/CreatePostCard';
 import PostCard from '@/components/PostCard';
+import StoryCard from '@/components/StoryCard';
 import StoriesBar from '@/components/StoriesBar';
 import FarmingTipsCard from '@/components/FarmingTipsCard';
-import RightSidebar from '@/components/RightSidebar';
-import { MOCK_POSTS } from '@/lib/mock-data';
+import AuthProvider from '@/components/AuthProvider';
+import { getPosts, getFeaturedStories } from '@/lib/supabase';
+import { generateWebsiteSchema } from '@/lib/seo';
+import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [posts, featuredStories] = await Promise.all([
+    getPosts({ limit: 20 }),
+    getFeaturedStories(4),
+  ]);
+
+  const allPosts = mapPostsToPostWithAuthor(posts ?? []);
+  const featuredData = mapPostsToPostWithAuthor(featuredStories ?? []);
+  const feedPosts = allPosts.filter((p) => p.post_type === 'discussion' || p.post_type === 'question');
+
   return (
-    <>
+    <AuthProvider>
       <Header />
-
-      <main className="pt-14 pb-20 min-h-screen bg-gray-50">
+      <main className="pt-14 pb-20 min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex gap-6">
+            <LeftSidebar />
 
-            {/* Main Feed */}
             <div className="flex-1 flex flex-col gap-4 min-w-0">
-
               {/* Hero Banner */}
-              <div className="bg-gradient-to-r from-green-600 to-green-500 text-white rounded-2xl p-5 shadow">
-                <h1 className="text-2xl font-bold">
-                  🌾 Apna Kisan
-                </h1>
-                <p className="text-sm mt-1 opacity-90">
-                  Kisan Se Kisan Tak
-                </p>
+              <div className="bg-gradient-to-r from-brand-600 to-brand-500 dark:from-brand-800 dark:to-brand-700 text-white rounded-2xl p-5 shadow-card">
+                <h1 className="text-2xl font-bold">&#127806; Apna Kisan</h1>
+                <p className="text-sm mt-1 opacity-90">Kisan Se Kisan Tak — Community, Knowledge, Growth</p>
               </div>
 
               <StoriesBar />
-
               <CreatePostCard />
 
-              {/* Nearby Farmers */}
-              <div className="bg-white rounded-2xl shadow-sm p-4">
-                <h2 className="font-bold text-lg mb-3">
-                  📍 Nearby Farmers
-                </h2>
-
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>🚜 Mahesh Gurjar</span>
-                    <span className="text-green-600">8 KM Away</span>
+              {/* Featured Stories */}
+              {featuredData.length > 0 && (
+                <section>
+                  <h2 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-3">Featured Stories</h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    {featuredData.map((story) => (
+                      <StoryCard key={story.id} story={story} featured />
+                    ))}
                   </div>
-
-                  <div className="flex justify-between">
-                    <span>🌾 Ramesh Kumar</span>
-                    <span className="text-green-600">12 KM Away</span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span>🥔 Suresh Singh</span>
-                    <span className="text-green-600">18 KM Away</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Trending Questions */}
-              <div className="bg-white rounded-2xl shadow-sm p-4">
-                <h2 className="font-bold text-lg mb-3">
-                  🔥 Trending Questions
-                </h2>
-
-                <div className="space-y-3">
-                  <div className="border-b pb-2">
-                    ❓ Gehu me peele daag aa rahe hain
-                    <div className="text-sm text-gray-500">
-                      23 Answers
-                    </div>
-                  </div>
-
-                  <div className="border-b pb-2">
-                    ❓ Sarso me kaunsa spray kare?
-                    <div className="text-sm text-gray-500">
-                      17 Answers
-                    </div>
-                  </div>
-
-                  <div>
-                    ❓ Tractor ka mileage kaise badhaye?
-                    <div className="text-sm text-gray-500">
-                      31 Answers
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </section>
+              )}
 
               <FarmingTipsCard />
 
-              {/* Feed Posts */}
-              <div className="flex flex-col gap-4">
-                {MOCK_POSTS.map((post) => (
-                  <PostCard key={post.id} post={post} />
-                ))}
-              </div>
-
+              {/* Community Feed */}
+              <section>
+                <h2 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-3">Community Charcha</h2>
+                <div className="flex flex-col gap-4">
+                  {feedPosts.length === 0 ? (
+                    <div className="card p-8 text-center">
+                      <p className="text-gray-400 dark:text-gray-500">Abhi koi post nahi hai. Pehla post banayein!</p>
+                    </div>
+                  ) : (
+                    feedPosts.map((post) => <PostCard key={post.id} post={post} />)
+                  )}
+                </div>
+              </section>
             </div>
 
-            {/* Desktop Sidebar */}
             <RightSidebar />
           </div>
         </div>
       </main>
 
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(generateWebsiteSchema()) }}
+      />
+
       <BottomNav />
-    </>
+    </AuthProvider>
   );
 }

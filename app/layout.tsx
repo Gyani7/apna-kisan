@@ -1,10 +1,15 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import ThemeProvider from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
-  title: 'Apna Kisan - Farmers Social Network',
-  description: 'Connect with farmers, share knowledge, and grow together',
+  title: {
+    default: 'Apna Kisan - Kisan Community Platform',
+    template: '%s | Apna Kisan',
+  },
+  description: 'Connect with farmers, share knowledge, and grow together. Community platform for Indian farmers.',
   manifest: '/manifest.json',
+  keywords: ['kisan', 'farming', 'agriculture', 'community', 'organic', 'mandi', 'India'],
 };
 
 export const viewport: Viewport = {
@@ -19,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="hi" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -28,7 +33,11 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-sans bg-gray-50 min-h-screen">{children}</body>
+      <body className="font-sans bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
