@@ -4,8 +4,21 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Sun, Droplets, TrendingUp, TrendingDown, Trophy, ArrowUpRight } from 'lucide-react';
-import { getMandiRates, getLeaderboard } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { MandiRateRow, ProfileRow } from '@/lib/database.types';
+
+const supabase = createClientComponentClient();
+
+async function getMandiRates() {
+    const { data } = await supabase.from('mandi_rates').select('*').order('updated_at', { ascending: false }).limit(4);
+    return data;
+}
+
+async function getLeaderboard(limit = 5) {
+    const { data } = await supabase.from('profiles').select('*').order('reputation', { ascending: false }).limit(limit);
+    return data;
+}
+
 
 const WEATHER_DATA = {
   location: 'Amritsar, Punjab',

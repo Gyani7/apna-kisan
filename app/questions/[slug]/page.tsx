@@ -1,7 +1,7 @@
-tsx
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import { generateQuestionSchema } from '@/lib/seo';
 import { PostCard } from '@/components/PostCard'; // Reusing existing card logic or custom
 import { Button } from '@/components/ui/button'; // Assuming a UI library or standard button
@@ -9,6 +9,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { ArrowBigUp, ArrowBigDown, MessageSquare, CheckCircle2 } from 'lucide-react';
+
+const supabase = createServerComponentClient({ cookies });
 
 interface QuestionPageProps {
   params: Promise<{ slug: string }>;

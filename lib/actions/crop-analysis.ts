@@ -1,7 +1,8 @@
-s'use server';
+'use server';
 
 import { z } from 'zod';
-import { supabase } from '@/lib/supabase/server';
+import { createServerActionClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
 // --- ZOD SCHEMA FOR INPUT VALIDATION ---
@@ -49,6 +50,7 @@ interface AnalysisFormState {
 }
 
 export async function analyzeCropImage(prevState: AnalysisFormState, formData: FormData): Promise<AnalysisFormState> {
+  const supabase = createServerActionClient({ cookies });
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return { success: false, message: 'Authentication Error: Please log in to use this feature.' };

@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { analyzeCropImage } from '@/lib/actions/crop-analysis';
-import { supabase } from '@/lib/supabase/client';
-import type { CropHealthAnalysis } from '@/lib/types'; // Assuming you'll create this type
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { CropHealthAnalysis } from '@/lib/types';
 import { UploadCloud, CheckCircle, AlertTriangle, BarChart2, Zap } from 'lucide-react';
 
 const initialState = { success: false, message: '', errors: {}, analysisResult: null };
@@ -69,6 +69,7 @@ export default function CropAnalysisPage() {
   const [state, formAction] = useFormState(analyzeCropImage, initialState);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [history, setHistory] = useState<CropHealthAnalysis[]>([]);
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
     async function fetchHistory() {
@@ -84,7 +85,7 @@ export default function CropAnalysisPage() {
         }
     }
     fetchHistory();
-  }, [state.success]);
+  }, [state.success, supabase.auth]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

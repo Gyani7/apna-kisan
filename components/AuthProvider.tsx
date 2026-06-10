@@ -2,9 +2,15 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { ProfileRow } from '@/lib/database.types';
-import { getProfile } from '@/lib/supabase';
+
+const supabase = createClientComponentClient();
+
+async function getProfile(userId: string) {
+    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    return data;
+}
 
 interface AuthContextValue {
   user: User | null;

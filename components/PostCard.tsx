@@ -6,8 +6,19 @@ import Link from 'next/link';
 import { Heart, MessageCircle, Share2, Bookmark, MapPin, MessageSquare, CircleHelp as HelpCircle, BookOpen, Bell, MoveHorizontal as MoreHorizontal } from 'lucide-react';
 import clsx from 'clsx';
 import { PostWithAuthor, POST_TYPE_CONFIG, timeAgo, formatCount } from '@/lib/types';
-import { toggleLike, toggleBookmark } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/components/AuthProvider';
+
+const supabase = createClientComponentClient();
+
+async function toggleLike(postId: string, userId: string) {
+    await supabase.rpc('toggle_like', { post_id: postId, user_id: userId });
+}
+
+async function toggleBookmark(postId: string, userId: string) {
+    await supabase.rpc('toggle_bookmark', { post_id: postId, user_id: userId });
+}
+
 
 const TYPE_ICONS: Record<string, typeof MessageSquare> = { discussion: MessageSquare, question: HelpCircle, story: BookOpen, update: Bell };
 

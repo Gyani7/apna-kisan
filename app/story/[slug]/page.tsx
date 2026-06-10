@@ -5,11 +5,23 @@ import { MapPin, Clock, Heart, MessageCircle, Share2, Bookmark, ArrowLeft, Tag }
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import AuthProvider from '@/components/AuthProvider';
-import { getPostBySlug } from '@/lib/supabase';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import { generatePageMeta, generateArticleSchema } from '@/lib/seo';
 import { mapPostToPostWithAuthor } from '@/lib/mappers';
 import { timeAgo, formatCount } from '@/lib/types';
 import type { Metadata } from 'next';
+
+const supabase = createServerComponentClient({ cookies });
+
+async function getPostBySlug(slug: string) {
+  const { data } = await supabase
+    .from('posts')
+    .select('*, author:profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')
+    .eq('slug', slug)
+    .single();
+  return data;
+}
 
 interface Props { params: Promise<{ slug: string }> }
 

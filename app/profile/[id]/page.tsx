@@ -8,11 +8,41 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { getProfile, getPosts, toggleFollow, isFollowing } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 import type { ProfileRow } from '@/lib/database.types';
 import type { PostWithAuthor } from '@/lib/types';
 import clsx from 'clsx';
+
+const supabase = createClientComponentClient();
+
+async function getProfile(userId: string) {
+    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    return data;
+}
+
+async function getPosts({ postType, orderBy = 'created_at', limit = 20 }: { postType?: string, orderBy?: string, limit?: number }) {
+  let query = supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge)');
+
+  if (postType) {
+    query = query.eq('post_type', postType);
+  }
+
+  query = query.order(orderBy, { ascending: false }).limit(limit);
+
+  const { data } = await query;
+  return data;
+}
+
+async function toggleFollow(followerId: string, followedId: string) {
+    await supabase.rpc('toggle_follow', { follower_id: followerId, followed_id: followedId });
+}
+
+async function isFollowing(followerId: string, followedId: string) {
+    const { data, count } = await supabase.from('follows').select('*', { count: 'exact' }).eq('follower_id', followerId).eq('followed_id', followedId);
+    return (count ?? 0) > 0;
+}
+
 
 export default function UserProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const [userId, setUserId] = useState('');

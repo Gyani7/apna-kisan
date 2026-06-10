@@ -2,9 +2,19 @@
 
 import { useState } from 'react';
 import { Mail } from 'lucide-react';
-import { signInWithEmail, signInWithGoogle } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
+
+const supabase = createClientComponentClient();
+
+async function signInWithEmail(email: string) {
+  return await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${location.origin}/auth/callback` } });
+}
+
+async function signInWithGoogle() {
+  return await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${location.origin}/auth/callback` } });
+}
 
 function LoginForm() {
   const [email, setEmail] = useState('');

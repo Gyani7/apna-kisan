@@ -7,10 +7,32 @@ import { MessageSquare, CircleHelp as HelpCircle, BookOpen, X, Send, ImagePlus, 
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { createPost, uploadFile, BUCKETS } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { CATEGORIES } from '@/lib/types';
 import type { PostType } from '@/lib/types';
 import clsx from 'clsx';
+
+const supabase = createClientComponentClient();
+
+const BUCKETS = {
+    posts: 'posts',
+    avatars: 'avatars',
+};
+
+async function createPost(post: any) {
+    return await supabase.from('posts').insert(post);
+}
+
+async function uploadFile(bucket: string, path: string, file: File) {
+    const { data, error } = await supabase.storage.from(bucket).upload(path, file);
+    if (error) {
+        console.error('Error uploading file:', error);
+        return null;
+    }
+    const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(path);
+    return publicUrl;
+}
+
 
 const POST_TYPES: { key: PostType; label: string; labelHi: string; icon: typeof MessageSquare; color: string }[] = [
   { key: 'discussion', label: 'Discussion', labelHi: 'Charcha', icon: MessageSquare, color: 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700' },

@@ -3,11 +3,28 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
 import AuthProvider from '@/components/AuthProvider';
-import { getPosts } from '@/lib/supabase';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import { CATEGORIES } from '@/lib/types';
 import { generatePageMeta } from '@/lib/seo';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 import type { Metadata } from 'next';
+
+const supabase = createServerComponentClient({ cookies });
+
+async function getPosts({ category, limit }: { category: string; limit: number }) {
+    let query = supabase
+        .from('posts')
+        .select('*, author:profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+    if (category) {
+        query = query.eq('category', category);
+    }
+    const { data } = await query;
+    return data;
+}
 
 interface Props { params: Promise<{ slug: string }> }
 

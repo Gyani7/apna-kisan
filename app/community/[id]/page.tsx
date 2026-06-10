@@ -7,11 +7,34 @@ import { ArrowLeft, Heart, MessageCircle, Share2, Bookmark, Send, MapPin } from 
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { supabase, getComments, addComment, toggleLike, toggleBookmark, type CommentWithAuthor as SupabaseComment } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { mapPostToPostWithAuthor } from '@/lib/mappers';
 import { timeAgo, formatCount, POST_TYPE_CONFIG, type PostWithAuthor } from '@/lib/types';
 import clsx from 'clsx';
 
+const supabase = createClientComponentClient();
+
+// These functions are now defined in this file to use the client instance
+async function getComments(postId: string) {
+  const { data } = await supabase.from('comments').select('*, profiles(*)').eq('post_id', postId).order('created_at');
+  return data;
+}
+
+async function addComment(postId: string, userId: string, content: string) {
+  const { data } = await supabase.from('comments').insert({ post_id: postId, user_id: userId, content }).select('*, profiles(*)').single();
+  return { data };
+}
+
+async function toggleLike(postId: string, userId: string) {
+    // This would be a call to a Supabase Edge Function
+    await supabase.rpc('toggle_like', { post_id: postId, user_id: userId });
+}
+
+async function toggleBookmark(postId: string, userId: string) {
+    await supabase.rpc('toggle_bookmark', { post_id: postId, user_id: userId });
+}
+
+// Mappers and types can remain as they are or be moved if preferred
 interface CommentWithAuthor {
   id: string;
   content: string;
@@ -20,7 +43,7 @@ interface CommentWithAuthor {
   author: { username: string; full_name: string | null; avatar_url: string | null; badge: string } | null;
 }
 
-function mapComment(c: SupabaseComment): CommentWithAuthor {
+function mapComment(c: any): CommentWithAuthor {
   return {
     id: c.id,
     content: c.content,
@@ -29,6 +52,8 @@ function mapComment(c: SupabaseComment): CommentWithAuthor {
     author: c.profiles,
   };
 }
+
+
 
 export default function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [postId, setPostId] = useState<string>('');

@@ -6,9 +6,30 @@ import Image from 'next/image';
 import { Search, Bell, Moon, Sun, LogIn, X } from 'lucide-react';
 import { useTheme } from '@/components/ThemeProvider';
 import { useAuth } from '@/components/AuthProvider';
-import { supabase, getNotifications, markNotificationsRead, getUnreadCount } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { NotificationRow } from '@/lib/database.types';
 import { timeAgo } from '@/lib/types';
+
+const supabase = createClientComponentClient();
+
+async function getNotifications(userId: string) {
+    const { data } = await supabase
+        .from('notifications')
+        .select('*, actor:actor_id(username, full_name, avatar_url)')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+    return data;
+}
+
+async function markNotificationsRead(userId: string) {
+    await supabase.from('notifications').update({ is_read: true }).eq('user_id', userId).eq('is_read', false);
+}
+
+async function getUnreadCount(userId: string) {
+    const { count } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('is_read', false);
+    return count ?? 0;
+}
 
 export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);

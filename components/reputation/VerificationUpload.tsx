@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { User } from '@supabase/supabase-js';
+
+const supabase = createClientComponentClient();
 
 type DocType = 'Aadhaar' | 'Farmer Card' | 'KCC Card';
 type VerificationStatus = 'pending' | 'approved' | 'rejected' | 'none';

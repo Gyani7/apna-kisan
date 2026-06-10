@@ -3,7 +3,14 @@
 import { useEffect, useState } from 'react';
 import { Leaf, TrendingUp, CircleAlert as AlertCircle, CloudRain } from 'lucide-react';
 import type { FarmingTipRow } from '@/lib/database.types';
-import { getFarmingTips } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+const supabase = createClientComponentClient();
+
+async function getFarmingTips() {
+    const { data } = await supabase.from('farming_tips').select('*').eq('is_active', true).limit(4);
+    return data;
+}
 
 const FALLBACK_TIPS: FarmingTipRow[] = [
   { id: '1', title: 'Organic Khatad', description: 'Vermicompost se mitti ki quality 3x behtar hoti hai', icon_name: 'Leaf', color_class: 'text-green-600 bg-green-50', is_active: true, created_at: '' },

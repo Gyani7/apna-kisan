@@ -7,9 +7,21 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import AuthProvider from '@/components/AuthProvider';
 import { CATEGORIES } from '@/lib/types';
-import { getMandiRates, getLeaderboard } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { MandiRateRow, ProfileRow } from '@/lib/database.types';
 import Image from 'next/image';
+
+const supabase = createClientComponentClient();
+
+async function getMandiRates() {
+  const { data } = await supabase.from('mandi_rates').select('*').limit(5);
+  return data;
+}
+
+async function getLeaderboard(limit: number = 10) {
+  const { data } = await supabase.from('profiles').select('*').order('reputation', { ascending: false }).limit(limit);
+  return data;
+}
 
 const TRENDING_TAGS = ['#GehunKisan', '#OrganicFarming', '#MSP2026', '#WaterSaving', '#DroneSpray', '#KisanCreditCard'];
 

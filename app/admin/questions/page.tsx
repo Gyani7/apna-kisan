@@ -1,6 +1,8 @@
-
-import { supabase } from '@/lib/supabase';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import QuestionActionButtons from '@/components/admin/QuestionActionButtons';
+
+const supabase = createServerComponentClient({ cookies });
 
 export const dynamic = 'force-dynamic';
 

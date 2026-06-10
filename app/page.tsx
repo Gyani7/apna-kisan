@@ -8,11 +8,52 @@ import StoryCard from '@/components/StoryCard';
 import StoriesBar from '@/components/StoriesBar';
 import FarmingTipsCard from '@/components/FarmingTipsCard';
 import AuthProvider from '@/components/AuthProvider';
-import { getPosts, getFeaturedStories } from '@/lib/supabase';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { generateWebsiteSchema } from '@/lib/seo';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 
 export default async function HomePage() {
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          cookieStore.set({ name, value, ...options })
+        },
+        remove(name: string, options: CookieOptions) {
+          cookieStore.set({ name, value: '', ...options })
+        },
+      },
+    }
+  );
+
+  async function getPosts({ limit }: { limit: number }) {
+      let query = supabase
+          .from('posts')
+          .select('*, author:profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')
+          .order('created_at', { ascending: false })
+          .limit(limit);
+      const { data } = await query;
+      return data;
+  }
+
+  async function getFeaturedStories(limit = 4) {
+      const { data } = await supabase
+          .from('posts')
+          .select('*, author:profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')
+          .eq('post_type', 'story')
+          .eq('featured', true)
+          .order('created_at', { ascending: false })
+          .limit(limit);
+      return data;
+  }
+
   const [posts, featuredStories] = await Promise.all([
     getPosts({ limit: 20 }),
     getFeaturedStories(4),

@@ -5,11 +5,26 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
 import AuthProvider from '@/components/AuthProvider';
-import { getPosts } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 import type { PostWithAuthor } from '@/lib/types';
 import { Search } from 'lucide-react';
 import clsx from 'clsx';
+
+const supabase = createClientComponentClient();
+
+async function getPosts({ postType, orderBy = 'created_at', limit = 20 }: { postType?: string, orderBy?: string, limit?: number }) {
+  let query = supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge)');
+
+  if (postType) {
+    query = query.eq('post_type', postType);
+  }
+
+  query = query.order(orderBy, { ascending: false }).limit(limit);
+
+  const { data } = await query;
+  return data;
+}
 
 type Tab = 'all' | 'questions' | 'discussions' | 'stories' | 'popular';
 
