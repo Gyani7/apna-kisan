@@ -8,7 +8,7 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { getPosts, updateProfile, uploadFile, BUCKETS, createClient } from '@/lib/supabase';
+import { getPosts, updateProfile, uploadFile, BUCKETS, supabase } from '@/lib/supabase';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 import type { PostWithAuthor } from '@/lib/types';
 import clsx from 'clsx';
@@ -35,7 +35,6 @@ function ProfileContent() {
     });
 
     // Fetch latest verification request
-    const supabase = createClient();
     supabase
       .from('verification_requests')
       .select('*')
@@ -119,7 +118,7 @@ function ProfileContent() {
               <span>{profile.location ?? 'Location add karein'}</span>
             </div>
           </div>
-          <ReputationBadge reputation_points={profile.reputation_points} is_verified={profile.is_verified} />
+          <ReputationBadge reputation_points={profile.reputation} is_verified={profile.is_verified} />
         </div>
         
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">{profile.bio ?? 'Apne baare mein bataiye...'}</p>
@@ -135,7 +134,7 @@ function ProfileContent() {
               </div>
             </div>
           ) : (
-            <VerificationUpload />
+            <VerificationUpload user={user}/>
           )}
         </div>
 
@@ -145,7 +144,7 @@ function ProfileContent() {
             <h3 className="font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <Trophy size={18} className="text-yellow-500" /> Reputation Points
             </h3>
-            <span className="text-brand-700 dark:text-brand-400 font-bold text-lg">{profile.reputation_points} pts</span>
+            <span className="text-brand-700 dark:text-brand-400 font-bold text-lg">{profile.reputation} pts</span>
           </div>
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
             <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Points kaise earn karein:</p>
@@ -177,7 +176,7 @@ function ProfileContent() {
 
         {/* Tabs */}
         <div className="flex gap-2 mt-4">
-          {(['posts', 'stories', 'answers'] as const).map((tab) => (
+          {(('posts' as const)).map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)} className={clsx(
               'px-4 py-2 rounded-xl text-sm font-medium capitalize transition-colors',
               activeTab === tab ? 'bg-brand-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400'

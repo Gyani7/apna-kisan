@@ -1,5 +1,5 @@
-tsx
-import { createClient } from '@/lib/supabase';
+
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { 
   Users, 
@@ -10,14 +10,21 @@ import {
   TrendingUp
 } from 'lucide-react';
 
-async function getStats() {
-  const supabase = await createClient();
+interface CommunityQuestion {
+  id: string;
+  created_at: string;
+  category: string;
+  question: string;
+  name: string;
+  state: string;
+}
 
+async function getStats() {
   const [
     { count: totalUsers },
     { count: pendingQuestions },
     { count: pendingVerifications },
-    { data: recentQuestions }
+    { data: recentQuestionsData }
   ] = await Promise.all([
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
     supabase.from('community_questions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
@@ -25,11 +32,13 @@ async function getStats() {
     supabase.from('community_questions').select('*').order('created_at', { ascending: false }).limit(5)
   ]);
 
+  const recentQuestions: CommunityQuestion[] = recentQuestionsData || [];
+
   return {
     totalUsers: totalUsers || 0,
     pendingQuestions: pendingQuestions || 0,
     pendingVerifications: pendingVerifications || 0,
-    recentQuestions: recentQuestions || []
+    recentQuestions
   };
 }
 

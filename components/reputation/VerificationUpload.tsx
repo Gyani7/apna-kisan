@@ -1,15 +1,13 @@
-tsx
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 
 type DocType = 'Aadhaar' | 'Farmer Card' | 'KCC Card';
 type VerificationStatus = 'pending' | 'approved' | 'rejected' | 'none';
 
 export default function FarmerVerificationUpload({ user }: { user: User }) {
-  const supabase = createClient();
   const [file, setFile] = useState<File | null>(null);
   const [docType, setDocType] = useState<DocType>('Aadhaar');
   const [uploading, setUploading] = useState(false);
@@ -150,7 +148,7 @@ export default function FarmerVerificationUpload({ user }: { user: User }) {
             type="submit"
             disabled={!file || uploading}
             className={`w-full py-3 rounded-xl font-bold text-white transition-all ${
-              !file || uploading ? 'bg-slate-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 shadow-lg'
+              !file || uploading ? 'bg-slate-300 cursor-not-allowed' : 'bg-slate-300 cursor-not-allowed'
             }`}
           >
             {uploading ? 'Processing Security Upload...' : 'Submit for Verification'}

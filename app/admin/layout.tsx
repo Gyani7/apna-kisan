@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { 
   LayoutDashboard, 
   Users, 
-  MessageSquareQuestion, 
+  MessageSquare, 
   Store, 
   Flag, 
   LogOut, 
@@ -18,7 +18,7 @@ interface AdminLayoutProps {
 const sidebarLinks = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Users', href: '/admin/users', icon: Users },
-  { name: 'Questions', href: '/admin/questions', icon: MessageSquareQuestion },
+  { name: 'Questions', href: '/admin/questions', icon: MessageSquare },
   { name: 'Marketplace', href: '/admin/marketplace', icon: Store },
   { name: 'Reports', href: '/admin/reports', icon: Flag },
 ];
