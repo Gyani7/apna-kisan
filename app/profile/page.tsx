@@ -16,6 +16,7 @@ import ReputationBadge from '@/components/reputation/ReputationBadge';
 import VerificationUpload from '@/components/reputation/VerificationUpload';
 
 const supabase = createClientComponentClient();
+
 const BUCKETS = {
     posts: 'posts',
     avatars: 'avatars',
@@ -35,8 +36,7 @@ async function getPosts({ postType, orderBy = 'created_at', limit = 20 }: { post
 }
 
 async function updateProfile(userId: string, updates: any) {
-    const { error } = await supabase.from('profiles').update(updates).eq('id', userId);
-    if (error) console.error('Error updating profile:', error);
+    return await supabase.from('profiles').update(updates).eq('id', userId);
 }
 
 async function uploadFile(bucket: string, path: string, file: File) {
