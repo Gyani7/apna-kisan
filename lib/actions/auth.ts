@@ -114,3 +114,85 @@ export async function signInWithPassword(formData: FormData): Promise<ActionResu
     return { success: false, message: 'An unexpected error occurred.' };
   }
 }
+
+// --- MOBILE OTP AUTHENTICATION ACTIONS ---
+
+const PhoneSchema = z.object({
+  phone: z.string().regex(/^\d{10}$/, 'Please enter a valid 10-digit mobile number.'),
+});
+
+export async function sendMobileOTP(formData: FormData): Promise<ActionResult> {
+  try {
+    const validation = PhoneSchema.safeParse(Object.fromEntries(formData));
+    if (!validation.success) {
+      return { 
+        success: false, 
+        message: 'Invalid phone number.',
+        error: validation.error.errors 
+      };
+    }
+
+    const { phone } = validation.data;
+    const supabase = createSupabaseServerClient();
+
+    // Important: Supabase requires the country code for phone auth. Assuming India (+91).
+    const formattedPhone = `+91${phone}`;
+
+    const { error } = await supabase.auth.signInWithOtp({
+      phone: formattedPhone,
+    });
+
+    if (error) {
+      console.error('SendOTPError: [Phone Redacted]', { message: error.message });
+      return { success: false, message: error.message };
+    }
+
+    return { success: true, message: 'An OTP has been sent to your mobile number.' };
+
+  } catch (e: any) {
+    console.error('Unexpected SendOTP Error: [Input Masked]', { message: e.message });
+    return { success: false, message: 'An unexpected error occurred.' };
+  }
+}
+
+
+const OTPSchema = z.object({
+  phone: z.string().regex(/^\d{10}$/, 'Invalid phone number format.'),
+  token: z.string().regex(/^\d{6}$/, 'OTP must be 6 digits.'),
+});
+
+export async function verifyMobileOTP(formData: FormData): Promise<ActionResult> {
+  try {
+    const validation = OTPSchema.safeParse(Object.fromEntries(formData));
+    if (!validation.success) {
+      return { 
+        success: false, 
+        message: 'Invalid OTP or phone number.',
+        error: validation.error.errors
+      };
+    }
+
+    const { phone, token } = validation.data;
+    const supabase = createSupabaseServerClient();
+    
+    const formattedPhone = `+91${phone}`;
+
+    const { error } = await supabase.auth.verifyOtp({
+      phone: formattedPhone,
+      token: token,
+      type: 'sms', // Explicitly setting type to 'sms'
+    });
+
+    if (error) {
+      console.error('VerifyOTPError: [Phone Redacted]', { message: error.message });
+      return { success: false, message: 'The OTP is incorrect or has expired.' }; // User-friendly error
+    }
+
+    revalidatePath('/', 'layout'); // Revalidate and refresh session
+    return { success: true, message: 'Verification successful. You are now signed in!' };
+
+  } catch (e: any) {
+    console.error('Unexpected VerifyOTP Error: [Input Masked]', { message: e.message });
+    return { success: false, message: 'An unexpected error occurred.' };
+  }
+}
