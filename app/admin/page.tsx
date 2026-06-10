@@ -69,29 +69,29 @@ export default async function AdminDashboard() {
       label: 'Total Farmers', 
       value: stats.totalUsers, 
       icon: Users, 
-      color: 'text-blue-600', 
-      bg: 'bg-blue-100' 
+      color: 'text-info-600', 
+      bg: 'bg-info-100' 
     },
     { 
       label: 'Pending Questions', 
       value: stats.pendingQuestions, 
       icon: HelpCircle, 
-      color: 'text-amber-600', 
-      bg: 'bg-amber-100' 
+      color: 'text-earth-600', 
+      bg: 'bg-earth-100' 
     },
     { 
       label: 'Verify Requests', 
       value: stats.pendingVerifications, 
       icon: CheckCircle, 
-      color: 'text-green-600', 
-      bg: 'bg-green-100' 
+      color: 'text-brand-600', 
+      bg: 'bg-brand-100' 
     },
     { 
       label: 'Active Reports', 
       value: 0, 
       icon: AlertCircle, 
-      color: 'text-red-600', 
-      bg: 'bg-red-100' 
+      color: 'text-danger-600', 
+      bg: 'bg-danger-100' 
     },
   ];
 
@@ -124,7 +124,7 @@ export default async function AdminDashboard() {
         <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
             <h2 className="font-semibold text-slate-800">Recent Guest Questions</h2>
-            <Link href="/admin/questions" className="text-sm text-green-600 font-medium hover:underline flex items-center">
+            <Link href="/admin/questions" className="text-sm text-brand-600 font-medium hover:underline flex items-center">
               View All <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
           </div>
@@ -156,7 +156,7 @@ export default async function AdminDashboard() {
         <div className="space-y-6">
           <div className="bg-slate-900 rounded-xl p-6 text-white">
             <h3 className="flex items-center text-lg font-semibold mb-4">
-              <TrendingUp className="w-5 h-5 mr-2 text-green-400" />
+              <TrendingUp className="w-5 h-5 mr-2 text-brand-400" />
               Platform Growth
             </h3>
             <p className="text-slate-400 text-sm mb-6">
@@ -164,7 +164,7 @@ export default async function AdminDashboard() {
             </p>
             <div className="space-y-4">
               <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-green-500 w-[70%]"></div>
+                <div className="h-full bg-brand-500 w-[70%]"></div>
               </div>
               <div className="flex justify-between text-xs text-slate-400">
                 <span>Storage Limit</span>

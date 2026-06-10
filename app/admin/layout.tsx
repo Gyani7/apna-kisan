@@ -29,7 +29,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <aside className="hidden md:flex md:w-64 flex-col bg-slate-900 text-slate-300">
         <div className="p-6 flex items-center gap-2 border-b border-slate-800">
-          <ShieldCheck className="text-emerald-500 w-8 h-8" />
+          <ShieldCheck className="text-brand-500 w-8 h-8" />
           <span className="font-bold text-xl text-white tracking-tight">AK ADMIN</span>
         </div>
         
@@ -42,7 +42,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 href={link.href}
                 className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-slate-800 hover:text-white group"
               >
-                <Icon className="w-5 h-5 group-hover:text-emerald-400" />
+                <Icon className="w-5 h-5 group-hover:text-brand-400" />
                 <span className="font-medium">{link.name}</span>
               </Link>
             );
@@ -50,7 +50,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
 
         <div className="p-4 border-t border-slate-800">
-          <button className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 hover:text-red-400 transition-colors">
+          <button className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 hover:text-danger-400 transition-colors">
             <LogOut className="w-5 h-5" />
             <span className="font-medium">Logout</span>
           </button>
@@ -73,9 +73,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex flex-col text-right">
               <span className="text-sm font-medium text-slate-900">System Admin</span>
-              <span className="text-xs text-emerald-600 font-bold uppercase">Root Access</span>
+              <span className="text-xs text-brand-600 font-bold uppercase">Root Access</span>
             </div>
-            <div className="h-10 w-10 rounded-full bg-slate-200 border-2 border-emerald-500 flex items-center justify-center text-slate-700 font-bold">
+            <div className="h-10 w-10 rounded-full bg-slate-200 border-2 border-brand-500 flex items-center justify-center text-slate-700 font-bold">
               AD
             </div>
           </div>

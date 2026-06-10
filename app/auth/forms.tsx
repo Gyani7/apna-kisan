@@ -1,4 +1,4 @@
-'use client';
+8'use client';
 
 import { useState, useTransition } from 'react';
 import { ActionResult, signInWithPassword, signUpWithPassword, sendMobileOTP, verifyMobileOTP } from '@/lib/actions/auth';
@@ -10,7 +10,7 @@ function FormFeedback({ message, type }: { message: string; type: 'error' | 'suc
   const baseClasses = 'px-4 py-2 my-2 text-sm font-medium rounded-md';
   const typeClasses = type === 'error' 
     ? 'bg-red-100 text-red-700' 
-    : 'bg-green-100 text-green-700';
+    : 'bg-brand-100 text-brand-700';
   return <div className={`${baseClasses} ${typeClasses}`}>{message}</div>;
 }
 
