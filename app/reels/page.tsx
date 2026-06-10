@@ -1,73 +1,107 @@
-'use client';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import ReelsFeed from './ReelsFeed'; // Client component for the UI
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { Play, Heart, MessageCircle, Film } from 'lucide-react';
-import Header from '@/components/Header';
-import BottomNav from '@/components/BottomNav';
-import AuthProvider from '@/components/AuthProvider';
-import { getReels } from '@/lib/supabase';
-import type { ReelRow } from '@/lib/database.types';
-import { formatCount } from '@/lib/types';
+// Strictly typed data structure for each reel, ensuring type safety.
+export type ReelData = {
+  id: string;
+  created_at: string;
+  video_url: string;
+  caption: string | null;
+  likes_count: number | null;
+  comments_count: number | null;
+  user: {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
+  village: {
+    id: number;
+    name: string | null;
+  } | null;
+  comments: {
+    id: string;
+    content: string;
+    created_at: string;
+    user: {
+        full_name: string | null;
+    } | null
+  }[];
+  user_has_liked_reel: boolean;
+};
 
-export default function ReelsPage() {
-  const [reels, setReels] = useState<(ReelRow & { profiles?: { username: string; full_name: string | null; avatar_url: string | null; badge: string } })[]>([]);
-
-  useEffect(() => {
-    getReels(20).then((data) => { if (data) setReels(data); });
-  }, []);
-
-  return (
-    <AuthProvider>
-      <Header />
-      <main className="pt-14 pb-20 min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Kisan Reels</h1>
-
-          {reels.length === 0 ? (
-            <div className="card p-12 text-center">
-              <div className="w-20 h-20 bg-brand-100 dark:bg-brand-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Film size={36} className="text-brand-600 dark:text-brand-400" />
-              </div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">Reels jald aa rahe hain</h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Short farming videos aur tips yahan hongi!</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {reels.map((reel) => {
-                const author = reel.profiles;
-                const authorName = author?.full_name ?? author?.username ?? 'Kisan';
-                return (
-                  <div key={reel.id} className="relative rounded-2xl overflow-hidden aspect-[9/16] bg-gray-900 group cursor-pointer">
-                    {reel.thumbnail_url ? (
-                      <Image src={reel.thumbnail_url} alt="" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-b from-brand-800 to-brand-950 flex items-center justify-center">
-                        <Film size={40} className="text-brand-400/50" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-                        <Play size={24} className="text-white ml-1" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-3">
-                      <p className="text-white text-sm font-semibold truncate">{authorName}</p>
-                      {reel.caption && <p className="text-gray-200 text-xs line-clamp-1 mt-0.5">{reel.caption}</p>}
-                      <div className="flex items-center gap-3 mt-1.5">
-                        <span className="flex items-center gap-1 text-white/80 text-xs"><Heart size={12} />{formatCount(reel.likes_count)}</span>
-                        <span className="flex items-center gap-1 text-white/80 text-xs"><MessageCircle size={12} />{formatCount(reel.comments_count)}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </main>
-      <BottomNav />
-    </AuthProvider>
+// Next.js 15 Server Component: Responsible for data fetching and passing to the client.
+export default async function ReelsPage() {
+  const cookieStore = cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!,
+    {
+      cookies: {
+        get: (name) => cookieStore.get(name)?.value,
+      },
+    }
   );
+
+  let reels: ReelData[] = [];
+  let fetchError: string | null = null;
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Fetch reels data with joins for user, village, and comments.
+    const { data: reelsData, error } = await supabase
+      .from('reels')
+      .select(`
+        id,
+        created_at,
+        video_url,
+        caption,
+        likes_count,
+        comments_count,
+        user:profiles(id, full_name, avatar_url),
+        village:villages(id, name),
+        comments:reel_comments(id, content, created_at, user:profiles(full_name))
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    if (reelsData) {
+      let likedReelIds = new Set();
+      if (user) {
+          const reelIds = reelsData.map(r => r.id);
+          // Fetch the likes for the current user for the loaded reels
+          const { data: likesData, error: likesError } = await supabase
+              .from('reel_likes')
+              .select('reel_id')
+              .in('reel_id', reelIds)
+              .eq('user_id', user.id);
+
+          if (likesError) {
+              // Data Masking: Log the internal error without exposing sensitive details
+              console.error("Reels Fetch Likes Error: [User ID Masked]", { message: likesError.message });
+          } else if (likesData) {
+              likedReelIds = new Set(likesData.map(l => l.reel_id));
+          }
+      }
+
+      // Map over the reels data to add the `user_has_liked_reel` property.
+      reels = reelsData.map(reel => ({
+        ...reel,
+        comments: reel.comments ?? [], // Ensure comments is always an array for safety
+        user_has_liked_reel: likedReelIds.has(reel.id)
+      })) as ReelData[];
+    }
+
+  } catch (e: any) {
+    // Data Masking: Log the error for debugging without exposing internals.
+    console.error('Reels Fetch Error: [Database Query Redacted]', { message: e.message });
+    fetchError = 'Could not load reels at this time.';
+  }
+
+  // Pass the safely fetched and augmented data to the client component.
+  return <ReelsFeed serverReels={reels} fetchError={fetchError} />;
 }
