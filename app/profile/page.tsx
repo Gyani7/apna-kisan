@@ -3,18 +3,17 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Settings, MapPin, LocationEdit as Edit2, Trophy, Star, Sprout, Award } from 'lucide-react';
+import { Settings, MapPin, Edit2, Trophy, Star, Sprout, Award, CheckCircle, Info } from 'lucide-react';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { getPosts, updateProfile, uploadFile, BUCKETS } from '@/lib/supabase';
+import { getPosts, updateProfile, uploadFile, BUCKETS, createClient } from '@/lib/supabase';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 import type { PostWithAuthor } from '@/lib/types';
-import type { ProfileRow } from '@/lib/database.types';
 import clsx from 'clsx';
-
-const BADGE_ICONS: Record<string, typeof Sprout> = { 'New Kisan': Sprout, 'Verified Kisan': Star, 'Expert Kisan': Award, 'Organic Farmer': Sprout };
+import ReputationBadge from '@/components/reputation/ReputationBadge';
+import VerificationUpload from '@/components/reputation/VerificationUpload';
 
 function ProfileContent() {
   const { user, profile, refreshProfile } = useAuth();
@@ -24,13 +23,27 @@ function ProfileContent() {
   const [editName, setEditName] = useState('');
   const [editBio, setEditBio] = useState('');
   const [editLocation, setEditLocation] = useState('');
+  const [verificationRequest, setVerificationRequest] = useState<any>(null);
 
   useEffect(() => {
     if (!user) return;
+    
+    // Fetch posts
     getPosts({ limit: 20 }).then((data) => {
       const typed = mapPostsToPostWithAuthor(data ?? []).filter((p) => p.user_id === user.id);
       setPosts(typed);
     });
+
+    // Fetch latest verification request
+    const supabase = createClient();
+    supabase
+      .from('verification_requests')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+      .then(({ data }) => setVerificationRequest(data));
   }, [user]);
 
   useEffect(() => {
@@ -72,7 +85,7 @@ function ProfileContent() {
     );
   }
 
-  const initials = (profile.full_name ?? profile.username).split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+  const initials = (profile.full_name ?? profile.username).split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
     <div>
@@ -98,36 +111,66 @@ function ProfileContent() {
           </button>
         </div>
 
-        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{profile.full_name ?? profile.username}</h2>
-        <div className="flex items-center gap-1 mt-1 text-gray-500 dark:text-gray-400 text-sm">
-          <MapPin size={13} className="text-brand-500" />
-          <span>{profile.location ?? 'Location add karein'}</span>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{profile.full_name ?? profile.username}</h2>
+            <div className="flex items-center gap-1 mt-1 text-gray-500 dark:text-gray-400 text-sm">
+              <MapPin size={13} className="text-brand-500" />
+              <span>{profile.location ?? 'Location add karein'}</span>
+            </div>
+          </div>
+          <ReputationBadge reputation_points={profile.reputation_points} is_verified={profile.is_verified} />
         </div>
+        
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">{profile.bio ?? 'Apne baare mein bataiye...'}</p>
 
-        {/* Badges & Reputation */}
-        <div className="flex flex-wrap items-center gap-2 mt-3">
-          <span className="badge bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">
-            <Trophy size={11} className="mr-1" />{profile.reputation} pts
-          </span>
-          <span className="badge bg-earth-100 dark:bg-earth-900/30 text-earth-700 dark:text-earth-400">
-            {(() => { const Icon = BADGE_ICONS[profile.badge] ?? Sprout; return <Icon size={11} className="mr-1" />; })()}
-            {profile.badge}
-          </span>
+        {/* Verification Status Section */}
+        <div className="mt-6">
+          {profile.is_verified ? (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 p-4 rounded-xl flex items-center gap-3">
+              <CheckCircle className="text-blue-600 dark:text-blue-400" size={20} />
+              <div>
+                <p className="text-blue-900 dark:text-blue-100 font-bold text-sm">Verified Farmer Account</p>
+                <p className="text-blue-700 dark:text-blue-300 text-xs">Aapka account verified hai. Trust aur credibility ke saath community se judiye.</p>
+              </div>
+            </div>
+          ) : (
+            <VerificationUpload />
+          )}
+        </div>
+
+        {/* Reputation Card */}
+        <div className="card mt-4 p-4 border border-brand-100 dark:border-brand-900/50">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <Trophy size={18} className="text-yellow-500" /> Reputation Points
+            </h3>
+            <span className="text-brand-700 dark:text-brand-400 font-bold text-lg">{profile.reputation_points} pts</span>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Points kaise earn karein:</p>
+            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400">
+              <div className="flex justify-between"><span>Sawaal Poochna</span> <span className="font-bold text-brand-600">+2</span></div>
+              <div className="flex justify-between"><span>Jawab Dena</span> <span className="font-bold text-brand-600">+10</span></div>
+              <div className="flex justify-between"><span>Upvote Milna</span> <span className="font-bold text-brand-600">+5</span></div>
+              <div className="flex justify-between"><span>Post Share</span> <span className="font-bold text-brand-600">+3</span></div>
+              <div className="flex justify-between"><span>Comment Karna</span> <span className="font-bold text-brand-600">+2</span></div>
+            </div>
+          </div>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-3 divide-x divide-gray-100 dark:divide-gray-700 card mt-4">
           <div className="flex flex-col items-center py-4">
-            <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{profile.posts_count}</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{profile.posts_count || 0}</span>
             <span className="text-xs text-gray-500 dark:text-gray-400">Posts</span>
           </div>
           <div className="flex flex-col items-center py-4">
-            <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{profile.followers_count}</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{profile.followers_count || 0}</span>
             <span className="text-xs text-gray-500 dark:text-gray-400">Followers</span>
           </div>
           <div className="flex flex-col items-center py-4">
-            <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{profile.following_count}</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{profile.following_count || 0}</span>
             <span className="text-xs text-gray-500 dark:text-gray-400">Following</span>
           </div>
         </div>
@@ -145,7 +188,10 @@ function ProfileContent() {
         {/* Posts */}
         <div className="flex flex-col gap-4 mt-4">
           {posts.length === 0 ? (
-            <p className="text-center text-gray-400 dark:text-gray-500 py-8">Abhi koi post nahi hai</p>
+            <div className="text-center py-12">
+               <Info size={32} className="mx-auto text-gray-300 dark:text-gray-600 mb-2" />
+               <p className="text-gray-400 dark:text-gray-500">Abhi koi post nahi hai</p>
+            </div>
           ) : (
             posts.map((post) => <PostCard key={post.id} post={post} compact />)
           )}

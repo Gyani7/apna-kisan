@@ -69,3 +69,85 @@ export function generateWebsiteSchema() {
     },
   };
 }
+
+export function generateQuestionSchema(question: {
+  title: string;
+  content: string;
+  url: string;
+  authorName: string;
+  createdAt: string;
+  upvoteCount: number;
+}, answers: Array<{
+  content: string;
+  authorName: string;
+  createdAt: string;
+  upvoteCount: number;
+  isBestAnswer?: boolean;
+}>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'QAPage',
+    mainEntity: {
+      '@type': 'Question',
+      name: question.title,
+      text: question.content,
+      answerCount: answers.length,
+      upvoteCount: question.upvoteCount,
+      datePublished: question.createdAt,
+      author: { '@type': 'Person', name: question.authorName },
+      suggestedAnswer: answers.map(ans => ({
+        '@type': 'Answer',
+        text: ans.content,
+        datePublished: ans.createdAt,
+        upvoteCount: ans.upvoteCount,
+        author: { '@type': 'Person', name: ans.authorName },
+      })),
+      acceptedAnswer: answers.find(ans => ans.isBestAnswer) ? {
+        '@type': 'Answer',
+        text: answers.find(ans => ans.isBestAnswer)?.content,
+        datePublished: answers.find(ans => ans.isBestAnswer)?.createdAt,
+        upvoteCount: answers.find(ans => ans.isBestAnswer)?.upvoteCount,
+        author: { '@type': 'Person', name: answers.find(ans => ans.isBestAnswer)?.authorName },
+      } : undefined,
+    },
+  };
+}
+
+export function generateProfileSchema(profile: {
+  name: string;
+  bio?: string;
+  url: string;
+  image?: string;
+  level?: string;
+  isVerified?: boolean;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: profile.name,
+    description: profile.bio,
+    url: profile.url,
+    image: profile.image,
+    jobTitle: profile.level ?? 'Farmer',
+    ...(profile.isVerified && {
+      identifier: {
+        '@type': 'PropertyValue',
+        name: 'Verified Farmer',
+        value: 'True'
+      }
+    })
+  };
+}
+
+export function generateBreadcrumbSchema(items: { name: string; item: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: `${SITE_URL}${item.item}`,
+    })),
+  };
+}
