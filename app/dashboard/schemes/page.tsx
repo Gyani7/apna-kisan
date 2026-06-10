@@ -18,6 +18,14 @@ interface SchemeMatch {
 }
 
 function SchemeCard({ match }: { match: SchemeMatch }) {
+  // Ensure match and scheme objects are not null before accessing properties.
+  if (!match || !match.government_schemes) {
+    // In a real scenario, you might log this unexpected state.
+    console.error('Error: Incomplete match data provided to SchemeCard.');
+    // Fallback to a null render to prevent a crash.
+    return null;
+  }
+
   const { government_schemes: scheme, is_eligible, match_score } = match;
   const matchPercentage = Math.round(match_score * 100);
 
@@ -37,9 +45,10 @@ function SchemeCard({ match }: { match: SchemeMatch }) {
       <div className="p-4">
         <div className="mb-4">
             <h4 className="font-semibold text-gray-700 mb-2">Key Benefits</h4>
+            {/* Null check: Ensure benefits array exists before mapping */}
             <ul className="space-y-2">
-                {scheme.benefits.map((benefit, i) => (
-                    <li key={i} className="flex items-center gap-2 text-gray-600">
+                {scheme.benefits && scheme.benefits.map((benefit, i) => (
+                    <li key={`${scheme.id}-benefit-${i}`} className="flex items-center gap-2 text-gray-600">
                         <Check size={16} className="text-green-500"/> {benefit}
                     </li>
                 ))}
@@ -77,11 +86,17 @@ export default function SchemesPage() {
 
   useEffect(() => {
     startTransition(async () => {
-      const result = await matchUserToSchemes();
-      if (result.success) {
-        setMatches(result.matches || []);
-      } else {
-        setError(result.message || 'An unknown error occurred.');
+      try {
+        const result = await matchUserToSchemes();
+        if (result.success && result.matches) {
+          setMatches(result.matches);
+        } else {
+          setError(result.message || 'An unknown error occurred.');
+        }
+      } catch (e: any) {
+        // Catch unexpected errors from the server action itself.
+        setError('Failed to communicate with the server.');
+        console.error('Scheme Match Action Failed:', e.message);
       }
     });
   }, []);
@@ -103,7 +118,8 @@ export default function SchemesPage() {
           </div>
         ) : matches.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {matches.map(match => (
+                {/* Null check: Ensure matches array is not null before mapping */}
+                {matches && matches.map(match => (
                     <SchemeCard key={match.government_schemes.id} match={match} />
                 ))}
             </div>
