@@ -6,11 +6,11 @@ import Image from 'next/image';
 import { Search, Bell, Moon, Sun, LogIn, X } from 'lucide-react';
 import { useTheme } from '@/components/ThemeProvider';
 import { useAuth } from '@/components/AuthProvider';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 import type { NotificationRow } from '@/lib/database.types';
 import { timeAgo } from '@/lib/types';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 async function getNotifications(userId: string) {
     const { data } = await supabase

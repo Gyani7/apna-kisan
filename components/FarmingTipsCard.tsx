@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { Leaf, TrendingUp, CircleAlert as AlertCircle, CloudRain } from 'lucide-react';
 import type { FarmingTipRow } from '@/lib/database.types';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 async function getFarmingTips() {
     const { data } = await supabase.from('farming_tips').select('*').eq('is_active', true).limit(4);

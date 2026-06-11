@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { Mail } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 async function signInWithEmail(email: string) {
   return await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${location.origin}/auth/callback` } });

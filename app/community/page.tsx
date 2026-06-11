@@ -5,13 +5,13 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
 import AuthProvider from '@/components/AuthProvider';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 import type { PostWithAuthor } from '@/lib/types';
 import { Search } from 'lucide-react';
 import clsx from 'clsx';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 async function getPosts({ postType, orderBy = 'created_at', limit = 20 }: { postType?: string, orderBy?: string, limit?: number }) {
   let query = supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge)');

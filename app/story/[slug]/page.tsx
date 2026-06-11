@@ -5,28 +5,36 @@ import { MapPin, Clock, Heart, MessageCircle, Share2, Bookmark, ArrowLeft, Tag }
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import AuthProvider from '@/components/AuthProvider';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/lib/supabase/utils';
 import { cookies } from 'next/headers';
 import { generatePageMeta, generateArticleSchema } from '@/lib/seo';
 import { mapPostToPostWithAuthor } from '@/lib/mappers';
 import { timeAgo, formatCount } from '@/lib/types';
 import type { Metadata } from 'next';
+import type { Database } from '@/lib/database.types';
 
-const supabase = createServerComponentClient({ cookies });
+type Post = Database['public']['Tables']['posts']['Row'] & {
+  author: Database['public']['Tables']['profiles']['Row'] | null;
+};
 
 async function getPostBySlug(slug: string) {
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
   const { data } = await supabase
     .from('posts')
     .select('*, author:profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')
     .eq('slug', slug)
-    .single();
+    .single<Post>();
   return data;
 }
 
-interface Props { params: Promise<{ slug: string }> }
+// CORRECT: params is a direct object, not a Promise.
+interface Props {
+  params: { slug: string };
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug } = params; // CORRECT: Removed 'await'
   const story = await getPostBySlug(slug);
   if (!story) return { title: 'Story Not Found' };
 
@@ -40,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function StoryPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug } = params; // CORRECT: Removed 'await'
   const rawStory = await getPostBySlug(slug);
 
   if (!rawStory) notFound();
@@ -85,7 +93,7 @@ export default async function StoryPage({ params }: Props) {
               {author?.avatar_url ? (
                 <Image src={author.avatar_url} alt="" width={48} height={48} className="rounded-full object-cover" />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold">{authorName[0]}</div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold">{authorName?.[0] ?? 'K'}</div>
               )}
             </Link>
             <div>
@@ -102,7 +110,8 @@ export default async function StoryPage({ params }: Props) {
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{story.content}</p>
           </div>
 
-          {story.tags.length > 0 && (
+          {/* COMPLIANT: Check for array existence and length before mapping */}
+          {story.tags && story.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-6">
               {story.tags.map((tag) => (
                 <Link key={tag} href={`/community?q=${tag}`} className="badge bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">

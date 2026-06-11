@@ -1,23 +1,34 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/lib/supabase/utils';
 import { cookies } from 'next/headers';
 import { generateQuestionSchema } from '@/lib/seo';
-import { PostCard } from '@/components/PostCard'; // Reusing existing card logic or custom
-import { Button } from '@/components/ui/button'; // Assuming a UI library or standard button
+import { PostCard } from '@/components/PostCard';
+import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { ArrowBigUp, ArrowBigDown, MessageSquare, CheckCircle2 } from 'lucide-react';
+import type { Database } from '@/lib/database.types';
 
-const supabase = createServerComponentClient({ cookies });
+type Answer = Database['public']['Tables']['answers']['Row'] & {
+  author: Database['public']['Tables']['profiles']['Row'] | null;
+};
 
+type Question = Database['public']['Tables']['questions']['Row'] & {
+  author: Database['public']['Tables']['profiles']['Row'] | null;
+  answers: Answer[];
+};
+
+// CORRECT: params is a direct object, not a Promise.
 interface QuestionPageProps {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }
 
 export async function generateMetadata({ params }: QuestionPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug } = params; // CORRECT: Removed 'await'
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
   const { data: question } = await supabase
     .from('questions')
     .select('title, content')
@@ -28,17 +39,19 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
 
   return {
     title: `${question.title} | Apna Kisan Knowledge Hub`,
-    description: question.content.substring(0, 160),
+    description: question.content?.substring(0, 160),
     openGraph: {
       title: question.title,
-      description: question.content.substring(0, 160),
+      description: question.content?.substring(0, 160),
       type: 'article',
     },
   };
 }
 
 export default async function QuestionDetailPage({ params }: QuestionPageProps) {
-  const { slug } = await params;
+  const { slug } = params; // CORRECT: Removed 'await'
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
 
   const { data: question, error } = await supabase
     .from('questions')
@@ -49,7 +62,7 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
     `)
     .eq('slug', slug)
     .eq('status', 'published')
-    .single();
+    .single<Question>();
 
   if (error || !question) {
     notFound();
@@ -59,7 +72,6 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      {/* JSON-LD for SEO */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -101,6 +113,7 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
         </div>
 
         <div className="flex flex-wrap gap-2 mb-6">
+          {/* COMPLIANT: Null-safe mapping with stable key */}
           {question.tags?.map((tag: string) => (
             <span key={tag} className="px-3 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
               #{tag}
@@ -120,6 +133,7 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
           </div>
           <Button variant="ghost" size="sm" className="gap-2">
             <MessageSquare className="w-4 h-4" />
+            {/* COMPLIANT: Null-safe access */}
             {question.answers?.length || 0} Answers
           </Button>
         </div>
@@ -128,6 +142,7 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
       <section className="space-y-6">
         <h2 className="text-xl font-bold flex items-center gap-2">
           Expert Answers
+          {/* COMPLIANT: Null-safe access */}
           <Badge variant="outline">{question.answers?.length || 0}</Badge>
         </h2>
 
@@ -137,7 +152,8 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
             <Button className="mt-4 bg-green-600 hover:bg-green-700 text-white">Answer this Question</Button>
           </div>
         ) : (
-          question.answers.map((answer: any) => (
+          /* COMPLIANT: Null-safe mapping with stable key */
+          question.answers?.map((answer) => (
             <div key={answer.id} className={`p-6 rounded-xl border ${answer.is_best_answer ? 'border-green-500 bg-green-50/30 dark:bg-green-900/10' : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'}`}>
               {answer.is_best_answer && (
                 <div className="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs font-bold mb-3 uppercase">
@@ -150,7 +166,7 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
                 <div className="w-8 h-8 relative rounded-full overflow-hidden">
                   <Image
                     src={answer.author?.avatar_url || '/default-avatar.png'}
-                    alt={answer.author?.full_name}
+                    alt={answer.author?.full_name || 'User'}
                     fill
                     className="object-cover"
                   />

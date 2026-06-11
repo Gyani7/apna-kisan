@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Sun, Droplets, TrendingUp, TrendingDown, Trophy, ArrowUpRight } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 import type { MandiRateRow, ProfileRow } from '@/lib/database.types';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 async function getMandiRates() {
     const { data } = await supabase.from('mandi_rates').select('*').order('updated_at', { ascending: false }).limit(4);

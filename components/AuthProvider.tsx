@@ -2,10 +2,10 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 import type { ProfileRow } from '@/lib/database.types';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 async function getProfile(userId: string) {
     const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();

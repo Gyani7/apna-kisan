@@ -8,14 +8,14 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 import type { PostWithAuthor } from '@/lib/types';
 import clsx from 'clsx';
 import ReputationBadge from '@/components/reputation/ReputationBadge';
 import VerificationUpload from '@/components/reputation/VerificationUpload';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 const BUCKETS = {
     posts: 'posts',

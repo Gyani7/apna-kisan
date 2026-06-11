@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useRef } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 import { createReelRecord, ActionResult } from '@/lib/actions/reels';
 import type { ReelData } from './page';
 import { Plus, Video, Send, Loader2 } from 'lucide-react';
@@ -15,7 +15,7 @@ function UploadReelForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const supabase = createClientComponentClient();
+  const supabase = createBrowser();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

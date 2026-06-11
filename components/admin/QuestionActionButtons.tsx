@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 export default function QuestionActionButtons({ questionId }: { questionId: string }) {
   const [loading, setLoading] = useState(false);

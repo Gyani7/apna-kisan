@@ -1,6 +1,6 @@
 'use server';
 
-import { createServerActionClient } from '@supabase/auth-helpers-nextjs';
+import { createServer } from '@/lib/supabase/utils';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
@@ -29,7 +29,7 @@ interface MatchResult {
  * Matches a user against a list of government schemes and upserts the results.
  */
 export async function matchUserToSchemes() {
-  const supabase = createServerActionClient({ cookies });
+  const supabase = createServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('User not authenticated');

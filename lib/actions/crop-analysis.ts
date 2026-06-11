@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createServerActionClient } from '@supabase/auth-helpers-nextjs';
+import { createServer } from '@/lib/supabase/utils';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
@@ -50,7 +50,7 @@ interface AnalysisFormState {
 }
 
 export async function analyzeCropImage(prevState: AnalysisFormState, formData: FormData): Promise<AnalysisFormState> {
-  const supabase = createServerActionClient({ cookies });
+  const supabase = createServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return { success: false, message: 'Authentication Error: Please log in to use this feature.' };

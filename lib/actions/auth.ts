@@ -1,198 +1,149 @@
 'use server';
 
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { z } from 'zod';
+import { createServer } from '@/lib/supabase/utils';
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
 
-// Define a unified, type-safe return structure for all actions.
-// This prevents implicit 'any' types on the client.
+// Common type for action results
 export type ActionResult = {
   success: boolean;
   message: string;
-  error?: {
-    path: (string | number)[];
-    message: string;
-  }[] | null;
 };
 
-// Helper to create a Supabase server client
-function createSupabaseServerClient() {
-  const cookieStore = cookies();
-  // NOTE: Using SUPABASE_SECRET_KEY for server-side actions is correct.
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SECRET_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options) {
-          try {
-            cookieStore.set({ name, value, ...options });
-          } catch (error) {
-            // This can fail during Next.js build.
-          }
-        },
-        remove(name: string, options) {
-          try {
-            cookieStore.set({ name, value: '', ...options });
-          } catch (error) {
-            // This can fail during Next.js build.
-          }
-        },
-      },
-    }
-  );
-}
-
-// --- PASSWORD AUTHENTICATION ACTIONS ---
-
-const PasswordSchema = z.object({
+// --- Schema Definitions ---
+const EmailPasswordSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters long'),
+  password: z.string().min(6, 'Password must be at least 6 characters long'),
 });
-
-export async function signUpWithPassword(formData: FormData): Promise<ActionResult> {
-  try {
-    const validation = PasswordSchema.safeParse(Object.fromEntries(formData));
-    if (!validation.success) {
-      return { 
-        success: false, 
-        message: 'Invalid form data.', 
-        error: validation.error.errors 
-      };
-    }
-
-    const { email, password } = validation.data;
-    const supabase = createSupabaseServerClient();
-
-    const { error } = await supabase.auth.signUp({ email, password });
-
-    if (error) {
-      // Data Masking: Log internal errors without exposing sensitive user info.
-      console.error('SignUpError: [Email Redacted]', { message: error.message });
-      return { success: false, message: error.message };
-    }
-
-    revalidatePath('/', 'layout'); // Refresh user session info across the app
-    return { success: true, message: 'Sign up successful and logged in.' };
-
-  } catch (e: any) {
-    console.error('Unexpected SignUp Error: [Input Masked]', { message: e.message });
-    return { success: false, message: 'An unexpected error occurred.' };
-  }
-}
-
-export async function signInWithPassword(formData: FormData): Promise<ActionResult> {
-  try {
-    const validation = PasswordSchema.safeParse(Object.fromEntries(formData));
-    if (!validation.success) {
-      return { 
-        success: false, 
-        message: 'Invalid form data.', 
-        error: validation.error.errors 
-      };
-    }
-
-    const { email, password } = validation.data;
-    const supabase = createSupabaseServerClient();
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      console.error('SignInError: [Email Redacted]', { message: error.message });
-      return { success: false, message: 'Invalid credentials.' }; // Generic message for security
-    }
-
-    revalidatePath('/', 'layout');
-    return { success: true, message: 'Sign in successful.' };
-
-  } catch (e: any) {
-    console.error('Unexpected SignIn Error: [Input Masked]', { message: e.message });
-    return { success: false, message: 'An unexpected error occurred.' };
-  }
-}
-
-// --- MOBILE OTP AUTHENTICATION ACTIONS ---
 
 const PhoneSchema = z.object({
-  phone: z.string().regex(/^\d{10}$/, 'Please enter a valid 10-digit mobile number.'),
+  phone: z.string().regex(/^\d{10}$/, 'Please enter a valid 10-digit mobile number'),
 });
 
-export async function sendMobileOTP(formData: FormData): Promise<ActionResult> {
-  try {
-    const validation = PhoneSchema.safeParse(Object.fromEntries(formData));
-    if (!validation.success) {
-      return { 
-        success: false, 
-        message: 'Invalid phone number.',
-        error: validation.error.errors 
-      };
-    }
+const VerifyOTPSchema = z.object({
+  phone: z.string().regex(/^\d{10}$/, 'Invalid phone number format'),
+  token: z.string().min(6, 'OTP must be 6 digits').max(6, 'OTP must be 6 digits'),
+});
 
-    const { phone } = validation.data;
-    const supabase = createSupabaseServerClient();
 
-    // Important: Supabase requires the country code for phone auth. Assuming India (+91).
-    const formattedPhone = `+91${phone}`;
+// --- Password Authentication ---
+export async function signInWithPassword(formData: FormData): Promise<ActionResult> {
+  const supabase = createServer();
+  const validation = EmailPasswordSchema.safeParse(Object.fromEntries(formData.entries()));
 
-    const { error } = await supabase.auth.signInWithOtp({
-      phone: formattedPhone,
+  if (!validation.success) {
+    return { success: false, message: validation.error.errors.map(e => e.message).join(', ') };
+  }
+
+  const { email, password } = validation.data;
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    return { success: false, message: `Authentication failed: ${error.message}` };
+  }
+
+  revalidatePath('/', 'layout');
+  return { success: true, message: 'Successfully signed in!' };
+}
+
+export async function signUpWithPassword(formData: FormData): Promise<ActionResult> {
+  const supabase = createServer();
+  const validation = EmailPasswordSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!validation.success) {
+    return { success: false, message: validation.error.errors.map(e => e.message).join(', ') };
+  }
+
+  const { email, password } = validation.data;
+  const { error } = await supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      }
     });
 
-    if (error) {
-      console.error('SendOTPError: [Phone Redacted]', { message: error.message });
-      return { success: false, message: error.message };
-    }
-
-    return { success: true, message: 'An OTP has been sent to your mobile number.' };
-
-  } catch (e: any) {
-    console.error('Unexpected SendOTP Error: [Input Masked]', { message: e.message });
-    return { success: false, message: 'An unexpected error occurred.' };
+  if (error) {
+    return { success: false, message: `Sign-up failed: ${error.message}` };
   }
+
+  return { success: true, message: 'Sign-up successful! Please check your email to verify.' };
+}
+
+// --- Mobile OTP Authentication ---
+export async function sendMobileOTP(formData: FormData): Promise<ActionResult> {
+  const supabase = createServer();
+  const validation = PhoneSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!validation.success) {
+    return { success: false, message: validation.error.errors.map(e => e.message).join(', ') };
+  }
+  
+  const { phone } = validation.data;
+  
+  const { error } = await supabase.auth.signInWithOtp({
+    phone: `+91${phone}`, // Assuming Indian numbers
+  });
+
+  if (error) {
+    return { success: false, message: `Failed to send OTP: ${error.message}` };
+  }
+
+  return { success: true, message: 'OTP sent to your mobile number.' };
+}
+
+export async function verifyMobileOTP(formData: FormData): Promise<ActionResult> {
+  const supabase = createServer();
+  const validation = VerifyOTPSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!validation.success) {
+      return { success: false, message: validation.error.errors.map(e => e.message).join(', ') };
+  }
+  
+  const { phone, token } = validation.data;
+
+  const { error } = await supabase.auth.verifyOtp({
+    phone: `+91${phone}`,
+    token: token,
+    type: 'sms'
+  });
+
+  if (error) {
+    return { success: false, message: `Failed to verify OTP: ${error.message}` };
+  }
+
+  revalidatePath('/', 'layout');
+  return { success: true, message: 'Successfully verified and signed in!' };
 }
 
 
-const OTPSchema = z.object({
-  phone: z.string().regex(/^\d{10}$/, 'Invalid phone number format.'),
-  token: z.string().regex(/^\d{6}$/, 'OTP must be 6 digits.'),
-});
+// --- Existing Functions (retained and updated) ---
 
-export async function verifyMobileOTP(formData: FormData): Promise<ActionResult> {
-  try {
-    const validation = OTPSchema.safeParse(Object.fromEntries(formData));
-    if (!validation.success) {
-      return { 
-        success: false, 
-        message: 'Invalid OTP or phone number.',
-        error: validation.error.errors
-      };
-    }
-
-    const { phone, token } = validation.data;
-    const supabase = createSupabaseServerClient();
-    
-    const formattedPhone = `+91${phone}`;
-
-    const { error } = await supabase.auth.verifyOtp({
-      phone: formattedPhone,
-      token: token,
-      type: 'sms', // Explicitly setting type to 'sms'
+export async function signInWithEmail(email: string) {
+    const supabase = createServer();
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      }
     });
+    return { error };
+}
 
-    if (error) {
-      console.error('VerifyOTPError: [Phone Redacted]', { message: error.message });
-      return { success: false, message: 'The OTP is incorrect or has expired.' }; // User-friendly error
-    }
+export async function signInWithGoogle() {
+    const supabase = createServer();
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      }
+    });
+    return { data, error };
+}
 
-    revalidatePath('/', 'layout'); // Revalidate and refresh session
-    return { success: true, message: 'Verification successful. You are now signed in!' };
-
-  } catch (e: any) {
-    console.error('Unexpected VerifyOTP Error: [Input Masked]', { message: e.message });
-    return { success: false, message: 'An unexpected error occurred.' };
-  }
+export async function signOut() {
+    const supabase = createServer();
+    const { error } = await supabase.auth.signOut();
+    revalidatePath('/', 'layout');
+    return { error };
 }

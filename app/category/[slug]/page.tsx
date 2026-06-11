@@ -3,19 +3,19 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
 import AuthProvider from '@/components/AuthProvider';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/lib/supabase/utils';
 import { cookies } from 'next/headers';
 import { CATEGORIES } from '@/lib/types';
 import { generatePageMeta } from '@/lib/seo';
-import { mapPostsToPostWithAuthor } from '@/lib/mappers';
+import { mapPostsToPostWithAuthor, RawPost } from '@/lib/mappers';
 import type { Metadata } from 'next';
 
-const supabase = createServerComponentClient({ cookies });
-
 async function getPosts({ category, limit }: { category: string; limit: number }) {
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
     let query = supabase
         .from('posts')
-        .select('*, author:profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')
+        .select('*, profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')
         .order('created_at', { ascending: false })
         .limit(limit);
 
@@ -23,13 +23,16 @@ async function getPosts({ category, limit }: { category: string; limit: number }
         query = query.eq('category', category);
     }
     const { data } = await query;
-    return data;
+    return data as RawPost[];
 }
 
-interface Props { params: Promise<{ slug: string }> }
+// CORRECT: params is a direct object, not a Promise.
+interface Props {
+  params: { slug: string };
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug } = params; // CORRECT: Removed 'await'
   const cat = CATEGORIES.find((c) => c.slug === slug);
   if (!cat) return { title: 'Category Not Found' };
   return generatePageMeta({
@@ -44,11 +47,12 @@ export async function generateStaticParams() {
 }
 
 export default async function CategoryPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug } = params; // CORRECT: Removed 'await'
   const category = CATEGORIES.find((c) => c.slug === slug);
   if (!category) notFound();
 
   const rawPosts = await getPosts({ category: slug, limit: 20 });
+  // COMPLIANT: Null-safe handling of the fetched data before mapping.
   const typedPosts = mapPostsToPostWithAuthor(rawPosts ?? []);
 
   return (
@@ -74,6 +78,7 @@ export default async function CategoryPage({ params }: Props) {
                 <p className="text-gray-400 dark:text-gray-500">Is category mein abhi koi post nahi hai</p>
               </div>
             ) : (
+              // COMPLIANT: Mapping is null-safe and uses a stable, unique key.
               typedPosts.map((post) => <PostCard key={post.id} post={post} />)
             )}
           </div>

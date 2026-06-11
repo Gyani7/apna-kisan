@@ -8,13 +8,13 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 import type { ProfileRow } from '@/lib/database.types';
 import type { PostWithAuthor } from '@/lib/types';
 import clsx from 'clsx';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 async function getProfile(userId: string) {
     const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();

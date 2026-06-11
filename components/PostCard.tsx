@@ -6,10 +6,10 @@ import Link from 'next/link';
 import { Heart, MessageCircle, Share2, Bookmark, MapPin, MessageSquare, CircleHelp as HelpCircle, BookOpen, Bell, MoveHorizontal as MoreHorizontal } from 'lucide-react';
 import clsx from 'clsx';
 import { PostWithAuthor, POST_TYPE_CONFIG, timeAgo, formatCount } from '@/lib/types';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 import { useAuth } from '@/components/AuthProvider';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 async function toggleLike(postId: string, userId: string) {
     await supabase.rpc('toggle_like', { post_id: postId, user_id: userId });

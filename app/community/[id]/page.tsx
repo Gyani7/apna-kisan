@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useParams } from 'next/navigation'; // CORRECT: Import useParams hook
 import { ArrowLeft, Heart, MessageCircle, Share2, Bookmark, Send, MapPin } from 'lucide-react';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
@@ -26,7 +27,6 @@ async function addComment(postId: string, userId: string, content: string) {
 }
 
 async function toggleLike(postId: string, userId: string) {
-    // This would be a call to a Supabase Edge Function
     await supabase.rpc('toggle_post_like', { p_post_id: postId, p_user_id: userId });
 }
 
@@ -53,10 +53,11 @@ function mapComment(c: any): CommentWithAuthor {
   };
 }
 
+// CORRECT: Component receives no props; params are accessed via hook
+export default function PostDetailPage() {
+  const params = useParams();
+  const postId = params.id as string; // CORRECT: Get ID directly from params
 
-
-export default function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const [postId, setPostId] = useState<string>('');
   const [post, setPost] = useState<PostWithAuthor | null>(null);
   const [comments, setComments] = useState<CommentWithAuthor[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -65,12 +66,11 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
   const [isBookmarked, setIsBookmarked] = useState(false);
   const { user } = useAuth();
 
-  useEffect(() => {
-    params.then((p) => setPostId(p.id));
-  }, [params]);
-
+  // CORRECT: Simplified data fetching logic triggered by postId
   useEffect(() => {
     if (!postId) return;
+
+    // Fetch post details
     supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)').eq('id', postId).single().then(({ data }) => {
       if (data) {
         const mapped = mapPostToPostWithAuthor(data as RawPost);
@@ -78,15 +78,18 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
         setLikesCount(mapped.likes_count);
       }
     });
+
+    // Fetch comments
     getComments(postId).then((data) => {
       if (data) setComments(data.map(mapComment));
     });
   }, [postId]);
 
   async function handleComment() {
-    if (!user || !newComment.trim()) return;
+    if (!user || !newComment.trim() || !postId) return;
     const { data } = await addComment(postId, user.id, newComment.trim());
-    if (data) {
+    // OPTIMIZED: Added null and length check for type safety
+    if (data && data.length > 0) {
       setComments([...comments, mapComment(data[0])]);
       setNewComment('');
     }

@@ -1,40 +1,90 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
-  // 1. Check if the user is authenticated
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getSession()
 
-  if (!session) {
-    const url = req.nextUrl.clone();
-    url.pathname = '/auth';
-    return NextResponse.redirect(url);
+  // Redirect to home if user is authenticated and tries to access /auth
+  if (session && request.nextUrl.pathname.startsWith('/auth')) {
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
-  // 2. Fetch the user's role from the 'profiles' table
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', session.user.id)
-    .single();
-
-  // 3. If role is NOT 'admin', redirect to 403 or Access Denied
-  if (error || profile?.role !== 'admin') {
-    const url = req.nextUrl.clone();
-    url.pathname = '/403'; // Ensure you have this page or use rewrite
-    return NextResponse.rewrite(url);
+  // Redirect to /auth if user is not authenticated and tries to access a protected route
+  if (!session && !request.nextUrl.pathname.startsWith('/auth')) {
+    // Add any public paths here that should be accessible without authentication
+    const publicPaths = ['/', '/explore', '/community', '/reels'];
+    if (!publicPaths.includes(request.nextUrl.pathname)) {
+        return NextResponse.redirect(new URL('/auth', request.url))
+    }
   }
 
-  return res;
+
+  return response
 }
 
-// 5. Only apply this middleware to the '/admin/:path*' routes
 export const config = {
-  matcher: ['/admin/:path*'],
-};
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
+}

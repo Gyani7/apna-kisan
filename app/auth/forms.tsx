@@ -1,4 +1,4 @@
-8'use client';
+'use client';
 
 import { useState, useTransition } from 'react';
 import { ActionResult, signInWithPassword, signUpWithPassword, sendMobileOTP, verifyMobileOTP } from '@/lib/actions/auth';
@@ -43,7 +43,7 @@ export function AuthForm() {
         <h2 className="text-2xl font-semibold">Sign In or Sign Up</h2>
         <p className="text-gray-600">Enter your email and password.</p>
       </div>
-      <form className="space-y-4">
+      <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
         <input name="email" type="email" placeholder="Email" required className="w-full p-2 border rounded-md" />
         <input name="password" type="password" placeholder="Password" required className="w-full p-2 border rounded-md" />
         
@@ -51,10 +51,10 @@ export function AuthForm() {
         {success && <FormFeedback message={success} type="success" />}
         
         <div className="flex gap-4">
-          <Button type="submit" onClick={(e) => handleSubmit(e as any, signInWithPassword)} disabled={isPending}>
+          <Button type="button" onClick={(e) => handleSubmit(e.currentTarget.form as any, signInWithPassword)} disabled={isPending}>
             {isPending ? 'Signing In...' : 'Sign In'}
           </Button>
-          <Button type="submit" onClick={(e) => handleSubmit(e as any, signUpWithPassword)} disabled={isPending}>
+          <Button type="button" onClick={(e) => handleSubmit(e.currentTarget.form as any, signUpWithPassword)} disabled={isPending}>
             {isPending ? 'Signing Up...' : 'Sign Up'}
           </Button>
         </div>
@@ -70,6 +70,7 @@ export function MobileOTPForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(false);
+  const [phone, setPhone] = useState('');
 
   const handleSendOTP = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -80,6 +81,7 @@ export function MobileOTPForm() {
       const result = await sendMobileOTP(formData);
       if (result.success) {
         setSuccess(result.message);
+        setPhone(formData.get('phone') as string);
         setOtpSent(true);
       } else {
         setError(result.message);
@@ -93,6 +95,7 @@ export function MobileOTPForm() {
     setSuccess(null);
     startTransition(async () => {
       const formData = new FormData(e.currentTarget);
+      formData.set('phone', phone); // Ensure phone number is in the form data
       const result = await verifyMobileOTP(formData);
       if (result.success) {
         setSuccess(result.message);
@@ -119,9 +122,8 @@ export function MobileOTPForm() {
         <form onSubmit={handleVerifyOTP} className="space-y-4">
            <div>
             <h2 className="text-2xl font-semibold">Verify OTP</h2>
-            <p className="text-gray-600">Enter the 6-digit code sent to your number.</p>
+            <p className="text-gray-600">Enter the 6-digit code sent to {phone}.</p>
           </div>
-          <input name="phone" type="hidden" value={(new FormData(document.querySelector('form')!)).get('phone') as string}/>
           <input name="token" type="text" placeholder="6-digit OTP" required className="w-full p-2 border rounded-md" />
           {error && <FormFeedback message={error} type="error" />}
           {success && <FormFeedback message={success} type="success" />}

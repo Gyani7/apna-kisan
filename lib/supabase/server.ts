@@ -1,15 +1,8 @@
-import { createClient, Session } from '@supabase/supabase-js';
-import type { Database } from './database.types';
-import type { RawPost } from './mappers';
+import { createServer } from './utils';
+import type { Database } from '../database.types';
+import type { RawPost } from '../mappers';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder';
-
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
-
-// Untyped client for tables not in generated types
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const db = supabase as any;
+const supabase = createServer();
 
 // Storage bucket names
 export const BUCKETS = {
@@ -32,47 +25,21 @@ export function getPublicUrl(bucket: string, path: string): string {
   return data.publicUrl;
 }
 
-// Auth helpers
-export async function signInWithEmail(email: string) {
-  const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}/auth/callback` } });
-  return { error };
-}
-
-export async function signInWithGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/auth/callback` } });
-  return { error };
-}
-
-export async function signOut() {
-  const { error } = await supabase.auth.signOut();
-  return { error };
-}
-
-export async function getSession(): Promise<Session | null> {
-  const { data } = await supabase.auth.getSession();
-  return data.session;
-}
-
-export async function getCurrentUserId(): Promise<string | null> {
-  const { data } = await supabase.auth.getUser();
-  return data.user?.id ?? null;
-}
-
 // Profile helpers
 export async function getProfile(userId: string) {
-  const { data } = await db.from('profiles').select('*').eq('id', userId).single();
+  const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
   return data as Database['public']['Tables']['profiles']['Row'] | null;
 }
 
 export async function updateProfile(userId: string, updates: Database['public']['Tables']['profiles']['Update']) {
   const payload = { ...updates, updated_at: new Date().toISOString() };
-  const { data, error } = await db.from('profiles').update(payload).eq('id', userId).select().single();
+  const { data, error } = await supabase.from('profiles').update(payload).eq('id', userId).select().single();
   return { data: data as Database['public']['Tables']['profiles']['Row'] | null, error };
 }
 
 // Post helpers
 export async function getPosts(options?: { category?: string; postType?: string; limit?: number; offset?: number; orderBy?: string }): Promise<RawPost[] | null> {
-  let query = db.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)');
+  let query = supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)');
 
   if (options?.postType) query = query.eq('post_type', options.postType);
   if (options?.category) query = query.eq('category', options.category);
@@ -85,49 +52,49 @@ export async function getPosts(options?: { category?: string; postType?: string;
 }
 
 export async function getFeaturedStories(limit = 4): Promise<RawPost[] | null> {
-  const { data } = await db.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)').eq('post_type', 'story').eq('is_featured', true).order('created_at', { ascending: false }).limit(limit);
+  const { data } = await supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)').eq('post_type', 'story').eq('is_featured', true).order('created_at', { ascending: false }).limit(limit);
   return data as RawPost[] | null;
 }
 
 export async function getPostBySlug(slug: string): Promise<RawPost | null> {
-  const { data } = await db.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)').eq('slug', slug).single();
+  const { data } = await supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)').eq('slug', slug).single();
   return data as RawPost | null;
 }
 
 export async function createPost(post: Database['public']['Tables']['posts']['Insert']) {
-  const { data, error } = await db.from('posts').insert(post).select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)').single();
+  const { data, error } = await supabase.from('posts').insert(post).select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)').single();
   return { data: data as RawPost | null, error };
 }
 
 export async function deletePost(postId: string) {
-  const { error } = await db.from('posts').delete().eq('id', postId);
+  const { error } = await supabase.from('posts').delete().eq('id', postId);
   return { error };
 }
 
 // Like helpers
 export async function toggleLike(postId: string, userId: string) {
-  const { data: existing } = await db.from('likes').select('id').eq('post_id', postId).eq('user_id', userId).maybeSingle();
+  const { data: existing } = await supabase.from('likes').select('id').eq('post_id', postId).eq('user_id', userId).maybeSingle();
   if (existing) {
-    const { error } = await db.from('likes').delete().eq('id', existing.id);
+    const { error } = await supabase.from('likes').delete().eq('id', existing.id);
     return { liked: false, error };
   }
-  const { error } = await db.from('likes').insert({ post_id: postId, user_id: userId });
+  const { error } = await supabase.from('likes').insert({ post_id: postId, user_id: userId });
   return { liked: true, error };
 }
 
 export async function isLikedByUser(postId: string, userId: string) {
-  const { data } = await db.from('likes').select('id').eq('post_id', postId).eq('user_id', userId).maybeSingle();
+  const { data } = await supabase.from('likes').select('id').eq('post_id', postId).eq('user_id', userId).maybeSingle();
   return !!data;
 }
 
 // Bookmark helpers
 export async function toggleBookmark(postId: string, userId: string) {
-  const { data: existing } = await db.from('bookmarks').select('id').eq('post_id', postId).eq('user_id', userId).maybeSingle();
+  const { data: existing } = await supabase.from('bookmarks').select('id').eq('post_id', postId).eq('user_id', userId).maybeSingle();
   if (existing) {
-    const { error } = await db.from('bookmarks').delete().eq('id', existing.id);
+    const { error } = await supabase.from('bookmarks').delete().eq('id', existing.id);
     return { bookmarked: false, error };
   }
-  const { error } = await db.from('bookmarks').insert({ post_id: postId, user_id: userId });
+  const { error } = await supabase.from('bookmarks').insert({ post_id: postId, user_id: userId });
   return { bookmarked: true, error };
 }
 
@@ -142,78 +109,78 @@ export interface CommentWithAuthor {
 }
 
 export async function getComments(postId: string): Promise<CommentWithAuthor[] | null> {
-  const { data } = await db.from('comments').select('*, profiles:user_id(username, full_name, avatar_url, badge)').eq('post_id', postId).order('created_at', { ascending: true });
+  const { data } = await supabase.from('comments').select('*, profiles:user_id(username, full_name, avatar_url, badge)').eq('post_id', postId).order('created_at', { ascending: true });
   return data as CommentWithAuthor[] | null;
 }
 
 export async function addComment(postId: string, userId: string, content: string): Promise<{ data: CommentWithAuthor | null; error: Error | null }> {
-  const { data, error } = await db.from('comments').insert({ post_id: postId, user_id: userId, content }).select('*, profiles:user_id(username, full_name, avatar_url, badge)').single();
-  return { data: data as CommentWithAuthor | null, error };
+  const { data, error } = await supabase.from('comments').insert({ post_id: postId, user_id: userId, content }).select('*, profiles:user_id(username, full_name, avatar_url, badge)').single();
+  return { data: data as CommentWithAuthor | null, error: error as any };
 }
 
 // Follow helpers
 export async function toggleFollow(followerId: string, followingId: string) {
-  const { data: existing } = await db.from('followers').select('id').eq('follower_id', followerId).eq('following_id', followingId).maybeSingle();
+  const { data: existing } = await supabase.from('followers').select('id').eq('follower_id', followerId).eq('following_id', followingId).maybeSingle();
   if (existing) {
-    const { error } = await db.from('followers').delete().eq('id', existing.id);
+    const { error } = await supabase.from('followers').delete().eq('id', existing.id);
     return { following: false, error };
   }
-  const { error } = await db.from('followers').insert({ follower_id: followerId, following_id: followingId });
+  const { error } = await supabase.from('followers').insert({ follower_id: followerId, following_id: followingId });
   return { following: true, error };
 }
 
 export async function isFollowing(followerId: string, followingId: string) {
-  const { data } = await db.from('followers').select('id').eq('follower_id', followerId).eq('following_id', followingId).maybeSingle();
+  const { data } = await supabase.from('followers').select('id').eq('follower_id', followerId).eq('following_id', followingId).maybeSingle();
   return !!data;
 }
 
 // Notification helpers
 export async function getNotifications(userId: string, limit = 20) {
-  const { data } = await db.from('notifications').select('*, actor:actor_id(username, full_name, avatar_url)').eq('user_id', userId).order('created_at', { ascending: false }).limit(limit);
+  const { data } = await supabase.from('notifications').select('*, actor:actor_id(username, full_name, avatar_url)').eq('user_id', userId).order('created_at', { ascending: false }).limit(limit);
   return data;
 }
 
 export async function markNotificationsRead(userId: string) {
-  const { error } = await db.from('notifications').update({ is_read: true }).eq('user_id', userId).eq('is_read', false);
+  const { error } = await supabase.from('notifications').update({ is_read: true }).eq('user_id', userId).eq('is_read', false);
   return { error };
 }
 
 export async function getUnreadCount(userId: string) {
-  const { count } = await db.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('is_read', false);
+  const { count } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('is_read', false);
   return count ?? 0;
 }
 
 // Stories helpers
 export async function getActiveStories() {
-  const { data } = await db.from('stories').select('*, profiles:user_id(username, full_name, avatar_url)').gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()).order('created_at', { ascending: false });
+  const { data } = await supabase.from('stories').select('*, profiles:user_id(username, full_name, avatar_url)').gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()).order('created_at', { ascending: false });
   return data;
 }
 
 export async function createStory(userId: string, mediaUrl: string, mediaType: string) {
-  const { data, error } = await db.from('stories').insert({ user_id: userId, media_url: mediaUrl, media_type: mediaType }).select().single();
+  const { data, error } = await supabase.from('stories').insert({ user_id: userId, media_url: mediaUrl, media_type: mediaType }).select().single();
   return { data, error };
 }
 
 // Reels helpers
 export async function getReels(limit = 20, offset = 0) {
-  const { data } = await db.from('reels').select('*, profiles:user_id(username, full_name, avatar_url, badge)').order('created_at', { ascending: false }).range(offset, offset + limit - 1);
+  const { data } = await supabase.from('reels').select('*, profiles:user_id(username, full_name, avatar_url, badge)').order('created_at', { ascending: false }).range(offset, offset + limit - 1);
   return data;
 }
 
 // Mandi rates helpers
 export async function getMandiRates() {
-  const { data } = await db.from('mandi_rates').select('*').order('updated_at', { ascending: false });
+  const { data } = await supabase.from('mandi_rates').select('*').order('updated_at', { ascending: false });
   return data;
 }
 
 // Farming tips helpers
 export async function getFarmingTips() {
-  const { data } = await db.from('farming_tips').select('*').eq('is_active', true).order('created_at', { ascending: false });
+  const { data } = await supabase.from('farming_tips').select('*').eq('is_active', true).order('created_at', { ascending: false });
   return data;
 }
 
 // Leaderboard
 export async function getLeaderboard(limit = 10) {
-  const { data } = await db.from('profiles').select('id, username, full_name, avatar_url, reputation, badge, posts_count').order('reputation', { ascending: false }).limit(limit);
+  const { data } = await supabase.from('profiles').select('id, username, full_name, avatar_url, reputation, badge, posts_count').order('reputation', { ascending: false }).limit(limit);
   return data;
 }

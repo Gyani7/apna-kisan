@@ -7,12 +7,12 @@ import { MessageSquare, CircleHelp as HelpCircle, BookOpen, X, Send, ImagePlus, 
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 import { CATEGORIES } from '@/lib/types';
 import type { PostType } from '@/lib/types';
 import clsx from 'clsx';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 const BUCKETS = {
     posts: 'posts',

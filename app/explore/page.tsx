@@ -7,11 +7,11 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import AuthProvider from '@/components/AuthProvider';
 import { CATEGORIES } from '@/lib/types';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowser } from '@/lib/supabase/utils';
 import type { MandiRateRow, ProfileRow } from '@/lib/database.types';
 import Image from 'next/image';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 async function getMandiRates() {
   const { data } = await supabase.from('mandi_rates').select('*').limit(5);
