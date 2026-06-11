@@ -1,3 +1,4 @@
+
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -42,16 +43,22 @@ export async function middleware(request: NextRequest) {
 
   // For unauthenticated users, protect all routes except the defined public ones.
   if (!session) {
+    // Define public path prefixes
+    const publicPrefixes = [
+      '/auth',
+      '/explore',
+      '/community',
+      '/reels',
+      '/category',
+      '/profile',
+      '/questions',
+      '/story',
+    ];
+
+    // Check if the path is public
     const isPublicPath = 
-      pathname === '/' ||
-      pathname.startsWith('/auth') ||
-      pathname.startsWith('/explore') ||
-      pathname.startsWith('/community') ||
-      pathname.startsWith('/reels') ||
-      pathname.startsWith('/category') ||
-      pathname.startsWith('/profile') ||
-      pathname.startsWith('/questions') ||
-      pathname.startsWith('/story');
+      pathname === '/' || 
+      publicPrefixes.some(prefix => pathname.startsWith(prefix));
 
     if (!isPublicPath) {
       // Redirect to the login page, preserving the intended destination for after login

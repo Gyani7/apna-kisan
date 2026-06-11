@@ -1,22 +1,3 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/auth/callback/page": "app/auth/callback/page.js",
-  "/auth/page": "app/auth/page.js",
-  "/community/[id]/page": "app/community/[id]/page.js",
-  "/community/page": "app/community/page.js",
-  "/create/page": "app/create/page.js",
-  "/dashboard/crop-analysis/page": "app/dashboard/crop-analysis/page.js",
-  "/explore/page": "app/explore/page.js",
-  "/dashboard/schemes/page": "app/dashboard/schemes/page.js",
-  "/profile/[id]/page": "app/profile/[id]/page.js",
-  "/page": "app/page.js",
-  "/profile/page": "app/profile/page.js",
-  "/questions/[slug]/page": "app/questions/[slug]/page.js",
-  "/robots.txt/route": "app/robots.txt/route.js",
-  "/reels/page": "app/reels/page.js",
-  "/story/[slug]/page": "app/story/[slug]/page.js",
-  "/sitemap.xml/route": "app/sitemap.xml/route.js",
-  "/category/[slug]/page": "app/category/[slug]/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/admin/questions/page": "app/admin/questions/page.js"
+  "/page": "app/page.js"
 }
