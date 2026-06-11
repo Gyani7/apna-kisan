@@ -10,9 +10,6 @@ interface UnifiedGlobalFeedProps {
 }
 
 export default function UnifiedGlobalFeed({ initialFeed }: UnifiedGlobalFeedProps) {
-  // In the future, this component can be extended with state management 
-  // for infinite scroll, real-time updates, etc.
-
   return (
     <div className="space-y-6">
       {(initialFeed || []).map((post) => {
@@ -25,7 +22,6 @@ export default function UnifiedGlobalFeed({ initialFeed }: UnifiedGlobalFeedProp
           case 'reel':
             return <ReelCard key={key} post={post} />;
           default:
-            // This helps in identifying if a new, unhandled post type is added.
             console.warn('Unsupported post type:', (post as any).type);
             return null;
         }
@@ -56,7 +52,7 @@ function StoryCard({ post }: { post: StoryPost }) {
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all hover:shadow-lg">
       {post.thumbnail_url && (
-        <Link href={`/story/${post.slug}'}>
+        <Link href={`/story/${post.slug}`}>
           <img src={post.thumbnail_url} alt={post.title} className="w-full h-48 object-cover" />
         </Link>
       )}
@@ -72,7 +68,6 @@ function StoryCard({ post }: { post: StoryPost }) {
 }
 
 function ReelCard({ post }: { post: ReelPost }) {
-  // A reel might not have a dedicated page, so we link to the author's profile.
   const authorLink = post.author?.username ? `/profile/${post.author.username}` : '#';
   return (
     <div className="bg-black border border-gray-700 rounded-lg overflow-hidden relative aspect-[9/16]">

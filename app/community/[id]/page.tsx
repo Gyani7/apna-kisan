@@ -3,27 +3,68 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation'; // CORRECT: Import useParams hook
+import { useParams } from 'next/navigation';
 import { ArrowLeft, Heart, MessageCircle, Share2, Bookmark, Send, MapPin } from 'lucide-react';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { createBrowser } from '@/lib/supabase/utils';
+import { createBrowserClient } from '@supabase/ssr';
+import type { Database } from '@/lib/database.types';
 import { mapPostToPostWithAuthor, RawPost } from '@/lib/mappers';
 import { timeAgo, formatCount, POST_TYPE_CONFIG, type PostWithAuthor } from '@/lib/types';
 import clsx from 'clsx';
 
-const supabase = createBrowser();
+const supabase = createBrowserClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-// These functions are now defined in this file to use the client instance
-async function getComments(postId: string) {
-  const { data } = await supabase.from('comments').select('*, profiles(*)').eq('post_id', postId).order('created_at');
-  return data;
+// --- Type Definitions ---
+type CommentRow = Database['public']['Tables']['comments']['Row'];
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+// ARCHITECTURAL FIX: Create a specific type for the data to be inserted.
+type CommentInsert = Database['public']['Tables']['comments']['Insert'];
+
+interface CommentWithAuthor extends CommentRow {
+    profiles: ProfileRow | null;
 }
 
-async function addComment(postId: string, userId: string, content: string) {
-  const { data } = await supabase.from('comments').insert([{ post_id: postId, user_id: userId, content }]).select('*, profiles(*)');
-  return { data };
+// --- Data Fetching Functions ---
+
+async function getComments(postId: string): Promise<CommentWithAuthor[]> {
+  const { data, error } = await supabase
+    .from('comments')
+    .select('*, profiles(*)')
+    .eq('post_id', postId)
+    .order('created_at');
+
+  if (error) {
+    console.error("Error fetching comments:", error);
+    return [];
+  }
+  return data as CommentWithAuthor[];
+}
+
+async function addComment(postId: string, userId: string, content: string): Promise<CommentWithAuthor | null> {
+  const commentPayload: CommentInsert = {
+    post_id: postId,
+    user_id: userId,
+    content: content,
+  };
+
+  // ARCHITECTURAL FIX: Provide a generic type parameter to the 'insert' method.
+  // This resolves the 'never' type error by explicitly telling Supabase what shape of data to expect.
+  const { data, error } = await supabase
+    .from('comments')
+    .insert<CommentInsert>([commentPayload])
+    .select('*, profiles(*)')
+    .single();
+
+  if (error) {
+    console.error("Error adding comment:", error);
+    return null;
+  }
+  return data as CommentWithAuthor;
 }
 
 async function toggleLike(postId: string, userId: string) {
@@ -34,29 +75,11 @@ async function toggleBookmark(postId: string, userId: string) {
     await supabase.rpc('toggle_post_bookmark', { p_post_id: postId, p_user_id: userId });
 }
 
-// Mappers and types can remain as they are or be moved if preferred
-interface CommentWithAuthor {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  author: { username: string; full_name: string | null; avatar_url: string | null; badge: string } | null;
-}
+// --- Component ---
 
-function mapComment(c: any): CommentWithAuthor {
-  return {
-    id: c.id,
-    content: c.content,
-    created_at: c.created_at,
-    user_id: c.user_id,
-    author: c.profiles,
-  };
-}
-
-// CORRECT: Component receives no props; params are accessed via hook
 export default function PostDetailPage() {
   const params = useParams();
-  const postId = params.id as string; // CORRECT: Get ID directly from params
+  const postId = params.id as string;
 
   const [post, setPost] = useState<PostWithAuthor | null>(null);
   const [comments, setComments] = useState<CommentWithAuthor[]>([]);
@@ -66,31 +89,41 @@ export default function PostDetailPage() {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const { user } = useAuth();
 
-  // CORRECT: Simplified data fetching logic triggered by postId
   useEffect(() => {
     if (!postId) return;
 
-    // Fetch post details
-    supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)').eq('id', postId).single().then(({ data }) => {
-      if (data) {
-        const mapped = mapPostToPostWithAuthor(data as RawPost);
-        setPost(mapped);
-        setLikesCount(mapped.likes_count);
-      }
-    });
+    async function fetchData() {
+        // Fetch post details
+        const { data: postData } = await supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)').eq('id', postId).single();
+        if (postData) {
+            const mapped = mapPostToPostWithAuthor(postData as RawPost);
+            setPost(mapped);
+            setLikesCount(mapped.likes_count);
+        }
 
-    // Fetch comments
-    getComments(postId).then((data) => {
-      if (data) setComments(data.map(mapComment));
-    });
-  }, [postId]);
+        // Fetch comments
+        const commentData = await getComments(postId);
+        setComments(commentData);
+
+        // Fetch user-specific status (like and bookmark)
+        if (user) {
+            const { data: likeData } = await supabase.from('post_likes').select('user_id').eq('post_id', postId).eq('user_id', user.id);
+            if (likeData && likeData.length > 0) setIsLiked(true);
+
+            const { data: bookmarkData } = await supabase.from('bookmarks').select('user_id').eq('post_id', postId).eq('user_id', user.id);
+            if (bookmarkData && bookmarkData.length > 0) setIsBookmarked(true);
+        }
+    }
+
+    fetchData();
+
+  }, [postId, user]);
 
   async function handleComment() {
     if (!user || !newComment.trim() || !postId) return;
-    const { data } = await addComment(postId, user.id, newComment.trim());
-    // OPTIMIZED: Added null and length check for type safety
-    if (data && data.length > 0) {
-      setComments([...comments, mapComment(data[0])]);
+    const newCommentData = await addComment(postId, user.id, newComment.trim());
+    if (newCommentData) {
+      setComments([...comments, newCommentData]);
       setNewComment('');
     }
   }
@@ -161,7 +194,6 @@ export default function PostDetailPage() {
             </div>
           </article>
 
-          {/* Comments */}
           <div className="card p-4">
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm mb-3">Comments ({comments.length})</h3>
 
@@ -170,11 +202,12 @@ export default function PostDetailPage() {
             ) : (
               <div className="flex flex-col gap-3 mb-4">
                 {comments.map((c) => {
-                  const cName = c.author?.full_name ?? c.author?.username ?? 'Kisan';
+                  const author = c.profiles;
+                  const cName = author?.full_name ?? author?.username ?? 'Kisan';
                   return (
                     <div key={c.id} className="flex items-start gap-2.5">
-                      {c.author?.avatar_url ? (
-                        <Image src={c.author.avatar_url} alt="" width={32} height={32} className="rounded-full object-cover mt-0.5" />
+                      {author?.avatar_url ? (
+                        <Image src={author.avatar_url} alt="" width={32} height={32} className="rounded-full object-cover mt-0.5" />
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">{cName[0]}</div>
                       )}
