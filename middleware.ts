@@ -1,20 +1,43 @@
-
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-// The middleware is used to refresh the user's session before loading Server Component routes
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
-  const { data: { session }} = await supabase.auth.getSession();
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
-  const { pathname } = req.nextUrl;
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value;
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          request.cookies.set({ name, value, ...options });
+          response = NextResponse.next({ request: { headers: request.headers } });
+          response.cookies.set({ name, value, ...options });
+        },
+        remove(name: string, options: CookieOptions) {
+          request.cookies.set({ name, value: '', ...options });
+          response = NextResponse.next({ request: { headers: request.headers } });
+          response.cookies.set({ name, value: '', ...options });
+        },
+      },
+    }
+  );
+
+  const { data: { session } } = await supabase.auth.getSession();
+  const { pathname } = request.nextUrl;
 
   // --- Advanced Route Protection ---
 
   // Redirect authenticated users from any /auth path to home
   if (session && pathname.startsWith('/auth')) {
-    return NextResponse.redirect(new URL('/', req.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   // For unauthenticated users, protect all routes except the defined public ones.
@@ -32,13 +55,13 @@ export async function middleware(req: NextRequest) {
 
     if (!isPublicPath) {
       // Redirect to the login page, preserving the intended destination for after login
-      const redirectUrl = new URL('/auth', req.url);
+      const redirectUrl = new URL('/auth', request.url);
       redirectUrl.searchParams.set('next', pathname);
       return NextResponse.redirect(redirectUrl);
     }
   }
 
-  return res;
+  return response;
 }
 
 export const config = {
