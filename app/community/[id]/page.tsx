@@ -7,12 +7,12 @@ import { ArrowLeft, Heart, MessageCircle, Share2, Bookmark, Send, MapPin } from 
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { mapPostToPostWithAuthor } from '@/lib/mappers';
+import { createBrowser } from '@/lib/supabase/utils';
+import { mapPostToPostWithAuthor, RawPost } from '@/lib/mappers';
 import { timeAgo, formatCount, POST_TYPE_CONFIG, type PostWithAuthor } from '@/lib/types';
 import clsx from 'clsx';
 
-const supabase = createClientComponentClient();
+const supabase = createBrowser();
 
 // These functions are now defined in this file to use the client instance
 async function getComments(postId: string) {
@@ -21,17 +21,17 @@ async function getComments(postId: string) {
 }
 
 async function addComment(postId: string, userId: string, content: string) {
-  const { data } = await supabase.from('comments').insert({ post_id: postId, user_id: userId, content }).select('*, profiles(*)').single();
+  const { data } = await supabase.from('comments').insert([{ post_id: postId, user_id: userId, content }]).select('*, profiles(*)');
   return { data };
 }
 
 async function toggleLike(postId: string, userId: string) {
     // This would be a call to a Supabase Edge Function
-    await supabase.rpc('toggle_like', { post_id: postId, user_id: userId });
+    await supabase.rpc('toggle_post_like', { p_post_id: postId, p_user_id: userId });
 }
 
 async function toggleBookmark(postId: string, userId: string) {
-    await supabase.rpc('toggle_bookmark', { post_id: postId, user_id: userId });
+    await supabase.rpc('toggle_post_bookmark', { p_post_id: postId, p_user_id: userId });
 }
 
 // Mappers and types can remain as they are or be moved if preferred
@@ -73,7 +73,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
     if (!postId) return;
     supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)').eq('id', postId).single().then(({ data }) => {
       if (data) {
-        const mapped = mapPostToPostWithAuthor(data);
+        const mapped = mapPostToPostWithAuthor(data as RawPost);
         setPost(mapped);
         setLikesCount(mapped.likes_count);
       }
@@ -87,7 +87,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
     if (!user || !newComment.trim()) return;
     const { data } = await addComment(postId, user.id, newComment.trim());
     if (data) {
-      setComments([...comments, mapComment(data)]);
+      setComments([...comments, mapComment(data[0])]);
       setNewComment('');
     }
   }
