@@ -2,14 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { MessageSquare, CircleHelp as HelpCircle, BookOpen, Plus } from 'lucide-react';
 import { useAuth } from '@/components/AuthProvider';
-
-const POST_TYPES = [
-  { label: 'Post', labelHi: 'Charcha', href: '/create?type=discussion', icon: MessageSquare, color: 'text-blue-600 bg-blue-50 dark:bg-blue-900/30' },
-  { label: 'Ask', labelHi: 'Sawaal', href: '/create?type=question', icon: HelpCircle, color: 'text-amber-600 bg-amber-50 dark:bg-amber-900/30' },
-  { label: 'Story', labelHi: 'Kahani', href: '/create?type=story', icon: BookOpen, color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30' },
-];
+import { POST_TYPES } from '@/lib/config';
 
 export default function CreatePostCard() {
   const { user, profile } = useAuth();

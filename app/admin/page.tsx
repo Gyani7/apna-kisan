@@ -1,5 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { getStats } from '@/lib/actions/admin';
 import Link from 'next/link';
 import { 
   Users, 
@@ -9,57 +8,6 @@ import {
   ArrowRight,
   TrendingUp
 } from 'lucide-react';
-
-interface CommunityQuestion {
-  id: string;
-  created_at: string;
-  category: string;
-  question: string;
-  name: string;
-  state: string;
-}
-
-async function getStats() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options })
-        },
-      },
-    }
-  );
-
-  const [
-    { count: totalUsers },
-    { count: pendingQuestions },
-    { count: pendingVerifications },
-    { data: recentQuestionsData }
-  ] = await Promise.all([
-    supabase.from('profiles').select('*', { count: 'exact', head: true }),
-    supabase.from('community_questions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('verification_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('community_questions').select('*').order('created_at', { ascending: false }).limit(5)
-  ]);
-
-  const recentQuestions: CommunityQuestion[] = recentQuestionsData || [];
-
-  return {
-    totalUsers: totalUsers || 0,
-    pendingQuestions: pendingQuestions || 0,
-    pendingVerifications: pendingVerifications || 0,
-    recentQuestions
-  };
-}
 
 export default async function AdminDashboard() {
   const stats = await getStats();
@@ -88,7 +36,7 @@ export default async function AdminDashboard() {
     },
     { 
       label: 'Active Reports', 
-      value: 0, 
+      value: 0, // Assuming no reports for now
       icon: AlertCircle, 
       color: 'text-danger-600', 
       bg: 'bg-danger-100' 
@@ -160,15 +108,15 @@ export default async function AdminDashboard() {
               Platform Growth
             </h3>
             <p className="text-slate-400 text-sm mb-6">
-              User engagement is up 12% this week. Verification requests are increasing.
+              User engagement is up {stats.platformGrowth.userEngagementIncrease}% this week. Verification requests are increasing.
             </p>
             <div className="space-y-4">
               <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-brand-500 w-[70%]"></div>
+                <div className="h-full bg-brand-500" style={{ width: `${stats.platformGrowth.storageUsedPercentage}%` }}></div>
               </div>
               <div className="flex justify-between text-xs text-slate-400">
                 <span>Storage Limit</span>
-                <span>70% Used</span>
+                <span>{stats.platformGrowth.storageUsedPercentage}% Used</span>
               </div>
             </div>
           </div>

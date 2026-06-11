@@ -8,47 +8,11 @@ import StoryCard from '@/components/StoryCard';
 import StoriesBar from '@/components/StoriesBar';
 import FarmingTipsCard from '@/components/FarmingTipsCard';
 import AuthProvider from '@/components/AuthProvider';
-import { createClient } from '@/lib/supabase/utils'; // CORRECT: Using the utility
-import { cookies } from 'next/headers';
 import { generateWebsiteSchema } from '@/lib/seo';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
+import { getPosts, getFeaturedStories } from '@/lib/actions/posts';
 
 export default async function HomePage() {
-  const cookieStore = cookies(); // CORRECT: No longer needs await
-  const supabase = createClient(cookieStore);
-
-  async function getPosts({ limit }: { limit: number }) {
-      const { data, error } = await supabase
-          .from('posts')
-          .select('*, author:profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')
-          .order('created_at', { ascending: false })
-          .limit(limit);
-
-      // COMPLIANT: Added error handling
-      if (error) {
-        console.error('Error fetching posts:', error);
-        return [];
-      }
-      return data;
-  }
-
-  async function getFeaturedStories(limit = 4) {
-      const { data, error } = await supabase
-          .from('posts')
-          .select('*, author:profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')
-          .eq('post_type', 'story')
-          .eq('featured', true)
-          .order('created_at', { ascending: false })
-          .limit(limit);
-
-      // COMPLIANT: Added error handling
-      if (error) {
-        console.error('Error fetching featured stories:', error);
-        return [];
-      }
-      return data;
-  }
-
   const [posts, featuredStories] = await Promise.all([
     getPosts({ limit: 20 }),
     getFeaturedStories(4),
