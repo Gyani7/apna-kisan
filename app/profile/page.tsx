@@ -64,7 +64,7 @@ function ProfileContent() {
     if (!user) return;
     
     // Fetch posts
-    getPosts({ limit: 20 }).then((data) => {
+    getPosts({ postType: activeTab === 'posts' ? undefined : activeTab, limit: 20 }).then((data) => {
       const typed = mapPostsToPostWithAuthor(data ?? []).filter((p) => p.user_id === user.id);
       setPosts(typed);
     });
@@ -78,7 +78,7 @@ function ProfileContent() {
       .limit(1)
       .single()
       .then(({ data }) => setVerificationRequest(data));
-  }, [user]);
+  }, [user, activeTab]);
 
   useEffect(() => {
     if (profile) {
@@ -211,7 +211,7 @@ function ProfileContent() {
 
         {/* Tabs */}
         <div className="flex gap-2 mt-4">
-          {(('posts' as const)).map((tab) => (
+          {(['posts', 'stories', 'answers'] as const).map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)} className={clsx(
               'px-4 py-2 rounded-xl text-sm font-medium capitalize transition-colors',
               activeTab === tab ? 'bg-brand-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400'
