@@ -1,14 +1,14 @@
+'use server';
 
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createServer } from '@/lib/supabase/server';
 import type { Database } from '@/lib/database.types';
 
 // --- TYPE DEFINITIONS FOR UNIFIED FEED ---
 
-// Base Profile Type
+/** Base profile type for post authors. */
 type AuthorProfile = Pick<Database['public']['Tables']['profiles']['Row'], 'id' | 'username' | 'avatar_url' | 'full_name'> | null;
 
-// Specific Post Types with Normalized Structure
+/** Represents a question in the unified feed. */
 export interface QuestionPost {
   id: string;
   type: 'question';
@@ -17,11 +17,11 @@ export interface QuestionPost {
   created_at: string;
   slug: string;
   author: AuthorProfile;
-  // Question-specific fields
   vote_count: number;
   answer_count: number;
 }
 
+/** Represents a story in the unified feed. */
 export interface StoryPost {
   id: string;
   type: 'story';
@@ -30,10 +30,10 @@ export interface StoryPost {
   created_at: string;
   slug: string;
   author: AuthorProfile;
-  // Story-specific fields
   thumbnail_url: string | null;
 }
 
+/** Represents a reel in the unified feed. */
 export interface ReelPost {
   id: string;
   type: 'reel';
@@ -41,71 +41,49 @@ export interface ReelPost {
   video_url: string;
   created_at: string;
   author: AuthorProfile;
-  // Reel-specific fields
   like_count: number;
 }
 
-// The final UnifiedPost type for the component
+/** A union type representing any possible item in the unified feed. */
 export type UnifiedPost = QuestionPost | StoryPost | ReelPost;
 
-// --- SERVER ACTION FOR DATA FETCHING ---
-
+/**
+ * Fetches and combines data from multiple sources (questions, stories, reels)
+ * into a single, time-sorted feed for display on the main community page.
+ * @returns A promise that resolves to an object containing the unified feed data or an error message.
+ */
 export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: string | null; }> {
-  const cookieStore = cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get: (name) => cookieStore.get(name)?.value,
-      },
-    }
-  );
+  const supabase = createServer();
 
   try {
-    // 1. Fetch Questions
-    const { data: questions, error: questionsError } = await supabase
-      .from('questions')
-      .select(`
-        id, title, content, created_at, slug, vote_count, 
-        answers ( id ),
-        author:profiles ( id, username, avatar_url, full_name )
-      `)
-      .order('created_at', { ascending: false })
-      .limit(20);
+    // --- STEP 1: Fetch all data sources in parallel ---
 
-    if (questionsError) throw new Error(`Failed to fetch questions: ${questionsError.message}`);
-
-    // 2. Fetch Stories (from 'posts' table)
-    const { data: stories, error: storiesError } = await supabase
-      .from('posts')
-      .select(`
-        id, title, content, created_at, slug, thumbnail_url,
-        author:profiles ( id, username, avatar_url, full_name )
-      `)
-      // Assuming you have a way to distinguish stories, e.g., a 'type' column
-      // .eq('post_type', 'story') 
-      .order('created_at', { ascending: false })
-      .limit(20);
-
-    if (storiesError) throw new Error(`Failed to fetch stories: ${storiesError.message}`);
-    
-    // 3. Fetch Reels (assuming a 'reels' table)
-    const { data: reels, error: reelsError } = await supabase
-        .from('reels')
-        .select(`
-            id, caption, video_url, created_at, like_count,
-            author:profiles(id, username, avatar_url, full_name)
-        `)
+    const [questionsResult, storiesResult, reelsResult] = await Promise.all([
+      supabase
+        .from('questions')
+        .select(`id, title, content, created_at, slug, vote_count, answers(id), author:profiles(id, username, avatar_url, full_name)`)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(20),
+      supabase
+        .from('posts')
+        .select(`id, title, content, created_at, slug, thumbnail_url, author:profiles(id, username, avatar_url, full_name)`)
+        .eq('post_type', 'story')
+        .order('created_at', { ascending: false })
+        .limit(20),
+      supabase
+        .from('reels')
+        .select(`id, caption, video_url, created_at, like_count, author:profiles(id, username, avatar_url, full_name)`)
+        .order('created_at', { ascending: false })
+        .limit(20)
+    ]);
 
-    if (reelsError) throw new Error(`Failed to fetch reels: ${reelsError.message}`);
+    if (questionsResult.error) throw new Error(`Failed to fetch questions: ${questionsResult.error.message}`);
+    if (storiesResult.error) throw new Error(`Failed to fetch stories: ${storiesResult.error.message}`);
+    if (reelsResult.error) throw new Error(`Failed to fetch reels: ${reelsResult.error.message}`);
 
+    // --- STEP 2: Normalize each data type into the UnifiedPost format ---
 
-    // --- NORMALIZE AND COMBINE DATA ---
-
-    const normalizedQuestions: QuestionPost[] = (questions || []).map(q => ({
+    const normalizedQuestions: QuestionPost[] = (questionsResult.data || []).map(q => ({
       id: q.id,
       type: 'question',
       title: q.title,
@@ -117,7 +95,7 @@ export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: st
       answer_count: Array.isArray(q.answers) ? q.answers.length : 0,
     }));
 
-    const normalizedStories: StoryPost[] = (stories || []).map(s => ({
+    const normalizedStories: StoryPost[] = (storiesResult.data || []).map(s => ({
       id: s.id,
       type: 'story',
       title: s.title,
@@ -128,7 +106,7 @@ export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: st
       thumbnail_url: s.thumbnail_url,
     }));
     
-    const normalizedReels: ReelPost[] = (reels || []).map(r => ({
+    const normalizedReels: ReelPost[] = (reelsResult.data || []).map(r => ({
       id: r.id,
       type: 'reel',
       caption: r.caption,
@@ -138,16 +116,15 @@ export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: st
       like_count: r.like_count ?? 0,
     }));
 
+    // --- STEP 3: Combine, sort, and return the final feed ---
 
     const unifiedFeed: UnifiedPost[] = [...normalizedQuestions, ...normalizedStories, ...normalizedReels];
-
-    // Sort the combined feed by date
     unifiedFeed.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     return { data: unifiedFeed, error: null };
 
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+    const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred while fetching the feed.';
     console.error("Error fetching unified feed:", errorMessage);
     return { data: [], error: errorMessage };
   }

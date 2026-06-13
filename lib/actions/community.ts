@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { supabase } from '@/lib/supabase/server';
+import { createServer } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 // --- UTILITIES ---
@@ -33,6 +33,10 @@ const GuestAnswerSchema = z.object({
 
 // --- SERVER ACTIONS ---
 
+/**
+ * Represents the state of a form action, including success status,
+ * messages, and validation errors.
+ */
 interface FormState {
   success: boolean;
   message: string;
@@ -41,8 +45,13 @@ interface FormState {
 
 /**
  * Submits a new community question as a guest.
+ * Performs validation and sanitization before inserting into the database.
+ * @param prevState The previous state of the form.
+ * @param formData The data submitted from the form.
+ * @returns A new `FormState` object indicating the result of the action.
  */
 export async function submitGuestQuestion(prevState: FormState, formData: FormData): Promise<FormState> {
+  const supabase = createServer();
   const validation = GuestQuestionSchema.safeParse(Object.fromEntries(formData));
 
   if (!validation.success) {
@@ -54,7 +63,7 @@ export async function submitGuestQuestion(prevState: FormState, formData: FormDa
   }
 
   const sanitizedQuestion = sanitizeInput(validation.data.question);
-  const sanitizedName = validation.data.guest_name ? sanitizeInput(validation.data.guest_name) : null;
+  const sanitizedName = validation.data.guest_name ? sanitizeInput(validation.data.guest_name) : undefined;
 
   const { error } = await supabase.from('community_questions').insert([{
     question: sanitizedQuestion,
@@ -65,9 +74,10 @@ export async function submitGuestQuestion(prevState: FormState, formData: FormDa
   }]);
 
   if (error) {
+    console.error('Error submitting guest question:', error);
     return {
       success: false,
-      message: `Database Error: ${error.message}`,
+      message: 'Database Error: Could not submit your question. Please try again later.',
     };
   }
 
@@ -76,13 +86,19 @@ export async function submitGuestQuestion(prevState: FormState, formData: FormDa
   return {
     success: true,
     message: 'Aapka sawaal safaltapoorvak post ho gaya hai. Admin approval ke baad yeh live ho jayega.',
+    errors: {},
   };
 }
 
 /**
  * Submits a new answer to a question as a guest.
+ * Performs validation and sanitization before inserting into the database.
+ * @param prevState The previous state of the form.
+ * @param formData The data submitted from the form.
+ * @returns A new `FormState` object indicating the result of the action.
  */
 export async function submitGuestAnswer(prevState: FormState, formData: FormData): Promise<FormState> {
+  const supabase = createServer();
   const validation = GuestAnswerSchema.safeParse(Object.fromEntries(formData));
 
   if (!validation.success) {
@@ -94,7 +110,7 @@ export async function submitGuestAnswer(prevState: FormState, formData: FormData
   }
 
   const sanitizedContent = sanitizeInput(validation.data.content);
-  const sanitizedName = validation.data.guest_name ? sanitizeInput(validation.data.guest_name) : null;
+  const sanitizedName = validation.data.guest_name ? sanitizeInput(validation.data.guest_name) : undefined;
 
   const { error } = await supabase.from('answers').insert([{
     content: sanitizedContent,
@@ -105,9 +121,10 @@ export async function submitGuestAnswer(prevState: FormState, formData: FormData
   }]);
 
   if (error) {
+    console.error('Error submitting guest answer:', error);
     return {
       success: false,
-      message: `Database Error: ${error.message}`,
+      message: 'Database Error: Could not submit your answer. Please try again later.',
     };
   }
 
@@ -116,5 +133,6 @@ export async function submitGuestAnswer(prevState: FormState, formData: FormData
   return {
     success: true,
     message: 'Aapka jawaab post ho gaya hai. Admin approval ke baad yeh live ho jayega.',
+    errors: {},
   };
 }

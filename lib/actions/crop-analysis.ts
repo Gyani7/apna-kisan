@@ -2,8 +2,48 @@
 
 import { z } from 'zod';
 import { createServer } from '@/lib/supabase/utils';
-import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
+
+// --- TYPE DEFINITIONS ---
+
+/**
+ * The result from the AI analysis service.
+ */
+interface AIAnalysisResult {
+  detected_disease: string;
+  confidence_score: number;
+  recommendations: string[];
+}
+
+/**
+ * The structure of the analysis result stored in the database and returned to the client.
+ */
+interface AnalysisRecord {
+  id: string;
+  user_id: string;
+  image_url: string;
+  status: 'pending' | 'completed' | 'failed';
+  analysis_provider: string | null;
+  analysis_payload: AIAnalysisResult | null;
+  detected_disease: string | null;
+  confidence_score: number | null;
+  recommendations: string[] | null;
+  created_at: string;
+}
+
+
+/**
+ * State object for the crop analysis form action.
+ */
+interface AnalysisFormState {
+  success: boolean;
+  message: string;
+  analysisResult?: AnalysisRecord; // Use a strong type
+  errors?: {
+    image?: string[];
+    _form?: string[];
+  };
+}
 
 // --- ZOD SCHEMA FOR INPUT VALIDATION ---
 const ImageAnalysisSchema = z.object({
@@ -13,10 +53,8 @@ const ImageAnalysisSchema = z.object({
 });
 
 // --- SIMULATED AI ANALYSIS SERVICE ---
-// In a real application, this would be a call to an external service like OpenAI or Gemini.
-async function getMockAIAnalysis(imageUrl: string): Promise<any> {
+async function getMockAIAnalysis(imageUrl: string): Promise<AIAnalysisResult> {
   console.log(`Simulating AI analysis for image: ${imageUrl}`);
-  // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1500));
 
   // Mock responses based on some deterministic factor from the URL
@@ -40,89 +78,97 @@ async function getMockAIAnalysis(imageUrl: string): Promise<any> {
   };
 }
 
+
 // --- SERVER ACTION ---
 
-interface AnalysisFormState {
-  success: boolean;
-  message: string;
-  analysisResult?: any;
-  errors?: Record<string, string[] | undefined>;
-}
-
+/**
+ * Analyzes a crop image by uploading it, calling a mock AI service, and storing the results.
+ * @param prevState The previous state of the form action.
+ * @param formData The form data containing the image to analyze.
+ * @returns An updated AnalysisFormState with the result of the operation.
+ */
 export async function analyzeCropImage(prevState: AnalysisFormState, formData: FormData): Promise<AnalysisFormState> {
   const supabase = createServer();
+
+  // 1. Authenticate user
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return { success: false, message: 'Authentication Error: Please log in to use this feature.' };
   }
 
+  // 2. Validate input
   const validation = ImageAnalysisSchema.safeParse({ image: formData.get('image') });
-
   if (!validation.success) {
     return {
       success: false,
-      message: 'Invalid input.',
+      message: 'Invalid image file.',
       errors: validation.error.flatten().fieldErrors,
     };
   }
-
   const { image } = validation.data;
   const filePath = `${user.id}/${Date.now()}-${image.name}`;
 
-  // 1. Upload the image to Supabase Storage
-  const { data: uploadData, error: uploadError } = await supabase.storage
+  // 3. Upload image to storage
+  const { error: uploadError } = await supabase.storage
     .from('crop_images')
     .upload(filePath, image);
 
   if (uploadError) {
-    return { success: false, message: `Storage Error: ${uploadError.message}` };
+    console.error('Storage Upload Error:', uploadError);
+    return { success: false, message: 'An error occurred while uploading the image. Please try again.' };
   }
 
-  // 2. Get the public URL of the uploaded image
   const { data: { publicUrl } } = supabase.storage.from('crop_images').getPublicUrl(filePath);
 
-  // 3. Create an initial analysis record
+  // 4. Create initial analysis record in database
   const { data: analysisRecord, error: insertError } = await supabase
     .from('crop_health_analysis')
     .insert({ user_id: user.id, image_url: publicUrl, status: 'pending' })
     .select().single();
 
   if (insertError) {
-    return { success: false, message: `Database Error: ${insertError.message}` };
+    console.error('DB Insert Error:', insertError);
+    return { success: false, message: 'An error occurred while preparing the analysis. Please try again.' };
   }
 
+  // 5. Perform analysis (and update record)
   try {
-    // 4. Call the AI analysis service
     const analysisResult = await getMockAIAnalysis(publicUrl);
 
-    // 5. Update the analysis record with the results
     const { data: updatedRecord, error: updateError } = await supabase
       .from('crop_health_analysis')
       .update({
         status: 'completed',
         analysis_provider: 'openai_mock',
-        analysis_payload: analysisResult,
+        analysis_payload: analysisResult, // Storing the full payload
         detected_disease: analysisResult.detected_disease,
         confidence_score: analysisResult.confidence_score,
         recommendations: analysisResult.recommendations,
       })
       .eq('id', analysisRecord.id)
-      .select().single();
+      .select()
+      .single();
 
     if (updateError) {
-      throw new Error(updateError.message);
+        throw updateError;
     }
 
-    revalidatePath('/dashboard/crop-analysis'); // Assuming this is the page where results are displayed
+    revalidatePath('/dashboard/crop-analysis');
     return {
       success: true,
       message: 'Analysis complete.',
-      analysisResult: updatedRecord,
+      analysisResult: updatedRecord as AnalysisRecord,
     };
 
   } catch (e: any) {
-    // If AI analysis fails, update the status to 'failed'
+    console.error('Analysis or DB Update Error:', e);
+    // Attempt to mark the record as failed
     await supabase.from('crop_health_analysis').update({ status: 'failed' }).eq('id', analysisRecord.id);
-    return { success: false, message: `Analysis failed: ${e.message}` };
+    
+    return { 
+        success: false, 
+        message: 'A critical error occurred during image analysis. The team has been notified.',
+        errors: { _form: ['Analysis failed. Please try again later.'] }
+    };
   }
 }
