@@ -1,9 +1,8 @@
 import { createBrowserClient, createServerClient as createServerClientBrowser, type CookieOptions } from '@supabase/ssr';
 import { createClient as createClientNode } from '@supabase/supabase-js';
 import type { Database } from '../database.types';
-import { cookies } from 'next/headers';
 
-export function createClient(cookieStore: ReturnType<typeof cookies>) {
+export function createClient(cookieStore: any) {
   return createServerClientBrowser<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

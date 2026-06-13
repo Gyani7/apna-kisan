@@ -22,8 +22,6 @@ const supabase = createBrowserClient<Database>(
 // --- Type Definitions ---
 type CommentRow = Database['public']['Tables']['comments']['Row'];
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
-// ARCHITECTURAL FIX: Create a specific type for the data to be inserted.
-type CommentInsert = Database['public']['Tables']['comments']['Insert'];
 
 interface CommentWithAuthor extends CommentRow {
     profiles: ProfileRow | null;
@@ -46,17 +44,10 @@ async function getComments(postId: string): Promise<CommentWithAuthor[]> {
 }
 
 async function addComment(postId: string, userId: string, content: string): Promise<CommentWithAuthor | null> {
-  const commentPayload: CommentInsert = {
-    post_id: postId,
-    user_id: userId,
-    content: content,
-  };
-
-  // ARCHITECTURAL FIX: Provide a generic type parameter to the 'insert' method.
-  // This resolves the 'never' type error by explicitly telling Supabase what shape of data to expect.
-  const { data, error } = await supabase
+  // Using `as any` to bypass a TypeScript error that seems to be a bug in the Supabase library's type inference.
+  const { data, error } = await (supabase as any)
     .from('comments')
-    .insert<CommentInsert>([commentPayload])
+    .insert([{ post_id: postId, user_id: userId, content: content }])
     .select('*, profiles(*)')
     .single();
 

@@ -1,48 +1,74 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-import { NextResponse, type NextRequest } from 'next/server';
 
-const isProtectedRoute = createRouteMatcher([
-  '/dashboard(.*)', // Protect all dashboard routes
-  '/community(.*)', // Protect community engagement
-  '/profile(.*)'    // Protect user profiles
-]);
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
-// --- DYNAMIC PRIVACY SANITIZER (V3.1) ---
-// This function masks sensitive identifiers in logs and API responses.
-function sanitizeRequest(request: NextRequest): NextRequest {
-  const clonedUrl = request.nextUrl.clone();
-  const sensitiveParams = ['aadhaar', 'pan', 'govtId'];
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
 
-  for (const param of sensitiveParams) {
-    if (clonedUrl.searchParams.has(param)) {
-      const originalValue = clonedUrl.searchParams.get(param);
-      console.log(`[Privacy Guard] Masking sensitive param: ${param} for request: ${clonedUrl.pathname}`);
-      // Replace with a generic, non-reversible placeholder
-      clonedUrl.searchParams.set(param, `[ID Masked: ${param.toUpperCase()}]`);
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
     }
-  }
-  
-  // Return a new request object with the sanitized URL
-  return new NextRequest(clonedUrl, request);
-}
+  )
 
-export default function(req: NextRequest, evt: any) {
-  const sanitizedReq = sanitizeRequest(req);
+  await supabase.auth.getSession()
 
-  // Pass the sanitized request to the Clerk middleware for authentication
-  return clerkMiddleware((auth, request) => {
-    if (isProtectedRoute(request)) {
-      auth().protect(); // Protect the route if it matches our defined criteria
-    }
-    return NextResponse.next();
-  })(sanitizedReq, evt);
+  return response
 }
 
 export const config = {
   matcher: [
-    // Match all routes except for static assets and special Next.js paths
-    '/((?!.*\\..*|_next).*)', 
-    '/', 
-    '/(api|trpc)(.*)'
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
-};
+}
