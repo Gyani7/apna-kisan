@@ -1,4 +1,4 @@
-import { createBrowserClient, createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 // Define a function to create a Supabase client for server-side operations
@@ -21,13 +21,5 @@ export function createServer() {
         },
       },
     }
-  )
-}
-
-// Define a function to create a Supabase client for client-side operations
-export function createBrowser() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 }

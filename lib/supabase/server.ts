@@ -66,45 +66,6 @@ export async function updateProfile(
 }
 
 // Post helpers
-export async function getPosts(options?: {
-  category?: string;
-  postType?: string;
-  limit?: number;
-  offset?: number;
-  orderBy?: string;
-}): Promise<RawPost[] | null> {
-  const supabase = createServer();
-  let query = supabase.from("posts").select(
-    "*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)",
-  );
-
-  if (options?.postType) query = query.eq("post_type", options.postType);
-  if (options?.category) query = query.eq("category", options.category);
-  query = query.order(options?.orderBy ?? "created_at", { ascending: false });
-  if (options?.limit) query = query.limit(options.limit);
-  if (options?.offset)
-    query = query.range(options.offset, options.offset + (options.limit ?? 10) - 1);
-
-  const { data } = await query;
-  return data as RawPost[] | null;
-}
-
-export async function getFeaturedStories(
-  limit = 4,
-): Promise<RawPost[] | null> {
-  const supabase = createServer();
-  const { data } = await supabase
-    .from("posts")
-    .select(
-      "*, profiles:user_id(username, full_name, avatar_url, reputation, badge, location)",
-    )
-    .eq("post_type", "story")
-    .eq("is_featured", true)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-  return data as RawPost[] | null;
-}
-
 export async function getPostBySlug(slug: string): Promise<RawPost | null> {
   const supabase = createServer();
   const { data } = await supabase
