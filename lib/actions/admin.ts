@@ -1,8 +1,8 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/utils';
-import { cookies } from 'next/headers';
+import { createServer } from '@/lib/supabase/server';
 
+// Define the shape of a community question
 interface CommunityQuestion {
   id: string;
   created_at: string;
@@ -12,35 +12,50 @@ interface CommunityQuestion {
   state: string;
 }
 
-export async function getStats() {
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+// Define the shape of the statistics object
+interface AdminStats {
+  totalUsers: number;
+  pendingQuestions: number;
+  pendingVerifications: number;
+  recentQuestions: CommunityQuestion[];
+  platformGrowth: {
+    userEngagementIncrease: number;
+    storageUsedPercentage: number;
+  };
+}
 
-    const [
-        { count: totalUsers },
-        { count: pendingQuestions },
-        { count: pendingVerifications },
-        { data: recentQuestionsData }
-    ] = await Promise.all([
-        supabase.from('profiles').select('*', { count: 'exact', head: true }),
-        supabase.from('community_questions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-        supabase.from('verification_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-        supabase.from('community_questions').select('*').order('created_at', { ascending: false }).limit(5)
-    ]);
+/**
+ * Fetches administration statistics from the database.
+ * @returns An object containing various statistics.
+ */
+export async function getStats(): Promise<AdminStats> {
+  const supabase = createServer();
 
-    const recentQuestions: CommunityQuestion[] = recentQuestionsData || [];
+  const [
+    { count: totalUsers },
+    { count: pendingQuestions },
+    { count: pendingVerifications },
+    { data: recentQuestionsData },
+  ] = await Promise.all([
+    supabase.from('profiles').select('*', { count: 'exact', head: true }),
+    supabase.from('community_questions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('verification_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('community_questions').select('*').order('created_at', { ascending: false }).limit(5),
+  ]);
 
-    // Simulated data for platform growth and system health
-    const platformGrowth = {
-        userEngagementIncrease: 12,
-        storageUsedPercentage: 70,
-    };
+  const recentQuestions: CommunityQuestion[] = recentQuestionsData || [];
 
-    return {
-        totalUsers: totalUsers || 0,
-        pendingQuestions: pendingQuestions || 0,
-        pendingVerifications: pendingVerifications || 0,
-        recentQuestions,
-        platformGrowth,
-    };
+  // Simulated data for platform growth and system health
+  const platformGrowth = {
+    userEngagementIncrease: 12, // Example static value
+    storageUsedPercentage: 70, // Example static value
+  };
+
+  return {
+    totalUsers: totalUsers || 0,
+    pendingQuestions: pendingQuestions || 0,
+    pendingVerifications: pendingVerifications || 0,
+    recentQuestions,
+    platformGrowth,
+  };
 }

@@ -1,37 +1,33 @@
-import { createBrowserClient, createServerClient as createServerClientBrowser, type CookieOptions } from '@supabase/ssr';
-import { createClient as createClientNode } from '@supabase/supabase-js';
-import type { Database } from '../database.types';
+import { createBrowserClient, createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
-export function createClient(cookieStore: any) {
-  return createServerClientBrowser<Database>(
+// Define a function to create a Supabase client for server-side operations
+export function createServer() {
+  const cookieStore = cookies()
+
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value;
+          return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options });
+          cookieStore.set({ name, value, ...options })
         },
         remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options });
+          cookieStore.set({ name, value: '', ...options })
         },
       },
     }
-  );
+  )
 }
 
+// Define a function to create a Supabase client for client-side operations
 export function createBrowser() {
-    return createBrowserClient<Database>(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-}
-
-export function createServer() {
-    return createClientNode<Database>(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_KEY!
-    );
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
 }

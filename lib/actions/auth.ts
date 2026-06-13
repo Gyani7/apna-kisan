@@ -1,13 +1,16 @@
 'use server';
 
-import { createServer } from '@/lib/supabase/utils';
+import { createServer } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { AuthError } from '@supabase/supabase-js';
 
-// Common type for action results
-export type ActionResult = {
+// A more generic action result type
+export type ActionAuthResult<T = null> = {
   success: boolean;
   message: string;
+  data: T | null;
+  error: { message: string; details: string } | null;
 };
 
 // --- Schema Definitions ---
@@ -26,32 +29,40 @@ const VerifyOTPSchema = z.object({
 });
 
 
+// Helper to format error
+const formatError = (error: AuthError | Error | null) => {
+    if (!error) return null;
+    return { message: error.message, details: (error as AuthError).cause?.toString() || '' };
+}
+
 // --- Password Authentication ---
-export async function signInWithPassword(formData: FormData): Promise<ActionResult> {
+export async function signInWithPassword(formData: FormData): Promise<ActionAuthResult> {
   const supabase = createServer();
   const validation = EmailPasswordSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validation.success) {
-    return { success: false, message: validation.error.errors.map(e => e.message).join(', ') };
+    const message = validation.error.errors.map(e => e.message).join(', ');
+    return { success: false, message, data: null, error: { message, details: '' } };
   }
 
   const { email, password } = validation.data;
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    return { success: false, message: `Authentication failed: ${error.message}` };
+    return { success: false, message: 'Authentication failed', data: null, error: formatError(error) };
   }
 
   revalidatePath('/', 'layout');
-  return { success: true, message: 'Successfully signed in!' };
+  return { success: true, message: 'Successfully signed in!', data: null, error: null };
 }
 
-export async function signUpWithPassword(formData: FormData): Promise<ActionResult> {
+export async function signUpWithPassword(formData: FormData): Promise<ActionAuthResult> {
   const supabase = createServer();
   const validation = EmailPasswordSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validation.success) {
-    return { success: false, message: validation.error.errors.map(e => e.message).join(', ') };
+    const message = validation.error.errors.map(e => e.message).join(', ');
+    return { success: false, message, data: null, error: { message, details: '' } };
   }
 
   const { email, password } = validation.data;
@@ -64,40 +75,42 @@ export async function signUpWithPassword(formData: FormData): Promise<ActionResu
     });
 
   if (error) {
-    return { success: false, message: `Sign-up failed: ${error.message}` };
+    return { success: false, message: 'Sign-up failed', data: null, error: formatError(error) };
   }
 
-  return { success: true, message: 'Sign-up successful! Please check your email to verify.' };
+  return { success: true, message: 'Sign-up successful! Please check your email to verify.', data: null, error: null };
 }
 
 // --- Mobile OTP Authentication ---
-export async function sendMobileOTP(formData: FormData): Promise<ActionResult> {
+export async function sendMobileOTP(formData: FormData): Promise<ActionAuthResult> {
   const supabase = createServer();
   const validation = PhoneSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validation.success) {
-    return { success: false, message: validation.error.errors.map(e => e.message).join(', ') };
+    const message = validation.error.errors.map(e => e.message).join(', ');
+    return { success: false, message, data: null, error: { message, details: '' } };
   }
   
   const { phone } = validation.data;
   
   const { error } = await supabase.auth.signInWithOtp({
-    phone: `+91${phone}`, // Assuming Indian numbers
+    phone: `+91${phone}`,
   });
 
   if (error) {
-    return { success: false, message: `Failed to send OTP: ${error.message}` };
+    return { success: false, message: 'Failed to send OTP', data: null, error: formatError(error) };
   }
 
-  return { success: true, message: 'OTP sent to your mobile number.' };
+  return { success: true, message: 'OTP sent to your mobile number.', data: null, error: null };
 }
 
-export async function verifyMobileOTP(formData: FormData): Promise<ActionResult> {
+export async function verifyMobileOTP(formData: FormData): Promise<ActionAuthResult> {
   const supabase = createServer();
   const validation = VerifyOTPSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validation.success) {
-      return { success: false, message: validation.error.errors.map(e => e.message).join(', ') };
+      const message = validation.error.errors.map(e => e.message).join(', ');
+      return { success: false, message, data: null, error: { message, details: '' } };
   }
   
   const { phone, token } = validation.data;
@@ -109,17 +122,16 @@ export async function verifyMobileOTP(formData: FormData): Promise<ActionResult>
   });
 
   if (error) {
-    return { success: false, message: `Failed to verify OTP: ${error.message}` };
+    return { success: false, message: 'Failed to verify OTP', data: null, error: formatError(error) };
   }
 
   revalidatePath('/', 'layout');
-  return { success: true, message: 'Successfully verified and signed in!' };
+  return { success: true, message: 'Successfully verified and signed in!', data: null, error: null };
 }
 
 
-// --- Existing Functions (retained and updated) ---
-
-export async function signInWithEmail(email: string) {
+// --- Email Link Authentication ---
+export async function signInWithEmail(email: string): Promise<ActionAuthResult> {
     const supabase = createServer();
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -127,10 +139,14 @@ export async function signInWithEmail(email: string) {
         emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
       }
     });
-    return { error };
+    if (error) {
+        return { success: false, message: 'Failed to send magic link.', data: null, error: formatError(error) };
+    }
+    return { success: true, message: 'Magic link sent to your email.', data: null, error: null };
 }
 
-export async function signInWithGoogle() {
+// --- OAuth (Google) Authentication ---
+export async function signInWithGoogle(): Promise<ActionAuthResult<{ url: string | null }>> {
     const supabase = createServer();
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -138,12 +154,19 @@ export async function signInWithGoogle() {
         redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
       }
     });
-    return { data, error };
+     if (error) {
+        return { success: false, message: 'Google sign-in failed.', data: null, error: formatError(error) };
+    }
+    return { success: true, message: 'Redirecting to Google for authentication...', data: { url: data.url }, error: null };
 }
 
-export async function signOut() {
+// --- Sign Out ---
+export async function signOut(): Promise<ActionAuthResult> {
     const supabase = createServer();
     const { error } = await supabase.auth.signOut();
+    if (error) {
+        return { success: false, message: 'Sign-out failed.', data: null, error: formatError(error) };
+    }
     revalidatePath('/', 'layout');
-    return { error };
+    return { success: true, message: 'Successfully signed out.', data: null, error: null };
 }
