@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Mail } from 'lucide-react';
-import { createBrowser } from '@/lib/supabase/utils';
+import { createBrowser } from '@/lib/supabase/client';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 

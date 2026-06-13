@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { analyzeCropImage } from '@/lib/actions/crop-analysis';
-import { createBrowser } from '@/lib/supabase/utils';
+import { createBrowser } from '@/lib/supabase/client';
 import type { CropHealthAnalysis } from '@/lib/types';
 import { UploadCloud, CheckCircle, AlertTriangle, BarChart2, Zap } from 'lucide-react';
 

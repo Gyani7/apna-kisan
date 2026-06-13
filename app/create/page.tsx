@@ -7,7 +7,7 @@ import { MessageSquare, CircleHelp as HelpCircle, BookOpen, X, Send, ImagePlus, 
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { createBrowser } from '@/lib/supabase/utils';
+import { createBrowser } from '@/lib/supabase/client';
 import { CATEGORIES } from '@/lib/types';
 import type { PostType } from '@/lib/types';
 import clsx from 'clsx';
