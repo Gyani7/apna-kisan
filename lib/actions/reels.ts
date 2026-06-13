@@ -1,9 +1,9 @@
 'use server';
 
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createServer } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import type { ReelData } from '@/lib/types';
 
 // --- TYPE DEFINITIONS ---
 export type ActionResult = {
@@ -29,30 +29,72 @@ const CreateReelSchema = z.object({
   video_url: z.string().url('A valid video URL must be provided.'),
 });
 
-// --- HELPER TO GET SUPABASE SERVER CLIENT ---
-function getSupabaseServerClient() {
-    const cookieStore = cookies();
-    return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SECRET_KEY!,
-        {
-            cookies: {
-                get: (name) => cookieStore.get(name)?.value,
-                set: (name, value, options) => cookieStore.set({ name, value, ...options }),
-                remove: (name, options) => cookieStore.set({ name, value: '', ...options }),
-            },
-        }
-    );
+// --- SERVER ACTIONS ---
+
+export async function getReels(): Promise<{ reels: ReelData[], error: string | null }> {
+  const supabase = createServer();
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const { data: reelsData, error } = await supabase
+      .from('reels')
+      .select(`
+        id,
+        created_at,
+        video_url,
+        caption,
+        likes_count,
+        comments_count,
+        user:profiles(id, full_name, avatar_url),
+        village:villages(id, name),
+        comments:reel_comments(id, content, created_at, user:profiles(full_name))
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    if (reelsData) {
+      let likedReelIds = new Set();
+      if (user) {
+          const reelIds = reelsData.map(r => r.id);
+          const { data: likesData, error: likesError } = await supabase
+              .from('reel_likes')
+              .select('reel_id')
+              .in('reel_id', reelIds)
+              .eq('user_id', user.id);
+
+          if (likesError) {
+              console.error("Reels Fetch Likes Error: [User ID Masked]", { message: likesError.message });
+          } else if (likesData) {
+              likedReelIds = new Set(likesData.map(l => l.reel_id));
+          }
+      }
+
+      const reels = reelsData.map(reel => ({
+        ...reel,
+        comments: reel.comments ?? [],
+        user_has_liked_reel: likedReelIds.has(reel.id)
+      })) as ReelData[];
+      return { reels, error: null };
+    }
+    return { reels: [], error: null };
+
+  } catch (e: any) {
+    console.error('Reels Fetch Error: [Database Query Redacted]', { message: e.message });
+    return { reels: [], error: 'Could not load reels at this time.' };
+  }
 }
 
-// --- SERVER ACTIONS ---
 
 /**
  * Toggles a user's like on a reel by calling a PostgreSQL RPC function.
  * This provides atomicity and prevents race conditions.
  */
 export async function toggleLike(reelId: string): Promise<LikeActionResult> {
-    const supabase = getSupabaseServerClient();
+    const supabase = createServer();
 
     try {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -60,20 +102,17 @@ export async function toggleLike(reelId: string): Promise<LikeActionResult> {
             return { success: false, message: 'Unauthorized action.' };
         }
 
-        // Validate the incoming reelId
         const validation = ReelIdSchema.safeParse(reelId);
         if (!validation.success) {
             return { success: false, message: 'Invalid Reel ID.' };
         }
 
-        // Call the atomic RPC function
         const { data, error: rpcError } = await supabase.rpc('toggle_reel_like', {
             p_reel_id: validation.data,
             p_user_id: user.id,
         });
 
         if (rpcError) {
-            // Data Masking: Log internal error, return generic message
             console.error('RPC toggle_reel_like Error: [ID Masked]', { message: rpcError.message });
             return { success: false, message: 'Could not update like status.' };
         }
@@ -97,7 +136,7 @@ export async function toggleLike(reelId: string): Promise<LikeActionResult> {
  * Adds a comment to a reel using an atomic RPC function.
  */
 export async function addComment(formData: FormData): Promise<ActionResult> {
-    const supabase = getSupabaseServerClient();
+    const supabase = createServer();
     
     try {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -134,7 +173,7 @@ export async function addComment(formData: FormData): Promise<ActionResult> {
  * Creates the database record for a new reel.
  */
 export async function createReelRecord(formData: FormData): Promise<ActionResult> {
-  const supabase = getSupabaseServerClient();
+  const supabase = createServer();
 
   try {
     const { data: { user }, error: authError } = await supabase.auth.getUser();

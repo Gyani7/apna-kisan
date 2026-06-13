@@ -3,24 +3,18 @@ import BottomNav from '@/components/BottomNav';
 import LeftSidebar from '@/components/LeftSidebar';
 import RightSidebar from '@/components/RightSidebar';
 import CreatePostCard from '@/components/CreatePostCard';
-import PostCard from '@/components/PostCard';
 import StoryCard from '@/components/StoryCard';
 import StoriesBar from '@/components/StoriesBar';
 import FarmingTipsCard from '@/components/FarmingTipsCard';
 import AuthProvider from '@/components/AuthProvider';
+import UnifiedGlobalFeed from '@/components/UnifiedGlobalFeed';
 import { generateWebsiteSchema } from '@/lib/seo';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
-import { getPosts, getFeaturedStories } from '@/lib/actions/posts';
+import { getFeaturedStories } from '@/lib/actions/posts';
 
 export default async function HomePage() {
-  const [posts, featuredStories] = await Promise.all([
-    getPosts({ limit: 20 }),
-    getFeaturedStories(4),
-  ]);
-
-  const allPosts = mapPostsToPostWithAuthor(posts ?? []);
+  const featuredStories = await getFeaturedStories(4);
   const featuredData = mapPostsToPostWithAuthor(featuredStories ?? []);
-  const feedPosts = allPosts.filter((p) => p.post_type === 'discussion' || p.post_type === 'question');
 
   return (
     <AuthProvider>
@@ -55,18 +49,8 @@ export default async function HomePage() {
               <FarmingTipsCard />
 
               {/* Community Feed */}
-              <section>
-                <h2 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-3">Community Charcha</h2>
-                <div className="flex flex-col gap-4">
-                  {feedPosts.length === 0 ? (
-                    <div className="card p-8 text-center">
-                      <p className="text-gray-400 dark:text-gray-500">Abhi koi post nahi hai. Pehla post banayein!</p>
-                    </div>
-                  ) : (
-                    feedPosts.map((post) => <PostCard key={post.id} post={post} />)
-                  )}
-                </div>
-              </section>
+              <h2 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-3">Community Charcha</h2>
+              <UnifiedGlobalFeed />
             </div>
 
             <RightSidebar />

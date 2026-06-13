@@ -32,6 +32,33 @@ export interface PostWithAuthor {
   is_bookmarked?: boolean;
 }
 
+export type ReelData = {
+  id: string;
+  created_at: string;
+  video_url: string;
+  caption: string | null;
+  likes_count: number | null;
+  comments_count: number | null;
+  user: {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
+  village: {
+    id: number;
+    name: string | null;
+  } | null;
+  comments: {
+    id: string;
+    content: string;
+    created_at: string;
+    user: {
+        full_name: string | null;
+    } | null
+  }[];
+  user_has_liked_reel: boolean;
+};
+
 export interface Category {
   slug: string;
   name: string;
