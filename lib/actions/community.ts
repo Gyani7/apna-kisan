@@ -3,6 +3,8 @@
 import { z } from 'zod';
 import { createServer } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import type { PostWithAuthor } from '@/lib/types';
+import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 
 // --- UTILITIES ---
 
@@ -32,6 +34,21 @@ const GuestAnswerSchema = z.object({
 });
 
 // --- SERVER ACTIONS ---
+
+export async function getCommunityPosts(options: { postType?: string, orderBy?: string, limit?: number }): Promise<PostWithAuthor[]> {
+  const supabase = createServer();
+  let query = supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge)');
+
+  if (options.postType) {
+    query = query.eq('post_type', options.postType);
+  }
+
+  query = query.order(options.orderBy ?? 'created_at', { ascending: false }).limit(options.limit ?? 20);
+
+  const { data } = await query;
+  return mapPostsToPostWithAuthor(data ?? []);
+}
+
 
 /**
  * Represents the state of a form action, including success status,
