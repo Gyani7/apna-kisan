@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Sun, Droplets, TrendingUp, TrendingDown, Trophy, ArrowUpRight } from 'lucide-react';
-import { createBrowser } from '@/lib/supabase/utils';
+import { createBrowser } from '@/lib/supabase/client';
 import type { MandiRateRow, ProfileRow } from '@/lib/database.types';
 
 const supabase = createBrowser();

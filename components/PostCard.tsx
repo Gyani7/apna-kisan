@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Heart, MessageCircle, Share2, Bookmark, MapPin, MessageSquare, CircleHelp as HelpCircle, BookOpen, Bell, MoveHorizontal as MoreHorizontal } from 'lucide-react';
 import clsx from 'clsx';
 import { PostWithAuthor, POST_TYPE_CONFIG, timeAgo, formatCount } from '@/lib/types';
-import { createBrowser } from '@/lib/supabase/utils';
+import { createBrowser } from '@/lib/supabase/client';
 import { useAuth } from '@/components/AuthProvider';
 
 const supabase = createBrowser();

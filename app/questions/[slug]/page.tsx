@@ -20,13 +20,12 @@ type Question = Database['public']['Tables']['questions']['Row'] & {
   answers: Answer[];
 };
 
-// CORRECT: params is a direct object, not a Promise.
 interface QuestionPageProps {
   params: { slug: string };
 }
 
 export async function generateMetadata({ params }: QuestionPageProps): Promise<Metadata> {
-  const { slug } = params; // CORRECT: Removed 'await'
+  const { slug } = params;
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
   const { data: question } = await supabase
@@ -49,7 +48,7 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
 }
 
 export default async function QuestionDetailPage({ params }: QuestionPageProps) {
-  const { slug } = params; // CORRECT: Removed 'await'
+  const { slug } = params;
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
 
@@ -62,7 +61,8 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
     `)
     .eq('slug', slug)
     .eq('status', 'published')
-    .single<Question>();
+    .limit(1)
+    .maybeSingle();
 
   if (error || !question) {
     notFound();
@@ -113,7 +113,6 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
         </div>
 
         <div className="flex flex-wrap gap-2 mb-6">
-          {/* COMPLIANT: Null-safe mapping with stable key */}
           {question.tags?.map((tag: string) => (
             <span key={tag} className="px-3 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
               #{tag}
@@ -133,7 +132,6 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
           </div>
           <Button variant="ghost" size="sm" className="gap-2">
             <MessageSquare className="w-4 h-4" />
-            {/* COMPLIANT: Null-safe access */}
             {question.answers?.length || 0} Answers
           </Button>
         </div>
@@ -142,7 +140,6 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
       <section className="space-y-6">
         <h2 className="text-xl font-bold flex items-center gap-2">
           Expert Answers
-          {/* COMPLIANT: Null-safe access */}
           <Badge variant="outline">{question.answers?.length || 0}</Badge>
         </h2>
 
@@ -152,7 +149,6 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
             <Button className="mt-4 bg-green-600 hover:bg-green-700 text-white">Answer this Question</Button>
           </div>
         ) : (
-          /* COMPLIANT: Null-safe mapping with stable key */
           question.answers?.map((answer) => (
             <div key={answer.id} className={`p-6 rounded-xl border ${answer.is_best_answer ? 'border-green-500 bg-green-50/30 dark:bg-green-900/10' : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'}`}>
               {answer.is_best_answer && (

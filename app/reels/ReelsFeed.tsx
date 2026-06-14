@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useRef } from 'react';
-import { createBrowser } from '@/lib/supabase/utils';
+import { createBrowser } from '@/lib/supabase/client';
 import { createReelRecord, ActionResult } from '@/lib/actions/reels';
 import type { ReelData } from './page';
 import { Plus, Video, Send, Loader2 } from 'lucide-react';

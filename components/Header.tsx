@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Search, Bell, Moon, Sun, LogIn, X } from 'lucide-react';
 import { useTheme } from '@/components/ThemeProvider';
 import { useAuth } from '@/components/AuthProvider';
-import { createBrowser } from '@/lib/supabase/utils';
+import { createBrowser } from '@/lib/supabase/client';
 import type { NotificationRow } from '@/lib/database.types';
 import { timeAgo } from '@/lib/types';
 

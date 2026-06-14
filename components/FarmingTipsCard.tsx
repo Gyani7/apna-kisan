@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Leaf, TrendingUp, CircleAlert as AlertCircle, CloudRain } from 'lucide-react';
 import type { FarmingTipRow } from '@/lib/database.types';
-import { createBrowser } from '@/lib/supabase/utils';
+import { createBrowser } from '@/lib/supabase/client';
 
 const supabase = createBrowser();
 
