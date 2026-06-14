@@ -1,3 +1,5 @@
+const { withContentlayer } = require("next-contentlayer")
+
 /** @type {import('next').NextConfig} */
 
 // --- SECURITY & PRIVACY HEADERS (V3.1) ---
@@ -61,4 +63,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withContentlayer(nextConfig);
