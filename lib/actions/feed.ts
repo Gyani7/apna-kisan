@@ -6,7 +6,7 @@ import type { Database } from '@/lib/database.types';
 // --- TYPE DEFINITIONS FOR UNIFIED FEED ---
 
 /** Base profile type for post authors. */
-type AuthorProfile = Pick<Database['public']['Tables']['profiles']['Row'], 'id' | 'username' | 'avatar_url' | 'full_name'> | null;
+type AuthorProfile = Pick<Database['public']['Tables']['profiles']['Row'], 'id' | 'username' | 'avatar_url' | 'full_name'>;
 
 /** Represents a question in the unified feed. */
 export interface QuestionPost {
@@ -74,54 +74,79 @@ export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: st
         .from('reels')
         .select(`id, caption, video_url, created_at, like_count, author:profiles!inner(id, username, avatar_url, full_name)`)
         .order('created_at', { ascending: false })
-        .limit(20)
+        .limit(20),
     ]);
 
-    if (questionsResult.error) throw new Error(`Failed to fetch questions: ${questionsResult.error.message}`);
-    if (storiesResult.error) throw new Error(`Failed to fetch stories: ${storiesResult.error.message}`);
-    if (reelsResult.error) throw new Error(`Failed to fetch reels: ${reelsResult.error.message}`);
+    // --- STEP 2: Process and combine the data ---
 
-    // --- STEP 2: Normalize each data type into the UnifiedPost format ---
+    if (questionsResult.error || storiesResult.error || reelsResult.error) {
+      console.error("Error fetching feed data:", questionsResult.error || storiesResult.error || reelsResult.error);
+      return { data: [], error: 'Failed to fetch feed data.' };
+    }
 
-    const normalizedQuestions: QuestionPost[] = (questionsResult.data || []).map(q => ({
-      id: q.id,
-      type: 'question',
-      title: q.title,
-      content: q.content,
-      created_at: q.created_at,
-      slug: q.slug,
-      author: Array.isArray(q.author) ? (q.author[0] ?? null) : q.author,
-      vote_count: q.vote_count ?? 0,
-      answer_count: Array.isArray(q.answers) ? q.answers.length : 0,
-    }));
+    const questions: QuestionPost[] = (questionsResult.data || [])
+      .map(q => {
+        if (!q.author) return null;
+        const author = Array.isArray(q.author) ? q.author[0] : q.author;
+        if (!author) return null;
 
-    const normalizedStories: StoryPost[] = (storiesResult.data || []).map(s => ({
-      id: s.id,
-      type: 'story',
-      title: s.title,
-      content: s.content,
-      created_at: s.created_at,
-      slug: s.slug,
-      author: Array.isArray(s.author) ? (s.author[0] ?? null) : s.author,
-      thumbnail_url: s.thumbnail_url,
-    }));
-    
-    const normalizedReels: ReelPost[] = (reelsResult.data || []).map(r => ({
-      id: r.id,
-      type: 'reel',
-      caption: r.caption,
-      video_url: r.video_url,
-      created_at: r.created_at,
-      author: Array.isArray(r.author) ? (r.author[0] ?? null) : r.author,
-      like_count: r.like_count ?? 0,
-    }));
+        return {
+          id: q.id,
+          type: 'question' as const,
+          title: q.title,
+          content: q.content,
+          created_at: q.created_at,
+          slug: q.slug,
+          author: author,
+          vote_count: q.vote_count,
+          answer_count: q.answers.length,
+        };
+      })
+      .filter((q): q is QuestionPost => q !== null);
 
-    // --- STEP 3: Combine, sort, and return the final feed ---
+    const stories: StoryPost[] = (storiesResult.data || [])
+      .map(s => {
+          if (!s.author) return null;
+          const author = Array.isArray(s.author) ? s.author[0] : s.author;
+          if (!author) return null;
 
-    const unifiedFeed: UnifiedPost[] = [...normalizedQuestions, ...normalizedStories, ...normalizedReels];
-    unifiedFeed.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+          return {
+              id: s.id,
+              type: 'story' as const,
+              title: s.title,
+              content: s.content,
+              created_at: s.created_at,
+              slug: s.slug,
+              author: author,
+              thumbnail_url: s.thumbnail_url,
+          };
+      })
+      .filter((s): s is StoryPost => s !== null);
 
-    return { data: unifiedFeed, error: null };
+    const reels: ReelPost[] = (reelsResult.data || [])
+      .map(r => {
+          if (!r.author) return null;
+          const author = Array.isArray(r.author) ? r.author[0] : r.author;
+          if (!author) return null;
+          
+          return {
+              id: r.id,
+              type: 'reel' as const,
+              caption: r.caption,
+              video_url: r.video_url,
+              created_at: r.created_at,
+              author: author,
+              like_count: r.like_count,
+          };
+      })
+      .filter((r): r is ReelPost => r !== null);
+
+    // --- STEP 3: Merge, sort, and return the final feed ---
+
+    const combinedFeed = [...questions, ...stories, ...reels];
+    combinedFeed.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    return { data: combinedFeed, error: null };
 
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred while fetching the feed.';

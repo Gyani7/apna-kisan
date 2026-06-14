@@ -1,42 +1,57 @@
-import type { Metadata, Viewport } from 'next';
-import './globals.css';
-import ThemeProvider from '@/components/ThemeProvider';
+import { Analytics } from '@vercel/analytics/react';
+import { Inter } from 'next/font/google';
+import { Toaster } from 'react-hot-toast';
 
-export const metadata: Metadata = {
-  title: {
-    default: 'Apna Kisan - Kisan Community Platform',
-    template: '%s | Apna Kisan',
-  },
-  description: 'Connect with farmers, share knowledge, and grow together. Community platform for Indian farmers.',
-  manifest: '/manifest.json',
-  keywords: ['kisan', 'farming', 'agriculture', 'community', 'organic', 'mandi', 'India'],
-};
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import { TailwindIndicator } from '@/components/TailwindIndicator';
+import { Providers } from '@/components/Providers';
+import { siteConfig } from '@/config/site';
+import { cn } from '@/lib/utils';
+import '@/styles/globals.css';
 
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  themeColor: '#16a34a',
-};
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+});
 
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="hi" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
+        <title>{siteConfig.name}</title>
+        <meta name="description" content={siteConfig.description} />
+        <meta
+          name="theme-color"
+          media="(prefers-color-scheme: light)"
+          content="white"
+        />
+        <meta
+          name="theme-color"
+          media="(prefers-color-scheme: dark)"
+          content="black"
         />
       </head>
-      <body className="font-sans bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased',
+          inter.variable,
+        )}
+      >
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+          <TailwindIndicator />
+        </Providers>
+        <Toaster />
+        <Analytics />
       </body>
     </html>
   );
