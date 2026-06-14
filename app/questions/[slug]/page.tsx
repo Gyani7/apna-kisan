@@ -1,40 +1,18 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/utils';
-import { cookies } from 'next/headers';
 import { generateQuestionSchema } from '@/lib/seo';
-import { PostCard } from '@/components/PostCard';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { ArrowBigUp, ArrowBigDown, MessageSquare, CheckCircle2 } from 'lucide-react';
-import type { Database } from '@/lib/database.types';
-
-type Answer = Database['public']['Tables']['answers']['Row'] & {
-  author: Database['public']['Tables']['profiles']['Row'] | null;
-};
-
-type Question = Database['public']['Tables']['questions']['Row'] & {
-  author: Database['public']['Tables']['profiles']['Row'] | null;
-  answers: Answer[];
-};
+import { getQuestion } from '@/lib/actions/question';
 
 interface QuestionPageProps {
   params: { slug: string };
 }
 
 export async function generateMetadata({ params }: QuestionPageProps): Promise<Metadata> {
-  const { slug } = params;
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
-  const { data: question } = await supabase
-    .from('questions')
-    .select('title, content')
-    .eq('slug', slug)
-    .single();
-
-  if (!question) return { title: 'Question Not Found' };
+  const question = await getQuestion(params.slug);
 
   return {
     title: `${question.title} | Apna Kisan Knowledge Hub`,
@@ -48,26 +26,7 @@ export async function generateMetadata({ params }: QuestionPageProps): Promise<M
 }
 
 export default async function QuestionDetailPage({ params }: QuestionPageProps) {
-  const { slug } = params;
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
-
-  const { data: question, error } = await supabase
-    .from('questions')
-    .select(`
-      *,
-      author:profiles(*),
-      answers(*, author:profiles(*))
-    `)
-    .eq('slug', slug)
-    .eq('status', 'published')
-    .limit(1)
-    .maybeSingle();
-
-  if (error || !question) {
-    notFound();
-  }
-
+  const question = await getQuestion(params.slug);
   const jsonLd = generateQuestionSchema(question, question.answers);
 
   return (

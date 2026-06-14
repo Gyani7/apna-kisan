@@ -61,18 +61,18 @@ export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: st
     const [questionsResult, storiesResult, reelsResult] = await Promise.all([
       supabase
         .from('questions')
-        .select(`id, title, content, created_at, slug, vote_count, answers(id), author:profiles(id, username, avatar_url, full_name)`)
+        .select(`id, title, content, created_at, slug, vote_count, answers(id), author:profiles!inner(id, username, avatar_url, full_name)`)
         .order('created_at', { ascending: false })
         .limit(20),
       supabase
         .from('posts')
-        .select(`id, title, content, created_at, slug, thumbnail_url, author:profiles(id, username, avatar_url, full_name)`)
+        .select(`id, title, content, created_at, slug, thumbnail_url, author:profiles!inner(id, username, avatar_url, full_name)`)
         .eq('post_type', 'story')
         .order('created_at', { ascending: false })
         .limit(20),
       supabase
         .from('reels')
-        .select(`id, caption, video_url, created_at, like_count, author:profiles(id, username, avatar_url, full_name)`)
+        .select(`id, caption, video_url, created_at, like_count, author:profiles!inner(id, username, avatar_url, full_name)`)
         .order('created_at', { ascending: false })
         .limit(20)
     ]);
@@ -90,7 +90,7 @@ export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: st
       content: q.content,
       created_at: q.created_at,
       slug: q.slug,
-      author: q.author,
+      author: Array.isArray(q.author) ? (q.author[0] ?? null) : q.author,
       vote_count: q.vote_count ?? 0,
       answer_count: Array.isArray(q.answers) ? q.answers.length : 0,
     }));
@@ -102,7 +102,7 @@ export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: st
       content: s.content,
       created_at: s.created_at,
       slug: s.slug,
-      author: s.author,
+      author: Array.isArray(s.author) ? (s.author[0] ?? null) : s.author,
       thumbnail_url: s.thumbnail_url,
     }));
     
@@ -112,7 +112,7 @@ export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: st
       caption: r.caption,
       video_url: r.video_url,
       created_at: r.created_at,
-      author: r.author,
+      author: Array.isArray(r.author) ? (r.author[0] ?? null) : r.author,
       like_count: r.like_count ?? 0,
     }));
 
