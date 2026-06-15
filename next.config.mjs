@@ -8,6 +8,10 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
+  webpack: (config) => {
+    config.resolve.alias['#site/content'] = './.velite/content';
+    return config;
+  },
 };
 
 export default nextConfig;
