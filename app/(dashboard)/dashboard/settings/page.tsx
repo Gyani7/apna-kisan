@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 
 import { getCurrentUser } from "@/lib/session"
-import { DashboardHeader } from "@/components/header"
+import { PageHeader } from "@/components/PageHeader"
 import { DashboardShell } from "@/components/shell"
 import { UserNameForm } from "@/components/UserNameForm"
 
@@ -18,7 +18,7 @@ export default async function SettingsPage() {
 
   return (
     <DashboardShell>
-      <DashboardHeader
+      <PageHeader
         heading="Settings"
         text="Manage account and website settings."
       />

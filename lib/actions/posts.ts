@@ -1,7 +1,8 @@
 'use server';
 
-import { createServer } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { Database } from '@/lib/database.types';
+import { cookies } from 'next/headers';
 
 // --- TYPE DEFINITIONS ---
 
@@ -26,7 +27,8 @@ export type Post = Database['public']['Tables']['posts']['Row'] & {
  * Returns an empty array if there's an error.
  */
 export async function getPosts({ limit }: { limit: number }): Promise<Post[]> {
-  const supabase = createServer();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
 
   const { data, error } = await supabase
     .from('posts')
@@ -50,7 +52,8 @@ export async function getPosts({ limit }: { limit: number }): Promise<Post[]> {
  * Returns an empty array if there's an error.
  */
 export async function getFeaturedStories(limit = 4): Promise<Post[]> {
-  const supabase = createServer();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
 
   const { data, error } = await supabase
     .from('posts')

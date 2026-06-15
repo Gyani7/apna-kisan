@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { Mail } from 'lucide-react';
-import { createBrowser } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 
-const supabase = createBrowser();
+const supabase = createBrowserClient();
 
 async function signInWithEmail(email: string) {
   return await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${location.origin}/auth/callback` } });

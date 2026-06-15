@@ -1,7 +1,8 @@
 'use server';
 
-import { createServer } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { Database } from '@/lib/database.types';
+import { cookies } from 'next/headers';
 
 // --- TYPE DEFINITIONS FOR UNIFIED FEED ---
 
@@ -53,7 +54,8 @@ export type UnifiedPost = QuestionPost | StoryPost | ReelPost;
  * @returns A promise that resolves to an object containing the unified feed data or an error message.
  */
 export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: string | null; }> {
-  const supabase = createServer();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
 
   try {
     // --- STEP 1: Fetch all data sources in parallel ---

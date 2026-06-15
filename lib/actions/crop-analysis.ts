@@ -1,8 +1,9 @@
 'use server';
 
 import { z } from 'zod';
-import { createServer } from '@/lib/supabase/utils';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 
 // --- TYPE DEFINITIONS ---
 
@@ -88,7 +89,8 @@ async function getMockAIAnalysis(imageUrl: string): Promise<AIAnalysisResult> {
  * @returns An updated AnalysisFormState with the result of the operation.
  */
 export async function analyzeCropImage(prevState: AnalysisFormState, formData: FormData): Promise<AnalysisFormState> {
-  const supabase = createServer();
+    const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
 
   // 1. Authenticate user
   const { data: { user } } = await supabase.auth.getUser();
@@ -162,7 +164,7 @@ export async function analyzeCropImage(prevState: AnalysisFormState, formData: F
 
   } catch (e: any) {
     console.error('Analysis or DB Update Error:', e);
-    // Attempt to mark the record as failed
+    // Attempt to mark the. record as failed
     await supabase.from('crop_health_analysis').update({ status: 'failed' }).eq('id', analysisRecord.id);
     
     return { 

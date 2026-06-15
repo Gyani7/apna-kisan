@@ -8,14 +8,14 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
 import AuthProvider, { useAuth } from '@/components/AuthProvider';
-import { createBrowser } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 import type { PostWithAuthor } from '@/lib/types';
 import clsx from 'clsx';
 import ReputationBadge from '@/components/reputation/ReputationBadge';
 import VerificationUpload from '@/components/reputation/VerificationUpload';
 
-const supabase = createBrowser();
+const supabase = createBrowserClient();
 
 const BUCKETS = {
     posts: 'posts',

@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createBrowser } from '@/lib/supabase/utils';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 
-const supabase = createBrowser();
+const supabase = createBrowserClient();
 
 type DocType = 'Aadhaar' | 'Farmer Card' | 'KCC Card';
 type VerificationStatus = 'pending' | 'approved' | 'rejected' | 'none';

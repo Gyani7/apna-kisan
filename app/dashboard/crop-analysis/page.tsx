@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { analyzeCropImage } from '@/lib/actions/crop-analysis';
-import { createBrowser } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 import type { CropHealthAnalysis } from '@/lib/types';
 import { UploadCloud, CheckCircle, AlertTriangle, BarChart2, Zap } from 'lucide-react';
 
@@ -69,7 +69,7 @@ export default function CropAnalysisPage() {
   const [state, formAction] = useFormState(analyzeCropImage, initialState);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [history, setHistory] = useState<CropHealthAnalysis[]>([]);
-  const supabase = createBrowser();
+  const supabase = createBrowserClient();
 
   useEffect(() => {
     async function fetchHistory() {

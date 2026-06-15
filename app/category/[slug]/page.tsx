@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
 import AuthProvider from '@/components/AuthProvider';
-import { createClient } from '@/lib/supabase/utils';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { CATEGORIES } from '@/lib/types';
 import { generatePageMeta } from '@/lib/seo';
@@ -12,7 +12,7 @@ import type { Metadata } from 'next';
 
 async function getPosts({ category, limit }: { category: string; limit: number }) {
     const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createSupabaseServerClient(cookieStore);
     let query = supabase
         .from('posts')
         .select('*, profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')

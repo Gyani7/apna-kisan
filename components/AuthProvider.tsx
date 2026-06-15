@@ -2,10 +2,10 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
-import { createBrowser } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 import type { ProfileRow } from '@/lib/database.types';
 
-const supabase = createBrowser();
+const supabase = createBrowserClient();
 
 async function getProfile(userId: string) {
     const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();

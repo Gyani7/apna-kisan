@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 
 import { getCurrentUser } from "@/lib/session"
-import { DashboardHeader } from "@/components/header"
+import { PageHeader } from "@/components/PageHeader"
 import { DashboardShell } from "@/components/shell"
 
 export const metadata = {
@@ -17,7 +17,7 @@ export default async function DashboardPage() {
 
   return (
     <DashboardShell>
-      <DashboardHeader
+      <PageHeader
         heading="Dashboard"
         text="Manage your account and website."
       />
