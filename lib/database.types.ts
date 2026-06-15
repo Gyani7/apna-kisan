@@ -54,6 +54,7 @@ export interface Database {
           title: string;
           content: string;
           image_url: string;
+          post_type: string;
           category: string;
           tags: string[];
           read_time: number;
@@ -70,6 +71,7 @@ export interface Database {
           title: string;
           content: string;
           image_url: string;
+          post_type: string;
           category: string;
           tags: string[];
           read_time: number;
@@ -86,6 +88,7 @@ export interface Database {
           title?: string;
           content?: string;
           image_url?: string;
+          post_type?: string;
           category?: string;
           tags?: string[];
           read_time?: number;
