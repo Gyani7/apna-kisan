@@ -29,7 +29,7 @@
         "./*"
       ],
       "#site/*": [
-        ".velite/*"
+        "lib/content/*"
       ]
     }
   },
