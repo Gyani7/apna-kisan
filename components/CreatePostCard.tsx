@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/components/AuthProvider';
-import { POST_TYPES } from '@/lib/config';
+import { POST_TYPES } from '@/lib/types';
 
 export default function CreatePostCard() {
   const { user, profile } = useAuth();

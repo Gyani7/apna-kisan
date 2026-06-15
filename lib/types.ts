@@ -1,4 +1,5 @@
 import { MessageSquare, CircleHelp as HelpCircle, BookOpen, Bell } from 'lucide-react';
+import React from 'react';
 
 export type PostType = 'discussion' | 'question' | 'story' | 'update';
 
@@ -105,6 +106,14 @@ export const POST_TYPE_CONFIG: Record<PostType, { label: string; labelHi: string
   story: { label: 'Story', labelHi: 'Kahani', color: 'text-emerald-600', bgColor: 'bg-emerald-50', Icon: BookOpen },
   update: { label: 'Update', labelHi: 'Taaza Khabar', color: 'text-purple-600', bgColor: 'bg-purple-50', Icon: Bell },
 };
+
+export const POST_TYPES = Object.entries(POST_TYPE_CONFIG).map(([type, config]) => ({
+  ...config,
+  type: type as PostType,
+  href: `/create?type=${type}`,
+  icon: config.Icon
+}));
+
 
 export interface NavItem {
   label: string;
