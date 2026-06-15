@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useTransition } from 'react';
 import { Heart, MessageCircle, Send, Loader2 } from 'lucide-react';
 import { toggleLike, addComment, LikeActionResult, ActionResult } from '@/lib/actions/reels';
-import type { ReelData } from './page'; // Assuming ReelData is exported from page.tsx
+import type { ReelData } from '@/lib/types'; 
 
 interface ReelPlayerProps {
   reel: ReelData;
@@ -18,7 +18,7 @@ export default function ReelPlayer({ reel, currentUserLiked }: ReelPlayerProps) 
   // Optimistic UI states
   const [optimisticLiked, setOptimisticLiked] = useState(currentUserLiked);
   const [optimisticLikesCount, setOptimisticLikesCount] = useState(reel.likes_count ?? 0);
-  const [optimisticComments, setOptimisticComments] = useState(reel.comments ?? []);
+  const [optimisticComments, _setOptimisticComments] = useState(reel.comments ?? []);
 
   let [isLikePending, startLikeTransition] = useTransition();
   let [isCommentPending, startCommentTransition] = useTransition();
@@ -28,7 +28,7 @@ export default function ReelPlayer({ reel, currentUserLiked }: ReelPlayerProps) 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          videoRef.current?.play().then(() => setIsPlaying(true)).catch(e => console.log('Autoplay prevented'));
+          videoRef.current?.play().then(() => setIsPlaying(true)).catch(_e => console.log('Autoplay prevented'));
         } else {
           videoRef.current?.pause();
           setIsPlaying(false);
