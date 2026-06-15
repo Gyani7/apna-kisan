@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Clock, MapPin, BookOpen } from 'lucide-react';
+import { Clock, BookOpen } from 'lucide-react';
 import { PostWithAuthor, timeAgo, POST_TYPE_CONFIG } from '@/lib/types';
 
 interface StoryCardProps {
