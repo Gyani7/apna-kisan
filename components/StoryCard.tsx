@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Clock, BookOpen } from 'lucide-react';
 import { PostWithAuthor, timeAgo, POST_TYPE_CONFIG } from '@/lib/types';
+import { Icons } from '@/components/icons';
 
 interface StoryCardProps {
   story: PostWithAuthor;
@@ -26,14 +26,14 @@ export default function StoryCard({ story, featured }: StoryCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <span className={clsx('inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full mb-2', config.color, config.bgColor)}>
-              <BookOpen size={12} />
+              <Icons.BookOpen size={12} />
               {config.labelHi}
             </span>
             <h3 className="text-white font-bold text-lg leading-snug group-hover:underline">{story.title}</h3>
             {story.excerpt && <p className="text-gray-200 text-sm mt-1 line-clamp-2">{story.excerpt}</p>}
             <div className="flex items-center gap-3 mt-2 text-gray-300 text-xs">
               <span className="font-semibold">{authorName}</span>
-              {story.read_time && <span className="flex items-center gap-1"><Clock size={10} />{story.read_time} min</span>}
+              {story.read_time && <span className="flex items-center gap-1"><Icons.Clock size={10} />{story.read_time} min</span>}
             </div>
           </div>
         </article>
@@ -52,7 +52,7 @@ export default function StoryCard({ story, featured }: StoryCardProps) {
         <div className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className={clsx('inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full', config.color, config.bgColor)}>
-              <BookOpen size={12} />
+              <Icons.BookOpen size={12} />
               {config.labelHi}
             </span>
             {story.category && <span className="text-xs text-gray-400">{story.category}</span>}
@@ -65,7 +65,7 @@ export default function StoryCard({ story, featured }: StoryCardProps) {
             </div>
             <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
               <span className="font-medium text-gray-700 dark:text-gray-300">{authorName}</span>
-              {story.read_time && <span className="flex items-center gap-0.5"><Clock size={10} />{story.read_time} min</span>}
+              {story.read_time && <span className="flex items-center gap-0.5"><Icons.Clock size={10} />{story.read_time} min</span>}
               <span>{timeAgo(story.created_at)}</span>
             </div>
           </div>
