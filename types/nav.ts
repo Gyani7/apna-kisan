@@ -1,7 +1,7 @@
 
 import { LucideIcon } from "lucide-react"
 
-import { Icon } from "@/components/icons"
+import { Icons } from "@/components/icons"
 
 export interface NavItem {
   title: string
@@ -20,3 +20,7 @@ export interface NavItemWithChildren extends NavItem {
 export interface MainNavItem extends NavItem {}
 
 export interface SidebarNavItem extends NavItemWithChildren {}
+
+export interface MarketingConfig {
+  mainNav: MainNavItem[]
+}
