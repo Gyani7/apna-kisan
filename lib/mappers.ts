@@ -7,7 +7,7 @@ export interface RawPost extends PostRow {
 
 export function mapPostToPostWithAuthor(p: RawPost): PostWithAuthor {
   return {
-    id: p.id,
+    id: p.id.toString(),
     user_id: p.user_id,
     title: p.title,
     content: p.content,
