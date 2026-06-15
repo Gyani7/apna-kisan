@@ -27,7 +27,7 @@
       "@/*": [
         "./*"
       ],
-      "#site/content": [".velite/content"]
+      "#site/*": [".velite/*"]
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true,

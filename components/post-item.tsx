@@ -1,39 +1,27 @@
-import { Post } from "#site/content"
+import { Post } from "#site/posts"
 import Link from "next/link"
 
 import { cn, formatDate } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "./ui/button"
 
-interface PostItemProps {
-    post: Post
+interface PostItemProps extends React.HTMLAttributes<HTMLDivElement> {
+  post: Post
 }
 
-export function PostItem({ post }: PostItemProps) {
-    return (
-        <article
-            className="group relative flex flex-col space-y-2"
-        >
-            {post.image && (
-                <img
-                    src={post.image}
-                    alt={post.title}
-                    width={804}
-                    height={452}
-                    className="rounded-md border bg-muted transition-colors"
-                />
-            )}
-            <h2 className="text-2xl font-extrabold">{post.title}</h2>
-            {post.description && (
-                <p className="text-muted-foreground">{post.description}</p>
-            )}
-            {post.date && (
-                <p className="text-sm text-muted-foreground">
-                    {formatDate(post.date)}
-                </p>
-            )}
-            <Link href={post.slug} className="absolute inset-0">
-                <span className="sr-only">View Article</span>
-            </Link>
-        </article>
-    )
+export function PostItem({ post, ...props }: PostItemProps) {
+  return (
+    <article
+      className={cn("group relative flex flex-col space-y-2", props.className)}
+    >
+      {post.date && (
+        <time dateTime={post.date} className="block text-sm text-muted-foreground">
+          {formatDate(post.date)}
+        </time>
+      )}
+      <h2 className="text-2xl font-extrabold">{post.title}</h2>
+      <Link href={post.slug} className={cn(buttonVariants({ variant: "link" }), "px-0")}>
+        Read More
+      </Link>
+    </article>
+  )
 }
