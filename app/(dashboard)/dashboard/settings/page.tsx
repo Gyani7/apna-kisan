@@ -1,7 +1,11 @@
 import { redirect } from "next/navigation"
 
 import { getCurrentUser } from "@/lib/session"
-import { PageHeader } from "@/components/PageHeader"
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderHeading,
+} from "@/components/PageHeader"
 import { DashboardShell } from "@/components/shell"
 import { UserNameForm } from "@/components/UserNameForm"
 
@@ -18,10 +22,12 @@ export default async function SettingsPage() {
 
   return (
     <DashboardShell>
-      <PageHeader
-        heading="Settings"
-        text="Manage account and website settings."
-      />
+      <PageHeader>
+        <PageHeaderHeading>Settings</PageHeaderHeading>
+        <PageHeaderDescription>
+          Manage account and website settings.
+        </PageHeaderDescription>
+      </PageHeader>
       <div className="grid gap-10">
         <UserNameForm user={{ id: user.id, name: user.name || "" }} />
       </div>
