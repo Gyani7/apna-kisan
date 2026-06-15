@@ -18,13 +18,18 @@ import {
 } from './ui/dropdown-menu';
 import { usePathname } from 'next/navigation';
 import { siteConfig } from '@/config/site';
+import { supabase } from '@/lib/supabase/client';
 
 export default function Header() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const pathname = usePathname();
 
   if (pathname && pathname.includes('auth')) {
     return null;
+  }
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
   }
 
   return (
@@ -43,7 +48,7 @@ export default function Header() {
                   <Avatar>
                     <AvatarImage src={user.user_metadata.avatar_url} />
                     <AvatarFallback>
-                      {user.user_metadata.name[0]}
+                      {user.user_metadata.name ? user.user_metadata.name[0] : 'U'}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>

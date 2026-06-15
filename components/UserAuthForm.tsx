@@ -3,7 +3,6 @@
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { signIn } from "next-auth/react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
@@ -14,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons"
+import { supabase } from "@/lib/supabase/client"
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -30,18 +30,19 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   async function onSubmit(data: FormData) {
     setIsLoading(true)
 
-    const signInResult = await signIn("email", {
+    const { error } = await supabase.auth.signInWithOtp({
       email: data.email.toLowerCase(),
-      redirect: false,
-      callbackUrl: searchParams?.get("from") || "/",
-    })
+      options: {
+        emailRedirectTo: `${location.origin}/auth/callback?next=${searchParams?.get("from") || "/"}`,
+      },
+    });
 
     setIsLoading(false)
 
-    if (!signInResult?.ok) {
+    if (error) {
       return toast({
         title: "Something went wrong.",
-        description: "Your sign in request failed. Please try again.",
+        description: error.message || "Your sign in request failed. Please try again.",
         variant: "destructive",
       })
     }
@@ -95,9 +96,14 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       <button
         type="button"
         className={cn(buttonVariants({ variant: "outline" }))}
-        onClick={() => {
-          setIsGitHubLoading(true)
-          signIn("github")
+        onClick={async () => {
+          setIsGitHubLoading(true);
+          await supabase.auth.signInWithOAuth({
+            provider: 'github',
+            options: {
+              redirectTo: `${location.origin}/auth/callback?next=${searchParams?.get("from") || "/"}`,
+            },
+          });
         }}
         disabled={isLoading || isGitHubLoading}
       >

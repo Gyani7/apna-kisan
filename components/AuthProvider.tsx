@@ -1,33 +1,19 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
-import { createBrowserClient } from '@/lib/supabase/client';
-import type { ProfileRow } from '@/lib/database.types';
-
-const supabase = createBrowserClient();
-
-async function getProfile(userId: string) {
-    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
-    return data;
-}
+import { supabase } from '@/lib/supabase/client';
 
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
-  profile: ProfileRow | null;
   loading: boolean;
-  refreshProfile: () => Promise<void>;
-  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   session: null,
-  profile: null,
   loading: true,
-  refreshProfile: async () => {},
-  signOut: async () => {},
 });
 
 export function useAuth() {
@@ -37,21 +23,7 @@ export function useAuth() {
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const refreshProfile = useCallback(async () => {
-    if (!user) {
-      setProfile(null);
-      return;
-    }
-    const p = await getProfile(user.id);
-    setProfile(p);
-  }, [user]);
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -69,12 +41,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    refreshProfile();
-  }, [refreshProfile]);
-
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, refreshProfile, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading }}>
       {children}
     </AuthContext.Provider>
   );
