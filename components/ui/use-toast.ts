@@ -1,10 +1,12 @@
 // Inspired by react-hot-toast library
 import * as React from "react"
+import { type VariantProps } from "class-variance-authority"
 
 interface Toast {
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: React.ReactElement;
+  variant?: "default" | "destructive";
 }
 
 type ToasterToast = Toast & {
