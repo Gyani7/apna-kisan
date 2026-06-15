@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin, Trophy, Sprout, Star, Award, ArrowLeft } from 'lucide-react';
+import { MapPin, Trophy, Sprout, ArrowLeft } from 'lucide-react';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
@@ -39,7 +39,7 @@ async function toggleFollow(followerId: string, followedId: string) {
 }
 
 async function isFollowing(followerId: string, followedId: string) {
-    const { data, count } = await supabase.from('follows').select('*', { count: 'exact' }).eq('follower_id', followerId).eq('followed_id', followedId);
+    const { count } = await supabase.from('follows').select('*', { count: 'exact' }).eq('follower_id', followerId).eq('followed_id', followedId);
     return (count ?? 0) > 0;
 }
 

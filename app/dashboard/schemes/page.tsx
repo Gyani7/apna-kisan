@@ -89,7 +89,7 @@ export default function SchemesPage() {
       try {
         const result = await matchUserToSchemes();
         if (result.success && result.matches) {
-          setMatches(result.matches);
+          setMatches(result.matches as any);
         } else {
           setError(result.message || 'An unknown error occurred.');
         }

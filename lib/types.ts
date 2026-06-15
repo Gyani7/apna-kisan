@@ -32,6 +32,27 @@ export interface PostWithAuthor {
   is_bookmarked?: boolean;
 }
 
+export interface Answer {
+  id: string;
+  content: string;
+  is_best_answer: boolean;
+  author: {
+    avatar_url: string | null;
+    full_name: string | null;
+    reputation_level: string;
+  } | null;
+}
+
+export interface CropHealthAnalysis {
+  id: string;
+  image_url: string;
+  detected_disease: string;
+  created_at: string;
+  status: string;
+  recommendations: string[];
+  confidence_score: number;
+}
+
 export type ReelData = {
   id: string;
   created_at: string;

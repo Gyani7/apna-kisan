@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { ArrowBigUp, ArrowBigDown, MessageSquare, CheckCircle2 } from 'lucide-react';
 import { getQuestion } from '@/lib/actions/question';
+import { Answer } from '@/lib/types';
 
 interface QuestionPageProps {
   params: { slug: string };
@@ -108,7 +109,7 @@ export default async function QuestionDetailPage({ params }: QuestionPageProps) 
             <Button className="mt-4 bg-green-600 hover:bg-green-700 text-white">Answer this Question</Button>
           </div>
         ) : (
-          question.answers?.map((answer) => (
+          question.answers?.map((answer: Answer) => (
             <div key={answer.id} className={`p-6 rounded-xl border ${answer.is_best_answer ? 'border-green-500 bg-green-50/30 dark:bg-green-900/10' : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'}`}>
               {answer.is_best_answer && (
                 <div className="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs font-bold mb-3 uppercase">

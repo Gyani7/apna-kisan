@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { MessageSquare, CircleHelp as HelpCircle, BookOpen, X, Send, ImagePlus, Tag } from 'lucide-react';
@@ -24,7 +24,7 @@ async function createPost(post: any) {
 }
 
 async function uploadFile(bucket: string, path: string, file: File) {
-    const { data, error } = await supabase.storage.from(bucket).upload(path, file);
+    const { error } = await supabase.storage.from(bucket).upload(path, file);
     if (error) {
         console.error('Error uploading file:', error);
         return null;
@@ -44,7 +44,7 @@ function CreateForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, profile } = useAuth();
-  const [postType, setPostType] = useState<PostType>((searchParams.get('type') as PostType) ?? 'discussion');
+  const [postType, setPostType] = useState<PostType>(((searchParams && searchParams.get('type')) as PostType) ?? 'discussion');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [category, setCategory] = useState('');
@@ -54,7 +54,7 @@ function CreateForm() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const initials = profile?.full_name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) ?? 'AK';
+  const initials = profile?.full_name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) ?? 'AK';
 
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

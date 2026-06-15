@@ -7,7 +7,7 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import type { CropHealthAnalysis } from '@/lib/types';
 import { UploadCloud, CheckCircle, AlertTriangle, BarChart2, Zap } from 'lucide-react';
 
-const initialState = { success: false, message: '', errors: {}, analysisResult: null };
+const initialState = { success: false, message: '', errors: {}, analysisResult: undefined };
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -75,7 +75,7 @@ export default function CropAnalysisPage() {
     async function fetchHistory() {
         const { data: { user } } = await supabase.auth.getUser();
         if(user) {
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from('crop_health_analysis')
                 .select('*')
                 .eq('user_id', user.id)

@@ -1,3 +1,14 @@
-WARN: no seed files matched pattern: supabase/seed.sql
-failed to inspect service: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
-Docker Desktop is a prerequisite for local development. Follow the official docs to install: https://docs.docker.com/desktop
+export type ProfileRow = {
+  id: string;
+  username: string;
+  full_name: string;
+  avatar_url: string;
+  reputation: number;
+  badge: string;
+  location: string;
+  bio: string;
+  posts_count: number;
+  followers_count: number;
+  following_count: number;
+  is_verified: boolean;
+};

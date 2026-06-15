@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Settings, MapPin, Edit2, Trophy, Star, Sprout, Award, CheckCircle, Info } from 'lucide-react';
+import { Settings, MapPin, Edit2, Trophy, Sprout, CheckCircle, Info } from 'lucide-react';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import PostCard from '@/components/PostCard';
@@ -40,7 +40,7 @@ async function updateProfile(userId: string, updates: any) {
 }
 
 async function uploadFile(bucket: string, path: string, file: File) {
-    const { data, error } = await supabase.storage.from(bucket).upload(path, file);
+    const { error } = await supabase.storage.from(bucket).upload(path, file);
     if (error) {
         console.error('Error uploading file:', error);
         return null;
@@ -58,18 +58,15 @@ function ProfileContent() {
   const [editName, setEditName] = useState('');
   const [editBio, setEditBio] = useState('');
   const [editLocation, setEditLocation] = useState('');
-  const [verificationRequest, setVerificationRequest] = useState<any>(null);
 
   useEffect(() => {
     if (!user) return;
     
-    // Fetch posts
     getPosts({ postType: activeTab === 'posts' ? undefined : activeTab, limit: 20 }).then((data) => {
       const typed = mapPostsToPostWithAuthor(data ?? []).filter((p) => p.user_id === user.id);
       setPosts(typed);
     });
 
-    // Fetch latest verification request
     supabase
       .from('verification_requests')
       .select('*')
@@ -77,7 +74,7 @@ function ProfileContent() {
       .order('created_at', { ascending: false })
       .limit(1)
       .single()
-      .then(({ data }) => setVerificationRequest(data));
+      .then(() => {});
   }, [user, activeTab]);
 
   useEffect(() => {

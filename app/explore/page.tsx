@@ -1,5 +1,4 @@
 
-import { getUnifiedFeed } from '@/lib/actions/feed';
 import UnifiedGlobalFeed from '@/components/UnifiedGlobalFeed';
 import { Suspense } from 'react';
 
@@ -8,26 +7,12 @@ export const revalidate = 60;
 
 // --- EXPLORE PAGE (SERVER COMPONENT) ---
 
-async function FeedContainer() {
-  const { data: feedItems, error } = await getUnifiedFeed();
-
-  if (error) {
-    return <p className="text-center text-red-500">Error loading feed. Please try again later.</p>;
-  }
-
-  if (!feedItems || feedItems.length === 0) {
-    return <p className="text-center text-gray-500">No content has been posted yet.</p>;
-  }
-
-  return <UnifiedGlobalFeed initialFeed={feedItems} />;
-}
-
 export default function ExplorePage() {
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Explore the Community Feed</h1>
       <Suspense fallback={<FeedSkeleton />}>
-        <FeedContainer />
+        <UnifiedGlobalFeed />
       </Suspense>
     </div>
   );
