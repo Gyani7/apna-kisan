@@ -5,7 +5,7 @@ import { mapPostsToPostWithAuthor } from '@/lib/mappers';
 
 async function Feed() {
   const posts = await getPosts({ limit: 20 });
-  const allPosts = mapPostsToPostWithAuthor(posts ?? []);
+  const allPosts = mapPostsToPostWithAuthor(posts as any ?? []);
 
   return (
     <div className="flex flex-col gap-4">

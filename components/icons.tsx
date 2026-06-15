@@ -1,4 +1,4 @@
-import { ChevronLeft, Command, LucideProps, Moon, SunMedium, type Icon as LucideIcon, Clock, BookOpen } from 'lucide-react';
+import { ChevronLeft, Command, LucideProps, Moon, SunMedium, type Icon as LucideIcon, Clock, BookOpen, Laptop, Loader } from 'lucide-react';
 
 export const Icons = {
     Sun: SunMedium,
@@ -7,4 +7,6 @@ export const Icons = {
     logo: Command,
     Clock: Clock,
     BookOpen: BookOpen,
+    Laptop: Laptop,
+    spinner: Loader,
 };
