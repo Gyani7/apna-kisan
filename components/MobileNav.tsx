@@ -1,3 +1,4 @@
+import { MainNavItem } from "@/types/nav";
 'use client';
 
 import * as React from "react"
