@@ -75,11 +75,17 @@ export async function getReels(): Promise<{ reels: ReelData[], error: string | n
           }
       }
 
-      const reels = reelsData.map(reel => ({
+      const reels = reelsData.map((reel: any) => ({
         ...reel,
-        comments: reel.comments ?? [],
-        user_has_liked_reel: likedReelIds.has(reel.id)
-      })) as ReelData[];
+        user: Array.isArray(reel.user) ? reel.user[0] : reel.user,
+        village: Array.isArray(reel.village) ? reel.village[0] : reel.village,
+        comments: (reel.comments ?? []).map((comment: any) => ({
+          ...comment,
+          user: Array.isArray(comment.user) ? comment.user[0] : comment.user,
+        })),
+        user_has_liked_reel: likedReelIds.has(reel.id),
+      })) as unknown as ReelData[];
+
       return { reels, error: null };
     }
     return { reels: [], error: null };
