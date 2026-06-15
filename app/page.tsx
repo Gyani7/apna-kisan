@@ -1,12 +1,9 @@
-import { posts } from "#site/posts";
-import { PostItem } from "@/components/post-item";
 import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
-import { cn, sortPosts } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export default function Home() {
-  const latestPosts = sortPosts(posts).slice(0, 5);
   return (
     <section className="container grid items-center gap-6 pb-8 pt-6 md:py-10">
       <div className="flex max-w-[980px] flex-col items-start gap-2">
@@ -37,16 +34,6 @@ export default function Home() {
           GitHub
         </Link>
       </div>
-      <section className="space-y-6">
-        <h2 className="text-2xl font-bold">Latest Posts</h2>
-        <ul className="space-y-4">
-          {latestPosts.map((post) => (
-            <li key={post.slug}>
-              <PostItem post={post} />
-            </li>
-          ))}
-        </ul>
-      </section>
     </section>
   );
 }
