@@ -14,7 +14,7 @@ import type { Metadata } from 'next';
 import type { Database } from '@/lib/database.types';
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
-  author: Database['public']['Tables']['profiles']['Row'] | null;
+  profiles: Database['public']['Tables']['profiles']['Row'] | null;
 };
 
 async function getPostBySlug(slug: string) {
@@ -22,7 +22,7 @@ async function getPostBySlug(slug: string) {
   const supabase = createSupabaseServerClient(cookieStore);
   const { data } = await supabase
     .from('posts')
-    .select('*, author:profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')
+    .select('*, profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')
     .eq('slug', slug)
     .single<Post>();
   return data;
@@ -110,7 +110,6 @@ export default async function StoryPage({ params }: Props) {
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{story.content}</p>
           </div>
 
-          {/* COMPLIANT: Check for array existence and length before mapping */}
           {story.tags && story.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-6">
               {story.tags.map((tag) => (
