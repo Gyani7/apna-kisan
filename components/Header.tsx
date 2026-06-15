@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { usePathname } from 'next/navigation';
+import { siteConfig } from '@/config/site';
 
 export default function Header() {
   const { user, signOut } = useAuth();
@@ -30,7 +31,7 @@ export default function Header() {
     <header className="supports-backdrop-blur:bg-background/60 sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="container flex h-14 items-center">
         <MainNav />
-        <MobileNav />
+        <MobileNav items={siteConfig.mainNav} />
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">
             <CommandMenu />
