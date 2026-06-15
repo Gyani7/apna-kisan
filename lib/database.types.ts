@@ -164,5 +164,6 @@ export interface Database {
 }
 
 export type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+export type PostRow = Database['public']['Tables']['posts']['Row'];
 export type FarmingTipRow = Database['public']['Tables']['farming_tips']['Row'];
 export type MandiRateRow = Database['public']['Tables']['mandi_rates']['Row'];
