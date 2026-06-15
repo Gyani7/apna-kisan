@@ -7,8 +7,13 @@ import { usePathname } from "next/navigation"
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
 import { Icons } from "@/components/icons"
+import { NavItem } from "@/types/nav";
 
-export function MainNav() {
+interface MainNavProps {
+  items?: NavItem[]
+}
+
+export function MainNav({ items }: MainNavProps) {
   const pathname = usePathname()
 
   return (
@@ -20,7 +25,7 @@ export function MainNav() {
         </span>
       </Link>
       <nav className="flex items-center space-x-6 text-sm font-medium">
-        {siteConfig.mainNav.map((item) => (
+        {items?.map((item) => (
           <Link
             key={item.title}
             href={item.href}
