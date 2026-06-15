@@ -3,7 +3,7 @@
 import { useState, useTransition, useRef } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { createReelRecord, ActionResult } from '@/lib/actions/reels';
-import type { ReelData } from './page';
+import type { ReelData } from '@/lib/types';
 import { Plus, Video, Send, Loader2 } from 'lucide-react';
 import ReelPlayer from './ReelPlayer'; // IMPORTING the new V2.8 ReelPlayer
 
