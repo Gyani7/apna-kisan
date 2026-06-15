@@ -1,4 +1,4 @@
-import { Post } from "#site/content"
+import { Post } from "#site/posts"
 import Link from "next/link"
 
 import { cn, formatDate } from "@/lib/utils"

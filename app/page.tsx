@@ -1,4 +1,4 @@
-import { posts } from "#site/content";
+import { posts } from "#site/posts";
 import { PostItem } from "@/components/post-item";
 import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
