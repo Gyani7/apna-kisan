@@ -1,14 +1,1 @@
-export type ProfileRow = {
-  id: string;
-  username: string;
-  full_name: string;
-  avatar_url: string;
-  reputation: number;
-  badge: string;
-  location: string;
-  bio: string;
-  posts_count: number;
-  followers_count: number;
-  following_count: number;
-  is_verified: boolean;
-};
+export type Json = | string | number | boolean | null | { [key: string]: Json | undefined } | Json[] export interface Database { public: { Tables: { profiles: { Row: { id: string; username: string; full_name: string; avatar_url: string; reputation: number; badge: string; location: string; bio: string; posts_count: number; followers_count: number; following_count: number; is_verified: boolean; }; Insert: { id: string; username: string; full_name: string; avatar_url: string; reputation?: number; badge?: string; location: string; bio: string; posts_count?: number; followers_count?: number; following_count?: number; is_verified?: boolean; }; Update: { id?: string; username?: string; full_name?: string; avatar_url?: string; reputation?: number; badge?: string; location?: string; bio?: string; posts_count?: number; followers_count?: number; following_count?: number; is_verified?: boolean; }; }; posts: { Row: { id: number; user_id: string; title: string; content: string; image_url: string; category: string; tags: string[]; read_time: number; created_at: string; updated_at: string; excerpt: string; slug: string; likes_count: number; comments_count: number; }; Insert: { id?: number; user_id: string; title: string; content: string; image_url: string; category: string; tags: string[]; read_time: number; created_at?: string; updated_at?: string; excerpt: string; slug: string; likes_count?: number; comments_count?: number; }; Update: { id?: number; user_id?: string; title?: string; content?: string; image_url?: string; category?: string; tags?: string[]; read_time?: number; created_at?: string; updated_at?: string; excerpt?: string; slug?: string; likes_count?: number; comments_count?: number; }; }; }; Enums: { user_badge: "Beginner" | "Intermediate" | "Advanced" | "Expert"; }; Functions: {}; }; }
