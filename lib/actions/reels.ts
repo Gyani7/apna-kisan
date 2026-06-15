@@ -1,9 +1,10 @@
 'use server';
 
-import { createServer } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import type { ReelData } from '@/lib/types';
+import { cookies } from 'next/headers';
 
 // --- TYPE DEFINITIONS ---
 export type ActionResult = {
@@ -32,7 +33,8 @@ const CreateReelSchema = z.object({
 // --- SERVER ACTIONS ---
 
 export async function getReels(): Promise<{ reels: ReelData[], error: string | null }> {
-  const supabase = createServer();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
 
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -94,7 +96,8 @@ export async function getReels(): Promise<{ reels: ReelData[], error: string | n
  * This provides atomicity and prevents race conditions.
  */
 export async function toggleLike(reelId: string): Promise<LikeActionResult> {
-    const supabase = createServer();
+    const cookieStore = cookies();
+    const supabase = createSupabaseServerClient(cookieStore);
 
     try {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -136,7 +139,8 @@ export async function toggleLike(reelId: string): Promise<LikeActionResult> {
  * Adds a comment to a reel using an atomic RPC function.
  */
 export async function addComment(formData: FormData): Promise<ActionResult> {
-    const supabase = createServer();
+    const cookieStore = cookies();
+    const supabase = createSupabaseServerClient(cookieStore);
     
     try {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -173,7 +177,8 @@ export async function addComment(formData: FormData): Promise<ActionResult> {
  * Creates the database record for a new reel.
  */
 export async function createReelRecord(formData: FormData): Promise<ActionResult> {
-  const supabase = createServer();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
 
   try {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
