@@ -64,6 +64,8 @@ export interface Database {
           slug: string;
           likes_count: number;
           comments_count: number;
+          is_featured: boolean;
+          shares_count: number;
         };
         Insert: {
           id?: number;
@@ -81,6 +83,8 @@ export interface Database {
           slug: string;
           likes_count?: number;
           comments_count?: number;
+          is_featured?: boolean;
+          shares_count?: number;
         };
         Update: {
           id?: number;
@@ -98,6 +102,8 @@ export interface Database {
           slug?: string;
           likes_count?: number;
           comments_count?: number;
+          is_featured?: boolean;
+          shares_count?: number;
         };
       };
       farming_tips: {
