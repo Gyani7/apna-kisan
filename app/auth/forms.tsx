@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { ActionResult, signInWithPassword, signUpWithPassword, sendMobileOTP, verifyMobileOTP } from '@/lib/actions/auth';
+import { ActionAuthResult, signInWithPassword, signUpWithPassword, sendMobileOTP, verifyMobileOTP } from '@/lib/actions/auth';
 import { Button } from '@/components/ui/button'; // Assuming a UI component library
 
 // --- Helper components for displaying form state ---
@@ -21,7 +21,7 @@ export function AuthForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>, action: (formData: FormData) => Promise<ActionResult>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>, action: (formData: FormData) => Promise<ActionAuthResult>) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);

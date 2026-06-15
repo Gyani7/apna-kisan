@@ -1,2 +1,2 @@
-[31mAccess token not provided. Supply an access token by running `supabase login` or setting the SUPABASE_ACCESS_TOKEN environment variable.[39m
+Invalid project ref format. Must be like `abcdefghijklmnopqrst`.
 Try rerunning the command with --debug to troubleshoot the error.
