@@ -27,7 +27,7 @@
       "@/*": [
         "./*"
       ],
-      "#site/content": ["content"]
+      "#site/content": [".velite/content"]
     },
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -40,7 +40,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "jest.config.js"
+    "jest.config.js",
+    ".velite"
   ],
   "exclude": [
     "node_modules"
