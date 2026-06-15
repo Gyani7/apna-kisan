@@ -23,7 +23,7 @@ export default function Header() {
   const { user, signOut } = useAuth();
   const pathname = usePathname();
 
-  if (pathname.includes('auth')) {
+  if (pathname && pathname.includes('auth')) {
     return null;
   }
 
