@@ -1,7 +1,6 @@
 'use client';
 
 import { useAuth } from '@/components/AuthProvider';
-import { siteConfig } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import { CommandMenu } from '@/components/CommandMenu';
 import { buttonVariants } from '@/components/ui/button';
