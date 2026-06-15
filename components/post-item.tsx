@@ -1,6 +1,6 @@
-import { Post } from "#site/posts"
 import Link from "next/link"
 
+import { Post } from "@/types/post"
 import { cn, formatDate } from "@/lib/utils"
 import { buttonVariants } from "./ui/button"
 

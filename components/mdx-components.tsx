@@ -1,8 +1,9 @@
 import Image from "next/image"
+import { useMDXComponent } from "next-contentlayer/hooks"
 
 import { cn } from "@/lib/utils"
 
-export const MDXComponents = {
+const components = {
   Image,
   h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1 className={cn("mt-2 scroll-m-20 text-4xl font-bold tracking-tight", className)} {...props} />
@@ -98,4 +99,18 @@ export const MDXComponents = {
       {...props}
     />
   ),
+}
+
+interface MdxProps {
+  code: string
+}
+
+export function MDXComponents({ code }: MdxProps) {
+  const Component = useMDXComponent(code)
+
+  return (
+    <div className="mdx">
+      <Component components={components} />
+    </div>
+  )
 }

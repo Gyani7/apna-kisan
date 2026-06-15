@@ -5,4 +5,5 @@ export interface Post {
   published: boolean;
   content: string;
   slugAsParams: string;
+  date: string;
 }
