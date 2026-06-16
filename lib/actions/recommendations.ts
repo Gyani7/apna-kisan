@@ -1,7 +1,6 @@
 'use server';
 
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
 
 // --- MOCK EMBEDDING SERVICE ---
 // In a real application, this would be a call to an embedding model like OpenAI's text-embedding-ada-002.
@@ -22,8 +21,7 @@ async function getMockEmbedding(text: string): Promise<number[]> {
  * This should be triggered after a new question is approved and inserted.
  */
 export async function generateAndUpdateEmbedding(questionId: string, questionText: string) {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   const embedding = await getMockEmbedding(questionText);
 
   const { error } = await supabase
@@ -43,8 +41,7 @@ export async function generateAndUpdateEmbedding(questionId: string, questionTex
  * Fetches recommended questions based on semantic similarity and user's state.
  */
 export async function getRecommendedQuestions(questionText: string, userState: string) {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   const queryEmbedding = await getMockEmbedding(questionText);
 
   const { data: questions, error } = await supabase.rpc('match_questions', {
