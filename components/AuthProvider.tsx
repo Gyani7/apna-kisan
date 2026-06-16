@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 // Define a type for the profile data
 interface Profile {
@@ -39,6 +39,7 @@ export function useAuth() {
 }
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
+  const supabase = createBrowserClient();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -61,7 +62,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     } else {
       setProfile(null);
     }
-  }, []);
+  }, [supabase]);
 
 
   useEffect(() => {
@@ -85,7 +86,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     });
 
     return () => subscription.unsubscribe();
-  }, [fetchProfile]);
+  }, [fetchProfile, supabase.auth]);
 
   const refreshProfile = useCallback(() => {
     if (user) {

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { posts } from "#site/posts";
-
-import { MDXComponents } from "@/components/mdx-components";
+import { useMDXComponent } from "next-contentlayer/hooks";
+import { components } from "@/components/mdx-components";
 
 interface PostPageProps {
   params: {
@@ -27,6 +27,8 @@ export default async function PostPage({ params }: PostPageProps) {
     notFound();
   }
 
+  const MDXContent = useMDXComponent(post.content);
+
   return (
     <article className="prose dark:prose-invert py-6">
       <h1 className="mb-2">{post.title}</h1>
@@ -34,7 +36,7 @@ export default async function PostPage({ params }: PostPageProps) {
         <p className="text-xl mt-0 text-muted-foreground">{post.description}</p>
       )}
       <hr className="my-4" />
-      <MDXComponents code={post.content} />
+      <MDXContent components={components} />
     </article>
   );
 }

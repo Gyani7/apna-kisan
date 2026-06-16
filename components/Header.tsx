@@ -18,11 +18,12 @@ import {
 } from './ui/dropdown-menu';
 import { usePathname } from 'next/navigation';
 import { siteConfig } from '@/config/site';
-import { supabase } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 export default function Header() {
   const { user } = useAuth();
   const pathname = usePathname();
+  const supabase = createBrowserClient();
 
   if (pathname && pathname.includes('auth')) {
     return null;
