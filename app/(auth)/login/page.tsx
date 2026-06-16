@@ -3,7 +3,7 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button-variants"
 import { Icons } from "@/components/icons"
 import { UserAuthForm } from "@/components/UserAuthForm"
 
