@@ -1,5 +1,5 @@
 import { Analytics } from '@vercel/analytics/react';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 
@@ -19,6 +19,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: siteConfig.name,
   description: siteConfig.description,
+};
+
+export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: 'white' },
     { media: '(prefers-color-scheme: dark)', color: 'black' },
