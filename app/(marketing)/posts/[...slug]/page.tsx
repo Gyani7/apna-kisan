@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { allPosts } from '@/lib/content/posts';
 import { MDXContent } from '@/components/mdx-components';
+import { MDXRemote } from 'next-mdx-remote/rsc';
 
 interface PostPageProps {
   params: {
@@ -37,7 +38,7 @@ export default async function PostPage({ params }: PostPageProps) {
       <h1>{post.title}</h1>
       {post.description && <p className="text-xl">{post.description}</p>}
       <hr />
-      <MDXContent code={post.body} />
+      <MDXRemote source={post.body} />
     </article>
   );
 }
