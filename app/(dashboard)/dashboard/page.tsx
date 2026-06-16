@@ -1,6 +1,3 @@
-import { redirect } from "next/navigation"
-
-import { getCurrentUser } from "@/lib/session"
 import { DashboardShell } from "@/components/shell"
 import {
   PageHeader,
@@ -13,12 +10,6 @@ export const metadata = {
 }
 
 export default async function DashboardPage() {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    redirect("/login")
-  }
-
   return (
     <DashboardShell>
       <PageHeader>

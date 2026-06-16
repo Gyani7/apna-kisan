@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { User } from "@prisma/client"
+import { User } from "@supabase/supabase-js"
 import * as z from "zod"
 
 import { cn } from "@/lib/utils"
@@ -16,7 +16,7 @@ import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons"
 
 interface UserNameFormProps extends React.HTMLAttributes<HTMLFormElement> {
-  user: Pick<User, "id" | "name">
+  user: Pick<User, "id"> & { name: string | null };
 }
 
 type FormData = z.infer<typeof userNameSchema>

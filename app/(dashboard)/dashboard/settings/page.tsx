@@ -1,24 +1,37 @@
-import { redirect } from "next/navigation"
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-import { getCurrentUser } from "@/lib/session"
 import {
   PageHeader,
   PageHeaderDescription,
   PageHeaderHeading,
-} from "@/components/PageHeader"
-import { DashboardShell } from "@/components/shell"
-import { UserNameForm } from "@/components/UserNameForm"
+} from "@/components/PageHeader";
+import { DashboardShell } from "@/components/shell";
+import { UserNameForm } from "@/components/UserNameForm";
+import { env } from "@/lib/env";
 
 export const metadata = {
   title: "Settings",
-}
+};
 
 export default async function SettingsPage() {
-  const user = await getCurrentUser()
+  const cookieStore = cookies();
 
-  if (!user) {
-    redirect("/login")
-  }
+  const supabase = createServerClient(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <DashboardShell>
@@ -29,8 +42,12 @@ export default async function SettingsPage() {
         </PageHeaderDescription>
       </PageHeader>
       <div className="grid gap-10">
-        <UserNameForm user={{ id: user.id, name: user.name || "" }} />
+        {user && (
+          <UserNameForm
+            user={{ id: user.id, name: user.user_metadata.name || null }}
+          />
+        )}
       </div>
     </DashboardShell>
-  )
+  );
 }
