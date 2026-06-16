@@ -21,7 +21,7 @@ export default function Home() {
           href={siteConfig.links.docs}
           target="_blank"
           rel="noreferrer"
-          className={cn(buttonVariants())}
+          className={buttonVariants()}
         >
           Documentation
         </Link>
@@ -29,7 +29,7 @@ export default function Home() {
           target="_blank"
           rel="noreferrer"
           href={siteConfig.links.github}
-          className={cn(buttonVariants({ variant: "outline" }))}
+          className={buttonVariants({ variant: "outline" })}
         >
           GitHub
         </Link>
