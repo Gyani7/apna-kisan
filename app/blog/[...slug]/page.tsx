@@ -1,6 +1,6 @@
-import { notFound } from "next/navigation";
-import { posts } from "#site/posts";
-import { MdxRenderer } from "@/components/mdx-renderer";
+import { notFound } from 'next/navigation';
+import { allPosts } from '@/lib/content/posts';
+import { MDXContent } from '@/components/mdx-components';
 
 interface PostPageProps {
   params: {
@@ -8,32 +8,36 @@ interface PostPageProps {
   };
 }
 
-async function getPostFromParams(params: PostPageProps["params"]) {
-  const slug = params?.slug?.join("/");
-  const post = posts.find((post) => post.slugAsParams === slug);
+async function getPostFromParams(params: PostPageProps['params']) {
+  const slug = params?.slug?.join('/');
+  const post = allPosts.find((post) => post.slugAsParams === slug);
+
+  if (!post) {
+    return null;
+  }
 
   return post;
 }
 
-export async function generateStaticParams(): Promise<PostPageProps["params"][]> {
-  return posts.map((post) => ({ slug: post.slugAsParams.split("/") }));
+export async function generateStaticParams(): Promise<PostPageProps['params'][]> {
+  return allPosts.map((post) => ({
+    slug: post.slugAsParams.split('/'),
+  }));
 }
 
 export default async function PostPage({ params }: PostPageProps) {
   const post = await getPostFromParams(params);
 
-  if (!post || !post.published) {
+  if (!post) {
     notFound();
   }
 
   return (
-    <article className="prose dark:prose-invert py-6">
-      <h1 className="mb-2">{post.title}</h1>
-      {post.description && (
-        <p className="text-xl mt-0 text-muted-foreground">{post.description}</p>
-      )}
-      <hr className="my-4" />
-      <MdxRenderer code={post.content} />
+    <article className="prose dark:prose-invert">
+      <h1>{post.title}</h1>
+      {post.description && <p className="text-xl">{post.description}</p>}
+      <hr />
+      <MDXContent code={post.body} />
     </article>
   );
 }
