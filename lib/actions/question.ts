@@ -2,11 +2,9 @@
 
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
-import { cookies } from 'next/headers';
 
 export async function getQuestions() {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
 
   const { data: questions, error } = await supabase
     .from('questions')
@@ -32,8 +30,7 @@ export async function getQuestions() {
 }
 
 export async function getQuestion(slug: string) {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
 
   const { data: question, error } = await supabase
     .from('questions')
@@ -66,8 +63,7 @@ export async function getQuestion(slug: string) {
 }
 
 export async function addAnswer(question_id: string, answer: string) {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
 
   const {
     data: { session },

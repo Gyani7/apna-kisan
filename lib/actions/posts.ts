@@ -27,8 +27,7 @@ export type Post = Database['public']['Tables']['posts']['Row'] & {
  * Returns an empty array if there's an error.
  */
 export async function getPosts({ limit }: { limit: number }): Promise<Post[]> {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
 
   const { data, error } = await supabase
     .from('posts')
@@ -52,8 +51,7 @@ export async function getPosts({ limit }: { limit: number }): Promise<Post[]> {
  * Returns an empty array if there's an error.
  */
 export async function getFeaturedStories(limit = 4): Promise<Post[]> {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
 
   const { data, error } = await supabase
     .from('posts')

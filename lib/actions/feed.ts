@@ -54,8 +54,7 @@ export type UnifiedPost = QuestionPost | StoryPost | ReelPost;
  * @returns A promise that resolves to an object containing the unified feed data or an error message.
  */
 export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: string | null; }> {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
 
   try {
     // --- STEP 1: Fetch all data sources in parallel ---
