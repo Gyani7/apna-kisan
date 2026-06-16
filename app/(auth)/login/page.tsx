@@ -1,45 +1,12 @@
-'use client';
 
-import Link from "next/link"
-
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button-variants"
-import { Icons } from "@/components/icons"
-import { UserAuthForm } from "@/components/UserAuthForm"
+import { AuthForm } from '@/components/common/AuthForm'
 
 export default function LoginPage() {
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center">
-      <Link
-        href="/"
-        className={cn(
-          buttonVariants({ variant: "ghost" }),
-          "absolute left-4 top-4 md:left-8 md:top-8"
-        )}
-      >
-        <>
-          <Icons.ChevronLeft className="mr-2 h-4 w-4" />
-          Back
-        </>
-      </Link>
-      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-        <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Welcome back
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Enter your email to sign in to your account
-          </p>
-        </div>
-        <UserAuthForm />
-        <p className="px-8 text-center text-sm text-muted-foreground">
-          <Link
-            href="/register"
-            className="hover:text-brand underline underline-offset-4"
-          >
-            Don't have an account? Sign Up
-          </Link>
-        </p>
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="w-full max-w-md p-8">
+        <h1 className="mb-6 text-center text-3xl font-bold">Login to Apna Kisan</h1>
+        <AuthForm type="login" />
       </div>
     </div>
   )

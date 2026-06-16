@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Chrome as Home, Users, SquarePen as PenSquare, Compass, User, Moon, Sun } from 'lucide-react';
 import clsx from 'clsx';
-import { useTheme } from '@/components/ThemeProvider';
+import { useTheme } from 'next-themes';
 import { CATEGORIES } from '@/lib/types';
 
 const NAV = [
@@ -17,7 +17,7 @@ const NAV = [
 
 export default function LeftSidebar() {
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
     <aside className="hidden lg:flex flex-col gap-1 w-56 shrink-0 sticky top-20">
@@ -43,7 +43,7 @@ export default function LeftSidebar() {
 
       <hr className="my-2 border-gray-200 dark:border-gray-700" />
 
-      <button onClick={toggleTheme} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+      <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
         {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
         <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
       </button>
