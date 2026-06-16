@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { cn } from "@/lib/utils"
 import { userAuthSchema } from "@/lib/validations/auth"
@@ -25,10 +26,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   })
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [isGitHubLoading, setIsGitHubLoading] = React.useState<boolean>(false)
+  const [supabase, setSupabase] = React.useState<SupabaseClient | null>(null);
   const searchParams = useSearchParams()
-  const supabase = createBrowserClient();
+
+  React.useEffect(() => {
+    setSupabase(createBrowserClient());
+  }, []);
 
   async function onSubmit(data: FormData) {
+    if (!supabase) return;
     setIsLoading(true)
 
     const { error } = await supabase.auth.signInWithOtp({
@@ -69,14 +75,14 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              disabled={isLoading || isGitHubLoading}
+              disabled={isLoading || isGitHubLoading || !supabase}
               {...register("email")}
             />
             {errors?.email && (
               <p className="px-1 text-xs text-red-600">{errors.email.message}</p>
             )}
           </div>
-          <button className={cn(buttonVariants())} disabled={isLoading}>
+          <button className={cn(buttonVariants())} disabled={isLoading || !supabase}>
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
@@ -98,6 +104,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         type="button"
         className={cn(buttonVariants({ variant: "outline" }))}
         onClick={async () => {
+          if (!supabase) return;
           setIsGitHubLoading(true);
           await supabase.auth.signInWithOAuth({
             provider: 'github',
@@ -106,7 +113,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             },
           });
         }}
-        disabled={isLoading || isGitHubLoading}
+        disabled={isLoading || isGitHubLoading || !supabase}
       >
         {isGitHubLoading ? (
           <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
