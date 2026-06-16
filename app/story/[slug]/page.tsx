@@ -18,8 +18,7 @@ type Post = Database['public']['Tables']['posts']['Row'] & {
 };
 
 async function getPostBySlug(slug: string) {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   const { data } = await supabase
     .from('posts')
     .select('*, profiles(*), likes_count:posts_likes(count), comments_count:posts_comments(count)')

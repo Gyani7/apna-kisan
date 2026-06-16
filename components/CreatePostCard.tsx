@@ -6,15 +6,15 @@ import { useAuth } from '@/components/AuthProvider';
 import { POST_TYPES } from '@/lib/types';
 
 export default function CreatePostCard() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
 
-  const initials = profile?.full_name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) ?? 'AK';
+  const initials = user?.user_metadata?.full_name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) ?? 'AK';
 
   return (
     <div className="card px-4 py-4">
       <div className="flex items-center gap-3 mb-3">
-        {profile?.avatar_url ? (
-          <Image src={profile.avatar_url} alt="" width={40} height={40} className="rounded-full object-cover" />
+        {user?.user_metadata?.avatar_url ? (
+          <Image src={user.user_metadata.avatar_url} alt="" width={40} height={40} className="rounded-full object-cover" />
         ) : (
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold text-sm shrink-0">{initials}</div>
         )}

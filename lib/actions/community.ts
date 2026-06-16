@@ -37,8 +37,7 @@ const GuestAnswerSchema = z.object({
 // --- SERVER ACTIONS ---
 
 export async function getCommunityPosts(options: { postType?: string, orderBy?: string, limit?: number }): Promise<PostWithAuthor[]> {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   let query = supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge)');
 
   if (options.postType) {
@@ -70,8 +69,7 @@ interface FormState {
  * @returns A new `FormState` object indicating the result of the action.
  */
 export async function submitGuestQuestion(prevState: FormState, formData: FormData): Promise<FormState> {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   const validation = GuestQuestionSchema.safeParse(Object.fromEntries(formData));
 
   if (!validation.success) {
@@ -118,8 +116,7 @@ export async function submitGuestQuestion(prevState: FormState, formData: FormDa
  * @returns A new `FormState` object indicating the result of the action.
  */
 export async function submitGuestAnswer(prevState: FormState, formData: FormData): Promise<FormState> {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   const validation = GuestAnswerSchema.safeParse(Object.fromEntries(formData));
 
   if (!validation.success) {

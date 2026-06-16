@@ -38,8 +38,7 @@ const formatError = (error: AuthError | Error | null) => {
 
 // --- Password Authentication ---
 export async function signInWithPassword(formData: FormData): Promise<ActionAuthResult> {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   const validation = EmailPasswordSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validation.success) {
@@ -59,8 +58,7 @@ export async function signInWithPassword(formData: FormData): Promise<ActionAuth
 }
 
 export async function signUpWithPassword(formData: FormData): Promise<ActionAuthResult> {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   const validation = EmailPasswordSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validation.success) {
@@ -86,8 +84,7 @@ export async function signUpWithPassword(formData: FormData): Promise<ActionAuth
 
 // --- Mobile OTP Authentication ---
 export async function sendMobileOTP(formData: FormData): Promise<ActionAuthResult> {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   const validation = PhoneSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validation.success) {
@@ -109,8 +106,7 @@ export async function sendMobileOTP(formData: FormData): Promise<ActionAuthResul
 }
 
 export async function verifyMobileOTP(formData: FormData): Promise<ActionAuthResult> {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   const validation = VerifyOTPSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validation.success) {
@@ -137,8 +133,7 @@ export async function verifyMobileOTP(formData: FormData): Promise<ActionAuthRes
 
 // --- Email Link Authentication ---
 export async function signInWithEmail(email: string): Promise<ActionAuthResult> {
-    const cookieStore = cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    const supabase = createSupabaseServerClient();
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -153,8 +148,7 @@ export async function signInWithEmail(email: string): Promise<ActionAuthResult> 
 
 // --- OAuth (Google) Authentication ---
 export async function signInWithGoogle(): Promise<ActionAuthResult<{ url: string | null }>> {
-    const cookieStore = cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    const supabase = createSupabaseServerClient();
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -169,8 +163,7 @@ export async function signInWithGoogle(): Promise<ActionAuthResult<{ url: string
 
 // --- Sign Out ---
 export async function signOut(): Promise<ActionAuthResult> {
-    const cookieStore = cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    const supabase = createSupabaseServerClient();
     const { error } = await supabase.auth.signOut();
     if (error) {
         return { success: false, message: 'Sign-out failed.', data: null, error: formatError(error) };

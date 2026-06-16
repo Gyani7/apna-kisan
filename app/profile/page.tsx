@@ -51,7 +51,7 @@ async function uploadFile(bucket: string, path: string, file: File) {
 
 
 function ProfileContent() {
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile, loading } = useAuth();
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
   const [activeTab, setActiveTab] = useState<'posts' | 'stories' | 'answers'>('posts');
   const [editing, setEditing] = useState(false);
@@ -103,6 +103,14 @@ function ProfileContent() {
     setEditing(false);
   }
 
+  if (loading) {
+    return (
+        <div className="text-center py-16">
+            <p>Loading profile...</p>
+        </div>
+    )
+  }
+
   if (!user || !profile) {
     return (
       <div className="text-center py-16">
@@ -116,7 +124,7 @@ function ProfileContent() {
     );
   }
 
-  const initials = (profile.full_name ?? profile.username).split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+  const initials = (profile.full_name || profile.username || '').split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
     <div>

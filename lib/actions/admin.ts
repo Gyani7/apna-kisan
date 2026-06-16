@@ -30,8 +30,7 @@ interface AdminStats {
  * @returns An object containing various statistics.
  */
 export async function getStats(): Promise<AdminStats> {
-    const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
 
   const [
     { count: totalUsers },
@@ -94,8 +93,7 @@ interface SchemeToSeed {
  * NOTE: This function assumes that the 'government_schemes' table has an 'embedding' column of type vector(1536).
  */
 export async function seedAndEmbedSchemes(): Promise<{ message: string; error?: string }> {
-    const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
 
   const schemes: SchemeToSeed[] = [
     {

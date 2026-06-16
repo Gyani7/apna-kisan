@@ -43,7 +43,7 @@ const POST_TYPES: { key: PostType; label: string; labelHi: string; icon: typeof 
 function CreateForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const [postType, setPostType] = useState<PostType>(((searchParams && searchParams.get('type')) as PostType) ?? 'discussion');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -54,7 +54,7 @@ function CreateForm() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const initials = profile?.full_name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) ?? 'AK';
+  const initials = user?.user_metadata?.full_name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) ?? 'AK';
 
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -141,8 +141,8 @@ function CreateForm() {
       )}
 
       <div className="flex items-start gap-3">
-        {profile?.avatar_url ? (
-          <Image src={profile.avatar_url} alt="" width={40} height={40} className="rounded-full object-cover" />
+        {user?.user_metadata?.avatar_url ? (
+          <Image src={user.user_metadata.avatar_url} alt="" width={40} height={40} className="rounded-full object-cover" />
         ) : (
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold text-sm shrink-0">{initials}</div>
         )}

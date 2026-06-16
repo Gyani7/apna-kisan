@@ -89,8 +89,7 @@ async function getMockAIAnalysis(imageUrl: string): Promise<AIAnalysisResult> {
  * @returns An updated AnalysisFormState with the result of the operation.
  */
 export async function analyzeCropImage(prevState: AnalysisFormState, formData: FormData): Promise<AnalysisFormState> {
-    const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
 
   // 1. Authenticate user
   const { data: { user } } = await supabase.auth.getUser();
