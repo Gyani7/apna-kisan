@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/react';
+import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import Head from 'next/head';
 import { Toaster } from 'react-hot-toast';
 
 import Footer from '@/components/Footer';
@@ -16,6 +16,15 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
+export const metadata: Metadata = {
+  title: siteConfig.name,
+  description: siteConfig.description,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
+  ],
+};
+
 interface RootLayoutProps {
   children: React.ReactNode;
 }
@@ -23,20 +32,6 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <Head>
-        <title>{siteConfig.name}</title>
-        <meta name="description" content={siteConfig.description} />
-        <meta
-          name="theme-color"
-          media="(prefers-color-scheme: light)"
-          content="white"
-        />
-        <meta
-          name="theme-color"
-          media="(prefers-color-scheme: dark)"
-          content="black"
-        />
-      </Head>
       <body
         className={cn(
           'min-h-screen bg-background font-sans antialiased',
