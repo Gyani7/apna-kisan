@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import Link from "next/link"
-import { Icons } from "@/components/Icons"
+import { Icons } from "@/components/icons"
 
 export function AuthForm({ type }: { type: 'login' | 'register' }) {
 
