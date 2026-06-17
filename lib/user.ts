@@ -32,6 +32,16 @@ export async function getUserProfile() {
 
 export async function getUserRole() {
     const profile = await getUserProfile();
-    // The type from Supabase indicates that `role` is an array.
-    return (profile?.role as any)?.[0]?.name || null;
+
+    if (!profile || !profile.role) {
+        return null;
+    }
+
+    const role = profile.role;
+
+    if (Array.isArray(role)) {
+        return role[0]?.name || null;
+    } else {
+        return role.name || null;
+    }
 }

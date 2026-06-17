@@ -19,6 +19,15 @@ export async function getUserRole() {
     return null;
   }
 
-  // The type from Supabase indicates that `role` is an array.
-  return (data?.role as any)?.[0]?.name || null;
+  if (!data || !data.role) {
+    return null;
+  }
+
+  const role = data.role;
+
+  if (Array.isArray(role)) {
+    return role[0]?.name || null;
+  } else {
+    return role.name || null;
+  }
 }
