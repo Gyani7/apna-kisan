@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import Link from "next/link"
-import { Chrome, SmartphoneIcon } from "lucide-react"
+import { Icons } from "@/components/Icons"
 
 export function AuthForm({ type }: { type: 'login' | 'register' }) {
 
@@ -61,14 +61,18 @@ export function AuthForm({ type }: { type: 'login' | 'register' }) {
                 </span>
             </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
              <Button variant="outline" onClick={handleGoogleLogin}>
-                <Chrome className="mr-2 h-4 w-4" />
+                <Icons.Chrome className="mr-2 h-4 w-4" />
                 Google
             </Button>
             <Button variant="outline" onClick={handleOtpLogin}>
-                <SmartphoneIcon className="mr-2 h-4 w-4" />
+                <Icons.Smartphone className="mr-2 h-4 w-4" />
                 OTP
+            </Button>
+            <Button variant="outline" onClick={handleGoogleLogin}>
+                <Icons.GitHub className="mr-2 h-4 w-4" />
+                GitHub
             </Button>
         </div>
         <div className="text-center text-sm text-muted-foreground">

@@ -9,8 +9,10 @@ import {
   BookOpen,
   Laptop,
   Loader,
-  Github,
   User,
+  GitHub,
+  Chrome,
+  Smartphone
 } from 'lucide-react';
 
 export const Icons = {
@@ -22,6 +24,8 @@ export const Icons = {
     BookOpen: BookOpen,
     Laptop: Laptop,
     spinner: Loader,
-    gitHub: Github,
     user: User,
+    GitHub: GitHub,
+    Chrome: Chrome,
+    Smartphone: Smartphone
 };
