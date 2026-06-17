@@ -3,7 +3,7 @@
 import { useAuth } from '@/components/AuthProvider';
 import { cn } from '@/lib/utils';
 import { CommandMenu } from '@/components/CommandMenu';
-import { buttonVariants } from '@/components/ui/button-variants';
+import { buttonVariants } from '@/components/ui/button';
 import { MainNav } from '@/components/MainNav';
 import { MobileNav } from '@/components/MobileNav';
 import Link from 'next/link';
