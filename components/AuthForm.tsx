@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
-import { Icons } from "@/components/Icons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const userAuthSchema = z.object({
@@ -26,7 +25,7 @@ type FormData = z.infer<typeof userAuthSchema>;
 
 export function AuthForm() {
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormData>({
-    resolver: zodResolver(userAuth-schema),
+    resolver: zodResolver(userAuthSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -155,7 +154,6 @@ export function AuthForm() {
           </div>
           <div className="flex space-x-2">
              <Button onClick={handleSubmit(handleLogin)} disabled={isLoading || isGitHubLoading} className="w-full">
-              {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
               Login
             </Button>
             <Button onClick={handleSubmit(handleSignUp)} disabled={isLoading || isGitHubLoading} variant="secondary" className="w-full">
@@ -179,11 +177,6 @@ export function AuthForm() {
         onClick={handleGithubSignIn}
         disabled={isLoading || isGitHubLoading}
       >
-        {isGitHubLoading ? (
-          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Icons.gitHub className="mr-2 h-4 w-4" />
-        )}{ " "}
         GitHub
       </Button>
     </div>
