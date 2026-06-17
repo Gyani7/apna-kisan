@@ -1,16 +1,24 @@
+import { createServerClient } from '@/lib/supabase/server';
+import { ProductCard } from '@/components/ProductCard';
+import { Product } from '@/lib/types';
 
-import { ProductCard } from "@/components/common/ProductCard"
+export default async function MarketPage() {
+  const supabase = createServerClient();
+  const { data: products, error } = await supabase
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false });
 
-export default function MarketplacePage() {
+  if (error) {
+    console.error('Error fetching products:', error);
+    return <div>Error loading products.</div>;
+  }
+
   return (
-    <div>
-      <h1 className="mb-6 text-3xl font-bold">Marketplace</h1>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {products.map((product: Product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
     </div>
-  )
+  );
 }

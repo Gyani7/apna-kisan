@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Chrome as Home, Users, SquarePen as PenSquare, Compass, User, Moon, Sun } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from 'next-themes';
-import { CATEGORIES } from '@/lib/types';
+import { CATEGORIES } from '@/components/questions/GuestQuestionForm';
 
 const NAV = [
   { label: 'Home', href: '/', icon: Home },

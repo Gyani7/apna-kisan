@@ -2,6 +2,7 @@
 import { Header } from '@/components/common/Header';
 import { LeftSidebar } from '@/components/common/LeftSidebar';
 import { RightSidebar } from '@/components/common/RightSidebar';
+import { Toaster } from '@/components/ui/toaster';
 
 export default function MainLayout({
   children,
@@ -18,6 +19,7 @@ export default function MainLayout({
         </main>
         <RightSidebar />
       </div>
+      <Toaster />
     </div>
   );
 }
