@@ -1,7 +1,7 @@
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 
 export default async function MandiRates() {
-  const supabase = createServerClient();
+  const supabase = createClient();
   const { data: rates, error } = await supabase.from('mandi_rates').select('*');
 
   return (

@@ -1,6 +1,6 @@
 'use server';
 
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 
 // Define the shape of a community question
@@ -30,7 +30,7 @@ interface AdminStats {
  * @returns An object containing various statistics.
  */
 export async function getStats(): Promise<AdminStats> {
-  const supabase = createServerClient();
+  const supabase = createClient();
 
   const [
     { count: totalUsers },
@@ -93,7 +93,7 @@ interface SchemeToSeed {
  * NOTE: This function assumes that the 'government_schemes' table has an 'embedding' column of type vector(1536).
  */
 export async function seedAndEmbedSchemes(): Promise<{ message: string; error?: string }> {
-  const supabase = createServerClient();
+  const supabase = createClient();
 
   const schemes: SchemeToSeed[] = [
     {

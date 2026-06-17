@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import type { PostWithAuthor } from '@/lib/types';
 import { mapPostsToPostWithAuthor } from '@/lib/mappers';
@@ -38,7 +38,7 @@ const GuestAnswerSchema = z.object({
 // --- SERVER ACTIONS ---
 
 export async function getCommunityPosts(options: { postType?: string, orderBy?: string, limit?: number }): Promise<PostWithAuthor[]> {
-  const supabase = createServerClient();
+  const supabase = createClient();
   let query = supabase.from('posts').select('*, profiles:user_id(username, full_name, avatar_url, reputation, badge)');
 
   if (options.postType) {
@@ -70,7 +70,7 @@ interface FormState {
  * @returns A new `FormState` object indicating the result of the action.
  */
 export async function submitGuestQuestion(prevState: FormState, formData: FormData): Promise<FormState> {
-  const supabase = createServerClient();
+  const supabase = createClient();
   const validation = GuestQuestionSchema.safeParse(Object.fromEntries(formData));
 
   if (!validation.success) {
@@ -118,7 +118,7 @@ export async function submitGuestQuestion(prevState: FormState, formData: FormDa
  * @returns A new `FormState` object indicating the result of the action.
  */
 export async function submitGuestAnswer(prevState: FormState, formData: FormData): Promise<FormState> {
-  const supabase = createServerClient();
+  const supabase = createClient();
   const validation = GuestAnswerSchema.safeParse(Object.fromEntries(formData));
 
   if (!validation.success) {

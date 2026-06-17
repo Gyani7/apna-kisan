@@ -1,8 +1,8 @@
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import { MessageFarmerButton } from '@/components/MessageFarmerButton';
 
 export default async function ProductsPage() {
-  const supabase = createServerClient();
+  const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { data: products, error } = await supabase
     .from('products')

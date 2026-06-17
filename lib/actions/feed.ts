@@ -1,6 +1,6 @@
 'use server';
 
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import type { Database } from '@/lib/database.types';
 import { cookies } from 'next/headers';
 
@@ -54,7 +54,7 @@ export type UnifiedPost = QuestionPost | StoryPost | ReelPost;
  * @returns A promise that resolves to an object containing the unified feed data or an error message.
  */
 export async function getUnifiedFeed(): Promise<{ data: UnifiedPost[]; error: string | null; }> {
-  const supabase = createServerClient();
+  const supabase = createClient();
 
   try {
     // --- STEP 1: Fetch all data sources in parallel ---

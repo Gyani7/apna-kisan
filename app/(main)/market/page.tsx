@@ -1,9 +1,9 @@
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import { ProductCard } from '@/components/ProductCard';
 import { Product } from '@/lib/types';
 
 export default async function MarketPage() {
-  const supabase = createServerClient();
+  const supabase = createClient();
   const { data: products, error } = await supabase
     .from('products')
     .select('*')

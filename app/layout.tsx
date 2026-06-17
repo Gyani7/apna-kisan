@@ -4,7 +4,7 @@ import { GeistSans } from 'geist/font/sans';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import { SignOutButton } from '@/components/SignOutButton';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createServerClient();
+  const supabase = createClient();
   const { data: { session } } = await supabase.auth.getSession();
   const role = await getUserRole();
 

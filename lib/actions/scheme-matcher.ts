@@ -1,6 +1,6 @@
 'use server';
 
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 interface UserProfile {
@@ -28,7 +28,7 @@ interface MatchResult {
  * Matches a user against a list of government schemes and upserts the results.
  */
 export async function matchUserToSchemes() {
-  const supabase = createServerClient();
+  const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('User not authenticated');
