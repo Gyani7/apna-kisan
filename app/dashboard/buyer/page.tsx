@@ -12,6 +12,7 @@ interface Product {
   price: number;
   image_urls: string[];
   category: string;
+  seller_id: string; // Added seller_id
 }
 
 export default function BuyerDashboard() {
