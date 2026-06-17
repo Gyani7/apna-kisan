@@ -61,18 +61,14 @@ export function AuthForm({ type }: { type: 'login' | 'register' }) {
                 </span>
             </div>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
              <Button variant="outline" onClick={handleGoogleLogin}>
-                <Icons.Chrome className="mr-2 h-4 w-4" />
+                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                 Google
             </Button>
             <Button variant="outline" onClick={handleOtpLogin}>
                 <Icons.Smartphone className="mr-2 h-4 w-4" />
                 OTP
-            </Button>
-            <Button variant="outline" onClick={handleGoogleLogin}>
-                <Icons.GitHub className="mr-2 h-4 w-4" />
-                GitHub
             </Button>
         </div>
         <div className="text-center text-sm text-muted-foreground">

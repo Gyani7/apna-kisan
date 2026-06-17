@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Chrome as Home, Users, SquarePen as PenSquare, Compass, User, Moon, Sun } from 'lucide-react';
+import { Home, Users, SquarePen as PenSquare, Compass, User, Moon, Sun } from 'lucide-react';
 import clsx from 'clsx';
 import { useTheme } from 'next-themes';
 import { CATEGORIES } from '@/lib/config';

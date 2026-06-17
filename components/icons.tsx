@@ -10,8 +10,6 @@ import {
   Laptop,
   Loader,
   User,
-  Github,
-  Chrome,
   Smartphone
 } from 'lucide-react';
 
@@ -25,7 +23,5 @@ export const Icons = {
     Laptop: Laptop,
     spinner: Loader,
     user: User,
-    GitHub: Github,
-    Chrome: Chrome,
     Smartphone: Smartphone
 };
