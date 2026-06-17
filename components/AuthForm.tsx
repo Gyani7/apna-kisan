@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
-import { Icons } from "@/components/icons";
+import { Icons } from "@/components/Icons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const userAuthSchema = z.object({
@@ -26,7 +26,7 @@ type FormData = z.infer<typeof userAuthSchema>;
 
 export function AuthForm() {
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormData>({
-    resolver: zodResolver(userAuthSchema),
+    resolver: zodResolver(userAuth-schema),
     defaultValues: {
       email: '',
       password: '',
