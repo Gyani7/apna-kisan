@@ -28,6 +28,9 @@ export async function getUserRole() {
   if (Array.isArray(role)) {
     return role[0]?.name || null;
   } else {
-    return role.name || null;
+    // The build fails here due to a type inference issue where `role` becomes `never`.
+    // The original logic assumes `role` can be an object or an array.
+    // Casting `role` here clarifies the intent for the type checker.
+    return (role as { name: string }).name || null;
   }
 }
