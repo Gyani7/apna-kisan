@@ -15,20 +15,23 @@ export interface Product {
 export interface Post {
   id: string;
   user_id: string;
-  post_type: 'question' | 'article' | 'notification';
+  post_type: 'question' | 'article' | 'notification' | 'story';
   title?: string;
   content: string;
   tags?: string[];
   likes_count: number;
   comments_count: number;
-  shares_count: number;
-  bookmarks_count: number;
   location?: string;
   created_at: string;
   slug?: string;
   image_url?: string;
   is_liked?: boolean;
   is_bookmarked?: boolean;
+  excerpt?: string;
+  read_time?: number;
+  category?: string;
+  shares_count: number;
+  is_featured?: boolean;
 }
 
 export interface Author {
@@ -42,6 +45,33 @@ export interface Author {
 
 export interface PostWithAuthor extends Post {
   author: Author;
+}
+
+export interface ReelData {
+  id: string;
+  created_at: string;
+  video_url: string;
+  caption?: string;
+  likes_count: number;
+  comments_count: number;
+  user: {
+    id: string;
+    full_name: string;
+    avatar_url: string;
+  };
+  village: {
+    id: string;
+    name: string;
+  };
+  comments: {
+    id: string;
+    content: string;
+    created_at: string;
+    user: {
+      full_name: string;
+    };
+  }[];
+  user_has_liked_reel: boolean;
 }
 
 export const POST_TYPE_CONFIG = {
@@ -66,6 +96,13 @@ export const POST_TYPE_CONFIG = {
     label: 'Notification',
     labelHi: 'सूचना'
   },
+  story: {
+    icon: BookOpen,
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-50',
+    label: 'Story',
+    labelHi: 'कहानी'
+  }
 };
 
 export function timeAgo(dateString: string): string {

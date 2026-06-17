@@ -1,9 +1,14 @@
-import type { PostWithAuthor } from '@/lib/types';
+import type { PostWithAuthor, Author } from '@/lib/types';
 import type { PostRow } from '@/lib/database.types';
 
 export interface RawPost extends PostRow {
-  profiles: PostWithAuthor['author'] | null;
+  profiles: Author | null;
 }
+
+const defaultAuthor: Author = {
+  username: 'anonymous',
+  reputation: 0,
+};
 
 export function mapPostToPostWithAuthor(p: RawPost): PostWithAuthor {
   return {
@@ -23,8 +28,7 @@ export function mapPostToPostWithAuthor(p: RawPost): PostWithAuthor {
     comments_count: p.comments_count,
     shares_count: p.shares_count,
     created_at: p.created_at,
-    updated_at: p.updated_at,
-    author: p.profiles,
+    author: p.profiles || defaultAuthor,
   };
 }
 

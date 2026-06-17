@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CATEGORIES } from '@/components/questions/GuestQuestionForm';
+import { CATEGORIES } from '@/lib/config';
 
 export default function StoriesBar() {
   return (
