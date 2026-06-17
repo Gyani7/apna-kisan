@@ -8,7 +8,7 @@ import { createClient } from '@/utils/supabase/server';
 import { SignOutButton } from '@/components/SignOutButton';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { getUserRole } from '@/lib/user';
+import { getUserRole } from '@/lib/user.server'; // Corrected import
 
 const inter = Inter({ subsets: ['latin'] });
 
