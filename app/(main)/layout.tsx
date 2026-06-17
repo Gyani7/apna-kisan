@@ -14,8 +14,10 @@ export default function MainLayout({
       <Header />
       <div className="flex">
         <LeftSidebar />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          {children}
+        <main className="flex-1 p-6">
+          <div className="container mx-auto max-w-4xl">
+            {children}
+          </div>
         </main>
         <RightSidebar />
       </div>

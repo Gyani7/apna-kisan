@@ -11,44 +11,52 @@ import { ThemeToggle } from "@/components/ThemeToggle"
 export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
-      <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-        <div className="flex gap-6 md:gap-10">
+      <div className="flex h-16 items-center px-4 md:px-6">
+        <div className="flex items-center gap-6">
           <Link href="/feed" className="flex items-center space-x-2">
             <Logo className="h-8 w-8" />
             <span className="hidden font-bold sm:inline-block text-lg">Apna Kisan</span>
           </Link>
-          <nav className="hidden gap-6 md:flex">
+        </div>
+
+        <div className="flex flex-1 items-center justify-end gap-4">
+          <nav className="hidden md:flex gap-4">
             <Link
               href="/feed"
-              className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Feed
             </Link>
             <Link
               href="/market"
-              className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Marketplace
             </Link>
             <Link
               href="/community"
-              className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Community
             </Link>
             <Link
               href="/ai-assistant"
-              className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               AI Assistant
             </Link>
           </nav>
-        </div>
-
-        <div className="flex flex-1 items-center justify-end space-x-4">
-           <div className="relative w-full max-w-sm md:block hidden">
-            <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search for anything..." className="pl-8" />
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+            <form>
+              <div className="relative">
+                <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search..."
+                  className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px] bg-background"
+                />
+              </div>
+            </form>
           </div>
           <ThemeToggle />
           <Button variant="ghost" size="icon" className="rounded-full">
@@ -56,13 +64,12 @@ export function Header() {
             <span className="sr-only">Notifications</span>
           </Button>
           <UserNav />
-        
           <Sheet>
             <SheetTrigger asChild>
               <Button
-                variant="ghost"
-                className="md:hidden"
+                variant="outline"
                 size="icon"
+                className="md:hidden"
               >
                 <MenuIcon className="h-6 w-6" />
                 <span className="sr-only">Toggle Menu</span>
