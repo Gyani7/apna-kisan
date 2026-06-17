@@ -98,18 +98,18 @@ const CommunityWidget = () => (
 export default function FarmerDashboard() {
   return (
     <div className="p-4 md:p-8">
-      <WelcomeHeader />
+      {/* <WelcomeHeader /> */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Main Widgets */}
-        <MyFarmWidget />
-        <AssistantWidget />
-        <CommunityWidget />
+        {/* <MyFarmWidget /> */}
+        {/* <AssistantWidget /> */}
+        {/* <CommunityWidget /> */}
         
         {/* Existing Cards - can be redesigned or used as is */}
         <div className="col-span-1 lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <WeatherCard />
-            <MandiRatesCard />
-            <CropInsightsCard />
+            {/* <WeatherCard /> */}
+            {/* <MandiRatesCard /> */}
+            {/* <CropInsightsCard /> */}
         </div>
       </div>
     </div>
