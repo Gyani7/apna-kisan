@@ -1,4 +1,4 @@
-import { getUserRole } from '@/lib/user';
+import { getUserRole } from '@/lib/user.server';
 import { redirect } from 'next/navigation';
 
 export default async function BuyerDashboard() {
