@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Chrome as Home, Users, SquarePen as PenSquare, Compass, User } from 'lucide-react';
+import { Home, Users, SquarePen as PenSquare, Compass, User } from 'lucide-react';
 import clsx from 'clsx';
 
 const NAV_ITEMS = [

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { HomeIcon, ShoppingCartIcon, UsersIcon, BotIcon, SettingsIcon, BarChart3Icon, NewspaperIcon } from "lucide-react"
+import { HomeIcon, ShoppingCartIcon, UsersIcon, Bot, SettingsIcon, BarChart3Icon, NewspaperIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
@@ -10,7 +10,7 @@ const navItems = [
   { href: "/feed", label: "Feed", icon: HomeIcon },
   { href: "/market", label: "Marketplace", icon: ShoppingCartIcon },
   { href: "/community", label: "Community", icon: UsersIcon },
-  { href: "/ai-assistant", label: "AI Assistant", icon: BotIcon },
+  { href: "/ai-assistant", label: "AI Assistant", icon: Bot },
   { href: "/schemes", label: "Govt. Schemes", icon: NewspaperIcon, badge: "3" },
 ];
 
