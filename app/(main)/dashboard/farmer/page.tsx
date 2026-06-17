@@ -33,7 +33,7 @@ const MyFarmWidget = () => (
         <CardHeader>
             <CardTitle>My Farm Overview</CardTitle>
              <CardDescription>A quick look at your primary crop's health and progress.</CardDescription>
-        </CardHeader>
+        </d`er>
         <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
                 <span className="font-medium">Wheat - Growth Stage: Tillering</span>
@@ -107,7 +107,7 @@ export default function FarmerDashboard() {
         
         {/* Existing Cards - can be redesigned or used as is */}
         <div className="col-span-1 lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* <WeatherCard /> */}
+            <WeatherCard />
             {/* <MandiRatesCard /> */}
             {/* <CropInsightsCard /> */}
         </div>
