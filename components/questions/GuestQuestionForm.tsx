@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { submitGuestQuestion } from '@/lib/actions/community';
+import { CATEGORIES } from '@/lib/config';
 
 const STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -11,11 +12,6 @@ const STATES = [
   'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
   'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
   'Uttar Pradesh', 'Uttarakhand', 'West Bengal'
-];
-
-const CATEGORIES = [
-  'Crop Protection', 'Fertilizers', 'Organic Farming', 'Irrigation',
-  'Market Rates', 'Government Schemes', 'Seeds', 'Machinery', 'Livestock'
 ];
 
 const initialState = { success: false, message: '', errors: {} };
@@ -93,7 +89,7 @@ export default function GuestQuestionForm() {
         <label className="text-sm font-semibold text-gray-700 ml-1">Category *</label>
         <select name="category" required className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:bg-white outline-none appearance-none transition-all">
           <option value="" disabled selected>Select a category</option>
-          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          {CATEGORIES.map(c => <option key={c.slug} value={c.name}>{c.nameHi}</option>)}
         </select>
       </div>
 
