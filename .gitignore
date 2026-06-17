@@ -1,41 +1,41 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Dependencies
+# dependencies
 /node_modules
 /.pnp
 .pnp.js
 
-# Testing
+# testing
 /coverage
 
-# Next.js
+# next.js
 /.next/
 /out/
 
-# Production
+# production
 /build
 
-# Miscellaneous
+# misc
 .DS_Store
 *.pem
 
-# Node.js
-npm-debug.log*
+# debug
+.npm-debug.log*
+.pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local environment variables
+# local env files
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Jest
-/jest.config.js
-/jest.setup.js
+# vercel
+.vercel
 
-# ESLint
-/eslint.config.js
+# typescript
+*.tsbuildinfo
 
-# TypeScript
-/tsconfig.tsbuildinfo
+# patch file
+fix.patch
