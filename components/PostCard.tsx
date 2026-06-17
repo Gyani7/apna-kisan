@@ -96,7 +96,7 @@ export default function PostCard({ post, compact }: PostCardProps) {
         <p className={clsx('text-gray-700 dark:text-gray-300 leading-relaxed', compact ? 'text-xs line-clamp-2' : 'text-sm', post.title && 'mt-1')}>
           {post.content}
         </p>
-        {post.tags.length > 0 && (
+        {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {post.tags.map((tag) => (
               <span key={tag} className="text-xs text-brand-600 dark:text-brand-400 font-medium bg-brand-50 dark:bg-brand-900/30 px-2 py-0.5 rounded-full">#{tag}</span>
