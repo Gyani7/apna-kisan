@@ -1,6 +1,6 @@
 'use server';
 
-import { createServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import type { ReelData } from '@/lib/types';
@@ -32,7 +32,7 @@ const CreateReelSchema = z.object({
 // --- SERVER ACTIONS ---
 
 export async function getReels(): Promise<{ reels: ReelData[], error: string | null }> {
-  const supabase = createServerClient();
+  const supabase = createSupabaseServerClient();
 
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -100,7 +100,7 @@ export async function getReels(): Promise<{ reels: ReelData[], error: string | n
  * This provides atomicity and prevents race conditions.
  */
 export async function toggleLike(reelId: string): Promise<LikeActionResult> {
-    const supabase = createServerClient();
+    const supabase = createSupabaseServerClient();
 
     try {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -142,7 +142,7 @@ export async function toggleLike(reelId: string): Promise<LikeActionResult> {
  * Adds a comment to a reel using an atomic RPC function.
  */
 export async function addComment(formData: FormData): Promise<ActionResult> {
-    const supabase = createServerClient();
+    const supabase = createSupabaseServerClient();
     
     try {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -179,7 +179,7 @@ export async function addComment(formData: FormData): Promise<ActionResult> {
  * Creates the database record for a new reel.
  */
 export async function createReelRecord(formData: FormData): Promise<ActionResult> {
-  const supabase = createServerClient();
+  const supabase = createSupabaseServerClient();
 
   try {
     const { data: { user }, error: authError } = await supabase.auth.getUser();

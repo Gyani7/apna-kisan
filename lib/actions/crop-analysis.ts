@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createServerClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
@@ -89,7 +89,7 @@ async function getMockAIAnalysis(imageUrl: string): Promise<AIAnalysisResult> {
  * @returns An updated AnalysisFormState with the result of the operation.
  */
 export async function analyzeCropImage(prevState: AnalysisFormState, formData: FormData): Promise<AnalysisFormState> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createServerClient();
 
   // 1. Authenticate user
   const { data: { user } } = await supabase.auth.getUser();

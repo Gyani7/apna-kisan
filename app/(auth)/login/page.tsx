@@ -1,13 +1,21 @@
+import { createServerClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { AuthForm } from "@/components/AuthForm";
 
-import { AuthForm } from '@/components/common/AuthForm'
+export default async function LoginPage() {
+  const supabase = createServerClient();
+  const { data } = await supabase.auth.getSession();
 
-export default function LoginPage() {
+  if (data.session) {
+    return redirect("/");
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8">
-        <h1 className="mb-6 text-center text-3xl font-bold">Login to Apna Kisan</h1>
-        <AuthForm type="login" />
+    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold text-center">Login to Apna Kisan</h1>
+        <AuthForm />
       </div>
     </div>
-  )
+  );
 }
