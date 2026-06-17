@@ -33,7 +33,7 @@ const MyFarmWidget = () => (
         <CardHeader>
             <CardTitle>My Farm Overview</CardTitle>
              <CardDescription>A quick look at your primary crop's health and progress.</CardDescription>
-        </d`er>
+        </CardHeader>
         <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
                 <span className="font-medium">Wheat - Growth Stage: Tillering</span>
