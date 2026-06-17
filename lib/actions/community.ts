@@ -25,6 +25,7 @@ const GuestQuestionSchema = z.object({
   category: z.string(),
   guest_name: z.string().max(50).optional(),
   guest_mobile: z.string().max(15).optional(),
+  state: z.string().optional(),
 });
 
 const GuestAnswerSchema = z.object({
@@ -88,6 +89,7 @@ export async function submitGuestQuestion(prevState: FormState, formData: FormDa
     category: validation.data.category,
     guest_name: sanitizedName,
     guest_mobile: validation.data.guest_mobile,
+    state: validation.data.state,
     status: 'pending', // Always set to pending for moderation
   }]);
 

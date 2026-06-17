@@ -85,12 +85,21 @@ export default function GuestQuestionForm() {
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <label className="text-sm font-semibold text-gray-700 ml-1">Category *</label>
-        <select name="category" required className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:bg-white outline-none appearance-none transition-all">
-          <option value="" disabled selected>Select a category</option>
-          {CATEGORIES.map(c => <option key={c.slug} value={c.name}>{c.nameHi}</option>)}
-        </select>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="space-y-1.5">
+          <label className="text-sm font-semibold text-gray-700 ml-1">Category *</label>
+          <select name="category" required className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:bg-white outline-none appearance-none transition-all">
+            <option value="" disabled selected>Select a category</option>
+            {CATEGORIES.map(c => <option key={c.slug} value={c.name}>{c.nameHi}</option>)}
+          </select>
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-semibold text-gray-700 ml-1">State *</label>
+          <select name="state" required className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:bg-white outline-none appearance-none transition-all">
+            <option value="" disabled selected>Select your state</option>
+            {STATES.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
       </div>
 
       <div className="space-y-1.5">
