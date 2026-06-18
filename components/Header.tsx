@@ -1,11 +1,10 @@
+
 'use client';
 
 import { useAuth } from '@/components/AuthProvider';
 import { cn } from '@/lib/utils';
 import { CommandMenu } from '@/components/CommandMenu';
 import { buttonVariants } from '@/components/ui/button';
-import { MainNav } from '@/components/MainNav';
-import { MobileNav } from '@/components/MobileNav';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
@@ -17,61 +16,62 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { usePathname } from 'next/navigation';
-import { siteConfig } from '@/config/site';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { MainNav } from './MainNav';
 
 export default function Header() {
   const { user } = useAuth();
   const pathname = usePathname();
   const supabase = createBrowserClient();
 
-  if (pathname && pathname.includes('auth')) {
+  if (pathname?.includes('auth')) {
     return null;
   }
 
   const signOut = async () => {
     await supabase.auth.signOut();
-  }
+  };
 
   return (
     <header className="supports-backdrop-blur:bg-background/60 sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-      <div className="container flex h-14 items-center">
+      <div className="container flex h-16 items-center">
         <MainNav />
-        <MobileNav items={siteConfig.mainNav} />
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-            <CommandMenu />
-          </div>
-          <nav className="flex items-center">
+        <div className="flex flex-1 items-center justify-end space-x-4">
+          <CommandMenu />
+          <nav className="flex items-center space-x-2">
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <Avatar>
-                    <AvatarImage src={user.user_metadata.avatar_url} />
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage
+                      src={user.user_metadata.avatar_url}
+                      alt={user.user_metadata.name}
+                    />
                     <AvatarFallback>
                       {user.user_metadata.name ? user.user_metadata.name[0] : 'U'}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href="/profile">Profile</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => signOut()}>
-                    Sign out
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut}>Sign out</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <Link
                 href="/auth"
-                className={cn(buttonVariants({ variant: 'secondary' }), 'px-4')}
+                className={cn(
+                  buttonVariants({ variant: 'secondary', size: 'sm' }),
+                  'px-4'
+                )}
               >
                 Login
               </Link>

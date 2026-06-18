@@ -1,62 +1,97 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
-import { getUser } from '@/lib/user';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Link from 'next/link';
-import { withAuthorization } from '@/components/withAuthorization';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PostCard } from "@/components/community/PostCard";
+import { ProductCard } from "@/components/market/ProductCard";
 
-function ProfilePage() {
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const supabase = createBrowserClient();
+const user = {
+  full_name: 'Amit Patel',
+  username: 'amitp',
+  avatar_url: 'https://i.pravatar.cc/150?u=amitp',
+};
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const currentUser = await getUser();
-      if (currentUser) {
-         const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', currentUser.id)
-          .single();
-        setUser(data);
-      }
-      setIsLoading(false);
-    };
+const enrolledSchemes = [
+  {
+    id: 1,
+    name: 'Pradhan Mantri Fasal Bima Yojana',
+    description: 'A crop insurance scheme to protect against crop failure.',
+  },
+  {
+    id: 2,
+    name: 'Kisan Credit Card',
+    description: 'A credit scheme for farmers to meet their cultivation needs.',
+  },
+];
 
-    fetchUser();
-  }, [supabase]);
+const userPosts = [
+  {
+    id: 1,
+    content: 'Just harvested my first batch of organic tomatoes! So proud of the result. 🍅',
+    author: user,
+    created_at: '2024-07-20T10:00:00.000Z',
+  },
+];
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+const userProducts = [
+  {
+    id: 1,
+    name: 'Fresh Tomatoes',
+    price: 50,
+    image: 'https://images.unsplash.com/photo-1588695039912-a85ec34a727c?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  },
+];
 
-  if (!user) {
-    return <div>User not found.</div>;
-  }
-
+export default function ProfilePage() {
   return (
-    <Card className="max-w-xl mx-auto">
-      <CardHeader className="text-center">
-        <Avatar className="w-24 h-24 mx-auto mb-4">
+    <div className="container mx-auto py-8">
+      <div className="flex items-center space-x-4 mb-8">
+        <Avatar className="h-24 w-24">
           <AvatarImage src={user.avatar_url} />
-          <AvatarFallback className="text-4xl">{user.username?.[0].toUpperCase()}</AvatarFallback>
+          <AvatarFallback>{user.full_name.charAt(0)}</AvatarFallback>
         </Avatar>
-        <CardTitle className="text-2xl">{user.username}</CardTitle>
-        <p className="text-muted-foreground">{user.role}</p>
-      </CardHeader>
-      <CardContent className="text-center">
-        <p className="mb-6">{user.bio || 'This user has not set a bio yet.'}</p>
-        <Link href="/profile/edit">
-            <Button>Edit Profile</Button>
-        </Link>
-      </CardContent>
-    </Card>
+        <div>
+          <h1 className="text-3xl font-bold">{user.full_name}</h1>
+          <p className="text-muted-foreground">@{user.username}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-2">
+          <h2 className="text-2xl font-bold mb-4">My Posts</h2>
+          <div>
+            {userPosts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-bold mb-4">My Schemes</h2>
+          <div className="space-y-4">
+            {enrolledSchemes.map((scheme) => (
+              <Card key={scheme.id}>
+                <CardHeader>
+                  <CardTitle>{scheme.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>{scheme.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold mb-4">My Products</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {userProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
-
-export default withAuthorization(ProfilePage, ['farmer', 'expert', 'buyer']);

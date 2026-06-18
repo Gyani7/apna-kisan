@@ -1,94 +1,50 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { createBrowserClient } from '@/lib/supabase/client';
-import { QuestionCard } from '@/components/community/QuestionCard';
-import { StoryCard } from '@/components/community/StoryCard';
-import { ReelCard } from '@/components/community/ReelCard';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PostCard } from "@/components/community/PostCard";
+import { CreatePostDialog } from "@/components/community/CreatePostDialog";
+import { useState } from "react";
 
-export default function CommunityFeed() {
-  const [feed, setFeed] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const supabase = createBrowserClient();
+const initialPosts = [
+  {
+    id: 1,
+    content: 'Just harvested my first batch of organic tomatoes! So proud of the result. 🍅',
+    author: {
+      full_name: 'Amit Patel',
+      username: 'amitp',
+      avatar_url: 'https://i.pravatar.cc/150?u=amitp',
+    },
+    created_at: '2024-07-20T10:00:00.000Z',
+  },
+  {
+    id: 2,
+    content: 'Looking for advice on dealing with pests for my wheat crop. Any suggestions? ',
+    author: {
+      full_name: 'Sunita Sharma',
+      username: 'sunitas',
+      avatar_url: 'https://i.pravatar.cc/150?u=sunitas',
+    },
+    created_at: '2024-07-19T15:30:00.000Z',
+  },
+];
 
-  useEffect(() => {
-    const fetchFeed = async () => {
-      const [questionsResult, storiesResult, reelsResult] = await Promise.all([
-        supabase
-          .from('questions')
-          .select('*, author:profiles(*)')
-          .order('created_at', { ascending: false })
-          .limit(20),
-        supabase
-          .from('stories')
-          .select('*, author:profiles(*)')
-          .order('created_at', { ascending: false })
-          .limit(20),
-        supabase
-          .from('reels')
-          .select('*, author:profiles(*)')
-          .order('created_at', { ascending: false })
-          .limit(20),
-      ]);
+export default function CommunityPage() {
+  const [posts, setPosts] = useState(initialPosts);
 
-      const questions = questionsResult.data?.map(q => ({ ...q, type: 'question' })) || [];
-      const stories = storiesResult.data?.map(s => ({ ...s, type: 'story' })) || [];
-      const reels = reelsResult.data?.map(r => ({ ...r, type: 'reel' })) || [];
-
-      const combinedFeed = [...questions, ...stories, ...reels]
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-      setFeed(combinedFeed);
-      setIsLoading(false);
-    };
-
-    fetchFeed();
-  }, [supabase]);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const handlePostCreated = (newPost: any) => {
+    setPosts([newPost, ...posts]);
+  };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="flex justify-between items-center p-4 bg-white rounded-lg shadow-md">
-        <h2 className="text-xl font-bold">Community Feed</h2>
-        <div className="flex gap-2">
-            <Link href="/community/ask">
-                <Button>
-                    <PlusCircle className="w-4 h-4 mr-2" />
-                    Ask Question
-                </Button>
-            </Link>
-            <Link href="/community/share-story">
-                <Button>
-                    <PlusCircle className="w-4 h-4 mr-2" />
-                    Share Story
-                </Button>
-            </Link>
-             <Link href="/community/create-reel">
-                <Button>
-                    <PlusCircle className="w-4 h-4 mr-2" />
-                    Create Reel
-                </Button>
-            </Link>
-        </div>
+    <div className="container mx-auto py-8">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">Community Feed</h1>
+        <CreatePostDialog onPostCreated={handlePostCreated} />
       </div>
-      {feed.map((item) => {
-        if (item.type === 'question') {
-          return <QuestionCard key={`question-${item.id}`} question={item} />;
-        }
-        if (item.type === 'story') {
-          return <StoryCard key={`story-${item.id}`} story={item} />;
-        }
-        if (item.type === 'reel') {
-          return <ReelCard key={`reel-${item.id}`} reel={item} />;
-        }
-        return null;
-      })}
+      <div>
+        {posts.map((post) => (
+          <PostCard key={post.id} post={post} />
+        ))}
+      </div>
     </div>
   );
 }

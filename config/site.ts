@@ -1,11 +1,11 @@
 export const siteConfig = {
   name: "Apna Kisan",
   description:
-    "An open source application built using the new router, server components and everything new in Next.js 16.",
+    "A modern AgriTech Super Platform for farmers, buyers, traders, and administrators.",
   links: {
-    twitter: "https://twitter.com/shadcn",
-    github: "https://github.com/shadcn/taxonomy",
-    docs: "https://ui.shadcn.com",
+    twitter: "https://twitter.com/apnakisan",
+    github: "https://github.com/apnakisan/apnakisan-platform",
+    docs: "https://apnakisan.com/docs",
   },
   mainNav: [
     {
@@ -13,16 +13,80 @@ export const siteConfig = {
       href: "/",
     },
     {
-      title: "Q&A",
-      href: "/qna",
+      title: "Marketplace",
+      href: "/market",
     },
     {
-      title: "Schemes",
-      href: "/schemes",
+      title: "Community",
+      href: "/community",
     },
     {
-      title: "Crops",
-      href: "/crops",
+      title: "AI Assistant",
+      href: "/ai-assistant",
+    },
+    {
+      title: "Mandi Rates",
+      href: "/mandi-rates",
     },
   ],
-}
+  sidebarNav: [
+    {
+      title: "Dashboard",
+      items: [
+        {
+          title: "Farmer Dashboard",
+          href: "/dashboard/farmer",
+          icon: "dashboard",
+        },
+        {
+          title: "Buyer Dashboard",
+          href: "/dashboard/buyer",
+          icon: "dashboard",
+        },
+      ],
+    },
+    {
+      title: "Marketplace",
+      items: [
+        {
+          title: "My Products",
+          href: "/my-products",
+          icon: "package",
+        },
+        {
+          title: "Sell a Product",
+          href: "/sell",
+          icon: "plusCircle",
+        },
+      ],
+    },
+  ],
+  adminNav: [
+    {
+      title: "Dashboard",
+      href: "/admin/dashboard",
+    },
+    {
+      title: "Users",
+      href: "/admin/users",
+    },
+    {
+      title: "Products",
+      href: "/admin/products",
+    },
+    {
+      title: "Community",
+      href: "/admin/community",
+    },
+    {
+      title: "Reports",
+      href: "/admin/reports",
+    },
+    {
+      title: "Settings",
+      href: "/admin/settings",
+    },
+  ],
+};
+
+export type SiteConfig = typeof siteConfig;

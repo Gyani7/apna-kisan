@@ -1,20 +1,15 @@
 'use client';
 
-import * as React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import * as React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-import { siteConfig } from "@/config/site"
-import { cn } from "@/lib/utils"
-import { Icons } from "@/components/icons"
-import { NavItem } from "@/types/nav";
+import { siteConfig } from '@/config/site';
+import { cn } from '@/lib/utils';
+import { Icons } from '@/components/icons';
 
-interface MainNavProps {
-  items?: NavItem[]
-}
-
-export function MainNav({ items }: MainNavProps) {
-  const pathname = usePathname()
+export function MainNav() {
+  const pathname = usePathname();
 
   return (
     <div className="mr-4 hidden md:flex">
@@ -25,18 +20,19 @@ export function MainNav({ items }: MainNavProps) {
         </span>
       </Link>
       <nav className="flex items-center space-x-6 text-sm font-medium">
-        {items?.map((item) => (
+        {siteConfig.mainNav.map((item) => (
           <Link
             key={item.title}
             href={item.href}
             className={cn(
-              "transition-colors hover:text-foreground/80",
-              pathname === item.href ? "text-foreground" : "text-foreground/60"
-            )}>
+              'transition-colors hover:text-foreground/80',
+              pathname === item.href ? 'text-foreground' : 'text-foreground/60'
+            )}
+          >
             {item.title}
           </Link>
         ))}
       </nav>
     </div>
-  )
+  );
 }
