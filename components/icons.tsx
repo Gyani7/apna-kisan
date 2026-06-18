@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -14,7 +15,8 @@ import {
   X,
   Facebook,
   Instagram,
-  Linkedin
+  Linkedin,
+  Github
 } from 'lucide-react';
 
 export const Icons = {
@@ -31,5 +33,6 @@ export const Icons = {
     X: X,
     Facebook: Facebook,
     Instagram: Instagram,
-    Linkedin: Linkedin
+    Linkedin: Linkedin,
+    gitHub: Github
 };

@@ -1,6 +1,7 @@
+
 export const siteConfig = {
-  name: "Apna Kisan",
-  description: "Apna Kisan is a platform for farmers to connect and share knowledge.",
+  name: "Apna Kisan - Agri Intelligence Platform",
+  description: "India's largest Agriculture Intelligence Platform for farmers, providing real-time information on farming, weather, mandi prices, government schemes, soil health, and crop advisory. We leverage AI, SEO, and Google Discover to deliver the most relevant and up-to-date agricultural insights.",
   links: {
     twitter: "https://twitter.com/shadcn",
     github: "https://github.com/shadcn/ui",

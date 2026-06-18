@@ -1,38 +1,64 @@
-'use client';
 
-import * as React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { siteConfig } from "@/config/site";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "./ui/button";
+import { Icons } from "./icons";
+import { MainNavItem } from "@/types/nav";
+import { UserAccountNav } from "./UserAccountNav";
 
-import { siteConfig } from '@/config/site';
-import { cn } from '@/lib/utils';
-import { Icons } from '@/components/icons';
+interface MainNavProps {
+  items?: MainNavItem[];
+}
 
-export function MainNav() {
-  const pathname = usePathname();
+export function MainNav({ items }: MainNavProps) {
+  const { data: session } = useSession();
 
   return (
-    <div className="mr-4 hidden md:flex">
-      <Link href="/" className="mr-6 flex items-center space-x-2">
+    <div className="flex gap-6 md:gap-10">
+      <Link href="/" className="flex items-center space-x-2">
         <Icons.logo className="h-6 w-6" />
-        <span className="hidden font-bold sm:inline-block">
+        <span className="inline-block font-bold">
           {siteConfig.name}
         </span>
       </Link>
-      <nav className="flex items-center space-x-6 text-sm font-medium">
-        {siteConfig.mainNav.map((item) => (
-          <Link
-            key={item.title}
-            href={item.href}
-            className={cn(
-              'transition-colors hover:text-foreground/80',
-              pathname === item.href ? 'text-foreground' : 'text-foreground/60'
-            )}
-          >
-            {item.title}
-          </Link>
-        ))}
-      </nav>
+      {items?.length ? (
+        <nav className="flex gap-6">
+          {items?.map(
+            (item, index) =>
+              item.href && (
+                <Link
+                  key={index}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center text-sm font-medium text-muted-foreground",
+                    item.disabled && "cursor-not-allowed opacity-80"
+                  )}
+                >
+                  {item.title}
+                </Link>
+              )
+          )}
+        </nav>
+      ) : null}
+      <div className="flex flex-1 items-center justify-end space-x-4">
+        <nav className="flex items-center space-x-1">
+          {session ? (
+            <UserAccountNav />
+          ) : (
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ variant: "secondary", size: "sm" }),
+                "px-4"
+              )}
+            >
+              Login
+            </Link>
+          )}
+        </nav>
+      </div>
     </div>
   );
 }

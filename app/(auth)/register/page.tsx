@@ -1,13 +1,11 @@
 
-import { AuthForm } from '@/components/common/AuthForm'
+import { AuthForm } from "@/components/AuthForm";
+import { Shell } from "@/components/shell";
 
 export default function RegisterPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8">
-        <h1 className="mb-6 text-center text-3xl font-bold">Create an Account</h1>
-        <AuthForm type="register" />
-      </div>
-    </div>
-  )
+    <Shell>
+      <AuthForm />
+    </Shell>
+  );
 }

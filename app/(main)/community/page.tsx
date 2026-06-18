@@ -1,4 +1,6 @@
 
+import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/PageHeader";
+import { Shell } from "@/components/shell";
 import { getFeed } from "@/lib/actions/feed";
 import { CreatePostDialog } from "@/components/community/CreatePostDialog";
 import { Feed } from "@/components/community/Feed";
@@ -11,12 +13,17 @@ export default async function CommunityPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Community Feed</h1>
+    <Shell>
+      <PageHeader>
+        <PageHeaderHeading>Community Feed</PageHeaderHeading>
+        <PageHeaderDescription>
+          Connect with other farmers, ask questions, and share your knowledge.
+        </PageHeaderDescription>
+      </PageHeader>
+      <div className="flex justify-end mb-4">
         <CreatePostDialog />
       </div>
       <Feed items={initialPosts || []} />
-    </div>
+    </Shell>
   );
 }

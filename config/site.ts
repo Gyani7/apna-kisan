@@ -1,3 +1,6 @@
+
+import { SidebarNavItem } from "@/types/nav";
+
 export const siteConfig = {
   name: "Apna Kisan",
   description:
@@ -21,72 +24,58 @@ export const siteConfig = {
       href: "/community",
     },
     {
-      title: "AI Assistant",
-      href: "/ai-assistant",
-    },
-    {
-      title: "Mandi Rates",
-      href: "/mandi-rates",
+      title: "Dashboard",
+      href: "/dashboard/farmer",
     },
   ],
   sidebarNav: [
     {
-      title: "Dashboard",
-      items: [
-        {
-          title: "Farmer Dashboard",
-          href: "/dashboard/farmer",
-          icon: "dashboard",
-        },
-        {
-          title: "Buyer Dashboard",
-          href: "/dashboard/buyer",
-          icon: "dashboard",
-        },
-      ],
-    },
-    {
-      title: "Marketplace",
+      title: "Farmer",
       items: [
         {
           title: "My Products",
-          href: "/my-products",
-          icon: "package",
+          href: "/dashboard/farmer/products",
         },
         {
-          title: "Sell a Product",
-          href: "/sell",
-          icon: "plusCircle",
+          title: "Sell Product",
+          href: "/dashboard/farmer/products/new",
+        },
+        {
+          title: "Orders",
+          href: "/dashboard/farmer/orders",
+        },
+        {
+          title: "Analytics",
+          href: "/dashboard/farmer/analytics",
+        },
+        {
+          title: "Settings",
+          href: "/dashboard/farmer/settings",
         },
       ],
     },
-  ],
-  adminNav: [
     {
-      title: "Dashboard",
-      href: "/admin/dashboard",
+      title: "Buyer",
+      items: [
+        {
+          title: "Browse Products",
+          href: "/market",
+        },
+        {
+          title: "My Orders",
+          href: "/dashboard/buyer/orders",
+        },
+        {
+          title: "Wishlist",
+          href: "/dashboard/buyer/wishlist",
+        },
+        {
+          title: "Settings",
+          href: "/dashboard/buyer/settings",
+        },
+      ],
     },
-    {
-      title: "Users",
-      href: "/admin/users",
-    },
-    {
-      title: "Products",
-      href: "/admin/products",
-    },
-    {
-      title: "Community",
-      href: "/admin/community",
-    },
-    {
-      title: "Reports",
-      href: "/admin/reports",
-    },
-    {
-      title: "Settings",
-      href: "/admin/settings",
-    },
-  ],
+  ] as SidebarNavItem[],
 };
 
 export type SiteConfig = typeof siteConfig;

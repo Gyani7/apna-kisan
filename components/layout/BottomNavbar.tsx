@@ -1,37 +1,84 @@
+
 'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Home, ShoppingCart, Users, MessageCircle } from "lucide-react";
-
-const navLinks = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/market", label: "Market", icon: ShoppingCart },
-  { href: "/community", label: "Community", icon: Users },
-  { href: "/ai-assistant", label: "Assistant", icon: MessageCircle },
-];
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { buttonVariants } from '../ui/button';
+import { cn } from '@/lib/utils';
+import { Icons } from '../icons';
 
 export function BottomNavbar() {
+  const { data: session } = useSession();
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t">
-      <div className="container grid h-16 max-w-lg grid-cols-4 mx-auto font-medium">
-        {navLinks.map((link) => {
-            const isActive = !!pathname && ((pathname === "/" && link.href === "/") || (link.href !== "/" && pathname.startsWith(link.href)));
-            return (
-                <Link
-                key={link.href}
-                href={link.href}
-                className={`inline-flex flex-col items-center justify-center px-5 hover:bg-muted/50 transition-colors group ${isActive ? "text-primary" : "text-muted-foreground"}`}>
-                    <link.icon className="w-5 h-5 mb-1" />
-                    <span className="text-xs font-medium">
-                        {link.label}
-                    </span>
-                </Link>
-            )
-        })}
+    <div className="fixed bottom-0 left-0 z-50 w-full border-t bg-background md:hidden">
+      <div className="grid h-16 grid-cols-4">
+        <Link
+          href="/"
+          className={cn(
+            buttonVariants({ variant: 'ghost' }),
+            'flex h-full flex-col items-center justify-center gap-1 rounded-none',
+            pathname === '/' && 'bg-muted'
+          )}
+        >
+          <Icons.home className="h-6 w-6" />
+          <span className="text-xs">Home</span>
+        </Link>
+        {
+          session && (
+            <Link
+              href="/dashboard/farmer"
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'flex h-full flex-col items-center justify-center gap-1 rounded-none',
+                pathname === '/dashboard/farmer' && 'bg-muted'
+              )}
+            >
+              <Icons.dashboard className="h-6 w-6" />
+              <span className="text-xs">Dashboard</span>
+            </Link>
+          )
+        }
+        <Link
+          href="/dashboard/farmer/settings"
+          className={cn(
+            buttonVariants({ variant: 'ghost' }),
+            'flex h-full flex-col items-center justify-center gap-1 rounded-none',
+            pathname === '/dashboard/farmer/settings' && 'bg-muted'
+          )}
+        >
+          <Icons.settings className="h-6 w-6" />
+          <span className="text-xs">Settings</span>
+        </Link>
+        {
+          session ? (
+            <Link
+              href="/api/auth/signout"
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'flex h-full flex-col items-center justify-center gap-1 rounded-none'
+              )}
+            >
+              <Icons.logout className="h-6 w-6" />
+              <span className="text-xs">Logout</span>
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'flex h-full flex-col items-center justify-center gap-1 rounded-none',
+                pathname === '/login' && 'bg-muted'
+              )}
+            >
+              <Icons.login className="h-6 w-6" />
+              <span className="text-xs">Login</span>
+            </Link>
+          )
+        }
       </div>
-    </nav>
+    </div>
   );
 }

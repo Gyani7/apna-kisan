@@ -1,5 +1,8 @@
+
 'use client';
 
+import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/PageHeader";
+import { Shell } from "@/components/shell";
 import { ProductCard } from "@/components/market/ProductCard";
 
 const products = [
@@ -25,13 +28,18 @@ const products = [
 
 export default function MarketPage() {
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Marketplace</h1>
+    <Shell>
+      <PageHeader>
+        <PageHeaderHeading>Marketplace</PageHeaderHeading>
+        <PageHeaderDescription>
+          Buy and sell fresh produce and other agricultural products.
+        </PageHeaderDescription>
+      </PageHeader>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
-    </div>
+    </Shell>
   );
 }

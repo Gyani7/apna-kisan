@@ -1,3 +1,4 @@
+
 'use client';
 
 import '../styles/globals.css';
@@ -22,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={cn('font-sans', GeistSans.variable)}>
       <Head>
+        <link rel="manifest" href="/manifest.json" />
         <link
           rel="stylesheet"
           href="https://unpkg.com/mappls-gl/dist/mappls-gl.css"
