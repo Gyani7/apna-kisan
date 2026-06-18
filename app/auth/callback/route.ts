@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server';
+import { createServerClient } from '@/utils/supabase/server';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get('next') ?? '/';
 
   if (code) {
-    const supabase = createClient();
+    const supabase = createServerClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);

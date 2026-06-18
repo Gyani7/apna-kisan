@@ -1,10 +1,10 @@
-import { createClient } from '@/utils/supabase/server';
+import { createServerClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Key } from 'react';
 
 export default async function ConversationsPage() {
-  const supabase = createClient();
+  const supabase = createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

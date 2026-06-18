@@ -1,10 +1,10 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/server';
+import { createServerClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
 export async function createConversation(farmerId: string) {
-  const supabase = createClient();
+  const supabase = createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

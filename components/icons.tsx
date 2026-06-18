@@ -10,7 +10,11 @@ import {
   Laptop,
   Loader,
   User,
-  Smartphone
+  Smartphone,
+  X,
+  Facebook,
+  Instagram,
+  Linkedin
 } from 'lucide-react';
 
 export const Icons = {
@@ -23,5 +27,9 @@ export const Icons = {
     Laptop: Laptop,
     spinner: Loader,
     user: User,
-    Smartphone: Smartphone
+    Smartphone: Smartphone,
+    X: X,
+    Facebook: Facebook,
+    Instagram: Instagram,
+    Linkedin: Linkedin
 };

@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { useState } from 'react';
+import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { SupabaseClient } from '@supabase/supabase-js';
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,17 +32,12 @@ export function AuthForm() {
     }
   });
   
-  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
+  const supabase = createClient();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGitHubLoading, setIsGitHubLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  useEffect(() => {
-    setSupabase(createBrowserClient());
-  }, []);
-
   const handleLogin = async (data: FormData) => {
-    if (!supabase) return;
     setIsLoading(true);
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -66,7 +60,6 @@ export function AuthForm() {
   };
 
   const handleSignUp = async (data: FormData) => {
-    if (!supabase) return;
     setIsLoading(true);
 
     const { error } = await supabase.auth.signUp({
@@ -97,7 +90,6 @@ export function AuthForm() {
   };
   
   const handleGithubSignIn = async () => {
-    if (!supabase) return;
     setIsGitHubLoading(true);
     await supabase.auth.signInWithOAuth({
       provider: 'github',

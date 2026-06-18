@@ -1,42 +1,47 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { ThumbsUp, MessageSquare } from 'lucide-react';
+import { Reel } from '@/lib/types';
+import { useRef, useState, useEffect } from 'react';
 
-export function ReelCard({ reel }) {
-  return (
-    <Card className="overflow-hidden">
-      <CardHeader>
-        <div className="flex items-center gap-3">
-          <Avatar>
-            <AvatarImage src={reel.author.avatar_url} />
-            <AvatarFallback>{reel.author.username?.[0].toUpperCase()}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="font-semibold">{reel.author.username}</p>
-            <p className="text-sm text-muted-foreground">Posted on {new Date(reel.created_at).toLocaleDateString()}</p>
-          </div>
+export function ReelCard({ reel }: { reel: Reel }) {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    const togglePlay = () => {
+        if (videoRef.current) {
+            if (isPlaying) {
+                videoRef.current.pause();
+            } else {
+                videoRef.current.play();
+            }
+            setIsPlaying(!isPlaying);
+        }
+    };
+    
+    return (
+        <div className="relative w-full h-[70vh] bg-black rounded-lg overflow-hidden">
+            <video
+                ref={videoRef}
+                src={reel.video_url}
+                loop
+                className="w-full h-full object-contain"
+                onClick={togglePlay}
+            />
+
+            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
+                <p className="text-white text-sm font-semibold">{reel.caption}</p>
+            </div>
+
+            {!isPlaying && (
+                <div 
+                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 cursor-pointer"
+                    onClick={togglePlay}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-white opacity-80" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                    </svg>
+                </div>
+            )}
         </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        {/* Placeholder for video player */}
-        <div className="w-full bg-black aspect-video flex items-center justify-center">
-          <p className="text-white">Video placeholder</p>
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-between p-4">
-        <p>{reel.caption}</p>
-        <div className="flex gap-4">
-          <Button variant="ghost" size="icon">
-            <ThumbsUp className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <MessageSquare className="w-5 h-5" />
-          </Button>
-        </div>
-      </CardFooter>
-    </Card>
-  );
+    );
 }

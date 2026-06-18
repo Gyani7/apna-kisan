@@ -1,29 +1,26 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { useRouter } from 'next/navigation';
+import { createPost } from '@/lib/actions/feed';
 
-export function CreatePostDialog({ onPostCreated }: { onPostCreated: (post: any) => void }) {
+export function CreatePostDialog() {
   const [content, setContent] = useState("");
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
-  const handlePost = () => {
-    // This is a placeholder for the actual API call
-    const newPost = {
-      id: Math.random(),
-      content,
-      author: {
-        full_name: 'New User',
-        username: 'newuser',
-        avatar_url: 'https://i.pravatar.cc/150?u=newuser',
-      },
-      created_at: new Date().toISOString(),
-    };
-    onPostCreated(newPost);
+  const handlePost = async () => {
+    await createPost({ content }); 
+    
     setOpen(false);
     setContent("");
+
+    // Refresh the page to show the new post
+    router.refresh(); 
   };
 
   return (
@@ -37,7 +34,7 @@ export function CreatePostDialog({ onPostCreated }: { onPostCreated: (post: any)
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <Textarea
-            placeholder="What\'s on your mind?"
+            placeholder="What's on your mind?"
             value={content}
             onChange={(e) => setContent(e.target.value)}
           />

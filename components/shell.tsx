@@ -1,13 +1,39 @@
 import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-interface DashboardShellProps extends React.HTMLAttributes<HTMLDivElement> {}
+const shellVariants = cva(
+  "grid items-center gap-8 pb-8 pt-6 md:py-8",
+  {
+    variants: {
+      variant: {
+        default: "container",
+        sidebar: "",
+        centered: "container max-w-2xl",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
 
-export function DashboardShell({ children, className, ...props }: DashboardShellProps) {
-    return (
-        <div className={cn("grid items-start gap-8", className)} {...props}>
-            {children}
-        </div>
-    )
+interface ShellProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof shellVariants> {
+  as?: React.ElementType
 }
+
+function Shell({
+  className,
+  as: Comp = "section",
+  variant,
+  ...props
+}: ShellProps) {
+  return (
+    <Comp className={cn(shellVariants({ variant }), className)} {...props} />
+  )
+}
+
+export { Shell, shellVariants }

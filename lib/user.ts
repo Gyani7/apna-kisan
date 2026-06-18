@@ -1,15 +1,15 @@
 'use client';
 
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createClient } from '@/utils/supabase/client';
 
 export async function getUser() {
-    const supabase = createBrowserClient();
+    const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     return user;
 }
 
 export async function getUserProfile() {
-    const supabase = createBrowserClient();
+    const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {

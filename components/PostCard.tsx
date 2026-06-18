@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PostWithAuthor, timeAgo, formatCount } from '@/lib/types';
+import { FeedItemType, timeAgo, formatCount } from '@/lib/types';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { useAuth } from '@/components/AuthProvider';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
@@ -30,7 +30,7 @@ async function deletePost(postId: string) {
 }
 
 interface PostCardProps {
-  post: PostWithAuthor;
+  post: FeedItemType;
   onDelete?: (postId: string) => void;
 }
 
@@ -55,7 +55,7 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
   }
   
   const handleDelete = async () => {
-    if (post.user_id !== user?.id) return;
+    if (post.author.id !== user?.id) return;
     
     const { error } = await deletePost(post.id);
 
@@ -72,7 +72,7 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
   const authorName = post.author?.full_name ?? post.author?.username ?? 'Anonymous';
   const authorInitials = authorName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
 
-  const postLink = post.post_type === 'story' ? `/story/${post.slug}` : `/community/post/${post.id}`;
+  const postLink = post.type === 'story' ? `/community/story/${post.slug}` : post.type === 'question' ? `/community/question/${post.slug}` : `/community/reel/${post.id}`;
 
   const postActions = [
     {
@@ -94,7 +94,7 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
     {
       label: 'Share',
       icon: Share2,
-      count: post.shares_count,
+      count: 0, // Assuming shares_count is not available on all feed item types
       onClick: () => { toast({ title: 'Link copied to clipboard!' }); navigator.clipboard.writeText(`${window.location.origin}${postLink}`)}, 
       color: 'hover:text-green-500',
     },
@@ -103,7 +103,7 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
   return (
     <Card className="w-full animate-fade-in">
       <CardHeader className="flex flex-row items-center gap-4 p-4">
-        <Link href={`/profile/${post.user_id}`}>
+        <Link href={`/profile/${post.author.id}`}>
           <Avatar>
             <AvatarImage src={post.author?.avatar_url} alt={authorName} />
             <AvatarFallback>{authorInitials}</AvatarFallback>
@@ -111,14 +111,12 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
         </Link>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <Link href={`/profile/${post.user_id}`} className="font-semibold hover:underline">
+            <Link href={`/profile/${post.author.id}`} className="font-semibold hover:underline">
               {authorName}
             </Link>
-            {post.author?.badge && <Badge variant="secondary">{post.author.badge}</Badge>}
           </div>
           <p className="text-sm text-muted-foreground">
             <time dateTime={post.created_at}>{timeAgo(post.created_at)}</time>
-             {post.author?.location && ` · ${post.author.location}`}
           </p>
         </div>
         <DropdownMenu>
@@ -130,32 +128,24 @@ export default function PostCard({ post, onDelete }: PostCardProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem>Report</DropdownMenuItem>
             <DropdownMenuItem>Block User</DropdownMenuItem>
-            {post.user_id === user?.id && <DropdownMenuItem onClick={handleDelete} className="text-red-500">Delete Post</DropdownMenuItem>}
+            {post.author.id === user?.id && <DropdownMenuItem onClick={handleDelete} className="text-red-500">Delete Post</DropdownMenuItem>}
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
 
       <CardContent className="p-4 pt-0">
-        {post.title && (
+        {post.type !== 'reel' && (
           <Link href={postLink} className="block">
             <h2 className="text-xl font-bold mb-2 hover:underline">{post.title}</h2>
           </Link>
         )}
-        <p className="text-muted-foreground line-clamp-3">
-          {post.content}
-        </p>
+<p className="text-muted-foreground line-clamp-3">
+  {post.type === 'reel' ? post.caption : post.content}
+</p>
 
-        {post.image_url && (
+        {post.type === 'story' && post.thumbnail_url && (
           <div className="mt-4 relative aspect-video rounded-lg overflow-hidden">
-            <Image src={post.image_url} alt={post.title || 'Post image'} fill className="object-cover" />
-          </div>
-        )}
-        
-        {post.tags && post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {post.tags.map((tag) => (
-              <Badge key={tag} variant="outline">#{tag}</Badge>
-            ))}
+            <Image src={post.thumbnail_url} alt={post.title || 'Post image'} fill className="object-cover" />
           </div>
         )}
       </CardContent>

@@ -10,16 +10,19 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
-// Placeholder for icons, assuming they are available
-import { Cloudy, Tractor, Users, Bot, Briefcase, Bell, Settings } from "lucide-react";
+// Placeholder for icons
+import { Bot, Users } from "lucide-react";
 
 // Re-using existing cards
 import { WeatherCard } from '@/components/farmers/WeatherCard';
 import { MandiRatesCard } from '@/components/farmers/MandiRatesCard';
 import { CropInsightsCard } from '@/components/farmers/CropInsightsCard';
+import { VillageIntelligence } from '@/components/dashboard/farmer/VillageIntelligence';
+import { TopFarmerLeaderboard } from '@/components/dashboard/farmer/TopFarmerLeaderboard';
+import { CropIntelligence } from "@/components/gis/CropIntelligence";
+import { Marketplace } from "@/components/gis/Marketplace";
 
-
-// A new component for the welcome header
+// Welcome header
 const WelcomeHeader = () => (
     <div className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight">Welcome back, [Farmer Name]!</h1>
@@ -27,12 +30,12 @@ const WelcomeHeader = () => (
     </div>
 );
 
-// A new component for "My Farm"
+// "My Farm" widget
 const MyFarmWidget = () => (
-    <Card className="col-span-1 lg:col-span-2">
+    <Card>
         <CardHeader>
             <CardTitle>My Farm Overview</CardTitle>
-             <CardDescription>A quick look at your primary crop's health and progress.</CardDescription>
+            <CardDescription>A quick look at your primary crop's health and progress.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
@@ -57,7 +60,7 @@ const MyFarmWidget = () => (
     </Card>
 );
 
-// A new component for the AI Assistant
+// AI Assistant widget
 const AssistantWidget = () => (
     <Card>
         <CardHeader>
@@ -70,7 +73,7 @@ const AssistantWidget = () => (
     </Card>
 );
 
-// A new component for Community Hot Topics
+// Community widget
 const CommunityWidget = () => (
     <Card>
         <CardHeader>
@@ -82,7 +85,7 @@ const CommunityWidget = () => (
                 <Button variant="outline" size="sm">View</Button>
             </div>
             <Separator />
-             <div className="flex justify-between items-center text-sm">
+            <div className="flex justify-between items-center text-sm">
                 <p>Best practices for drip irrigation?</p>
                 <Button variant="outline" size="sm">View</Button>
             </div>
@@ -97,21 +100,59 @@ const CommunityWidget = () => (
 
 export default function FarmerDashboard() {
   return (
-    <div className="p-4 md:p-8">
+    <div className="p-4 md:p-8 space-y-8">
       <WelcomeHeader />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Main Widgets */}
-        <MyFarmWidget />
-        <AssistantWidget />
-        <CommunityWidget />
-        
-        {/* Existing Cards - can be redesigned or used as is */}
-        <div className="col-span-1 lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <WeatherCard />
-            <MandiRatesCard />
-            <CropInsightsCard />
+
+      {/* Section 1: At a Glance */}
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight mb-4">At a Glance</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <MyFarmWidget />
+          </div>
+          <div className="space-y-6">
+            <AssistantWidget />
+            <CommunityWidget />
+          </div>
         </div>
       </div>
+
+      <Separator />
+
+      {/* Section 2: Farm Intelligence */}
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight mb-4">Farm Intelligence</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <WeatherCard />
+            <CropInsightsCard />
+        </div>
+        <div className="mt-6">
+            <CropIntelligence />
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Section 3: Market & Community Insights */}
+       <div>
+        <h2 className="text-2xl font-bold tracking-tight mb-4">Market & Community</h2>
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <MandiRatesCard />
+                <Marketplace />
+            </div>
+            <TopFarmerLeaderboard />
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Section 4: Village Analytics */}
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight mb-4">Village View</h2>
+        <VillageIntelligence />
+      </div>
+
     </div>
   );
 }

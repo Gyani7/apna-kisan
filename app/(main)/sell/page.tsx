@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { createBrowserClient } from '@/lib/supabase/client';
-import { getUser } from '@/lib/user';
+import { createClient } from '@/utils/supabase/client';
 import { withAuthorization } from '@/components/withAuthorization';
 
 function SellPage() {
@@ -17,7 +16,7 @@ function SellPage() {
   const [images, setImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const supabase = createBrowserClient();
+  const supabase = createClient();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -29,7 +28,7 @@ function SellPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const user = await getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast({ title: 'Please log in to sell products.', variant: 'destructive' });
       setIsSubmitting(false);

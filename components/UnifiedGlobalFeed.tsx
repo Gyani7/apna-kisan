@@ -1,16 +1,18 @@
 import { Suspense } from 'react';
 import PostCard from './PostCard';
-import { getPosts } from '@/lib/actions/posts';
-import { mapPostsToPostWithAuthor } from '@/lib/mappers';
+import { getFeed } from '@/lib/actions/feed';
 
 async function Feed() {
-  const posts = await getPosts({ limit: 20 });
-  const allPosts = mapPostsToPostWithAuthor(posts as any ?? []);
+  const { data: posts, error } = await getFeed(1, 20);
+
+  if (error) {
+    return <div className="text-center text-red-500 py-8">Error loading feed.</div>;
+  }
 
   return (
     <div className="flex flex-col gap-4">
-      {allPosts.length > 0 ? (
-        allPosts.map((post) => <PostCard key={post.id} post={post} />)
+      {posts && posts.length > 0 ? (
+        posts.map((post) => <PostCard key={post.id} post={post as any} />)
       ) : (
         <div className="text-center text-gray-500 py-8">No posts yet. Be the first to share!</div>
       )}

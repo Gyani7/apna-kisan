@@ -1,4 +1,5 @@
 import { Heart, MessageCircle, Share2, Bookmark, MapPin, MessageSquare, CircleHelp as HelpCircle, BookOpen, Bell, MoveHorizontal as MoreHorizontal } from 'lucide-react';
+import { StaticImageData } from "next/image";
 
 export interface Product {
   id: string;
@@ -12,67 +13,54 @@ export interface Product {
   created_at?: string;
 }
 
-export interface Post {
-  id: string;
-  user_id: string;
-  post_type: 'question' | 'article' | 'notification' | 'story';
-  title?: string;
-  content: string;
-  tags?: string[];
-  likes_count: number;
-  comments_count: number;
-  location?: string;
-  created_at: string;
-  slug?: string;
-  image_url?: string;
-  is_liked?: boolean;
-  is_bookmarked?: boolean;
-  excerpt?: string;
-  read_time?: number;
-  category?: string;
-  shares_count: number;
-  is_featured?: boolean;
-}
-
 export interface Author {
+  id: string;
   username: string;
-  full_name?: string;
-  avatar_url?: string;
-  reputation: number;
-  badge?: 'new' | 'bronze' | 'silver' | 'gold';
-  location?: string;
+  full_name: string;
+  avatar_url: string;
 }
 
-export interface PostWithAuthor extends Post {
+export interface Answer {
+  id: string;
+  content: string;
+  created_at: string;
   author: Author;
 }
 
-export interface ReelData {
-  id: string;
-  created_at: string;
-  video_url: string;
-  caption?: string;
-  likes_count: number;
-  comments_count: number;
-  user: {
+interface BaseFeedItem {
     id: string;
-    full_name: string;
-    avatar_url: string;
-  };
-  village: {
-    id: string;
-    name: string;
-  };
-  comments: {
-    id: string;
-    content: string;
     created_at: string;
-    user: {
-      full_name: string;
-    };
-  }[];
-  user_has_liked_reel: boolean;
+    author: Author;
+    likes_count: number;
+    comments_count: number;
+    is_liked: boolean;
+    is_bookmarked: boolean;
 }
+
+export interface Question extends BaseFeedItem {
+    type: 'question';
+    title: string;
+    content: string;
+    slug: string;
+    answers: Answer[];
+}
+
+export interface Story extends BaseFeedItem {
+    type: 'story';
+    title: string;
+    content: string;
+    slug: string;
+    thumbnail_url: string | StaticImageData;
+}
+
+export interface Reel extends BaseFeedItem {
+    type: 'reel';
+    caption?: string;
+    video_url: string;
+    thumbnail_url?: string;
+}
+
+export type FeedItemType = Question | Story | Reel;
 
 export const POST_TYPE_CONFIG = {
   question: {
@@ -110,15 +98,15 @@ export function timeAgo(dateString: string): string {
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  let interval = seconds / 31536000; // 1 year in seconds
+  let interval = seconds / 31536000;
   if (interval > 1) return Math.floor(interval) + "y";
-  interval = seconds / 2592000; // 1 month in seconds
+  interval = seconds / 2592000;
   if (interval > 1) return Math.floor(interval) + "mo";
-  interval = seconds / 86400; // 1 day in seconds
+  interval = seconds / 86400;
   if (interval > 1) return Math.floor(interval) + "d";
-  interval = seconds / 3600; // 1 hour in seconds
+  interval = seconds / 3600;
   if (interval > 1) return Math.floor(interval) + "h";
-  interval = seconds / 60; // 1 minute in seconds
+  interval = seconds / 60;
   if (interval > 1) return Math.floor(interval) + "m";
   return Math.floor(seconds) + "s";
 }

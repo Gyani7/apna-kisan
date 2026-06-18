@@ -1,9 +1,9 @@
-import { createClient } from '@/utils/supabase/server';
+import { createServerClient } from '@/utils/supabase/server';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 export default async function FarmerProductsPage() {
-  const supabase = createClient();
+  const supabase = createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   const { data: products, error } = await supabase

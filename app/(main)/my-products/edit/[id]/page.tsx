@@ -7,8 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { createBrowserClient } from '@/lib/supabase/client';
-import { getUser } from '@/lib/user';
+import { createClient } from '@/utils/supabase/client';
 import { withAuthorization } from '@/components/withAuthorization';
 import { Product } from '@/lib/types';
 
@@ -22,11 +21,11 @@ function EditProductPage() {
   const router = useRouter();
   const { id } = useParams() ?? {};
   const { toast } = useToast();
-  const supabase = createBrowserClient();
+  const supabase = createClient();
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const user = await getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push('/login');
         return;
