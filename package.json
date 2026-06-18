@@ -1,6 +1,7 @@
 {
-  "name": "apna-kisan",
-  "version": "1.0.0",
+  "name": "APNA KISAN X",
+  "version": "10.0.0",
+  "description": "India's Agricultural Intelligence Network",
   "private": true,
   "engines": {
     "node": ">=20.19.0"
