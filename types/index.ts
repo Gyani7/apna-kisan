@@ -1,3 +1,6 @@
+
+import { NavItem } from "@/types/nav";
+
 export type Post = {
     slug: string;
     slugAsParams: string;
@@ -7,3 +10,5 @@ export type Post = {
     description: string;
     author: string;
 };
+
+export type MainNavItem = NavItem;

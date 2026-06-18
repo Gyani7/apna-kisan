@@ -5,11 +5,11 @@ import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./ui/button";
 import { Icons } from "./icons";
-import { MainNavItem } from "@/types/nav";
+import { NavItem } from "@/types/nav";
 import { UserAccountNav } from "./UserAccountNav";
 
 interface MainNavProps {
-  items?: MainNavItem[];
+  items?: NavItem[];
 }
 
 export function MainNav({ items }: MainNavProps) {

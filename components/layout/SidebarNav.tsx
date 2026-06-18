@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { SidebarNavItem } from "@/types/nav";
+import { NavItem, SidebarNavItem } from "@/types/nav";
 import { cn } from "@/lib/utils";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
@@ -41,7 +41,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
 }
 
 interface SidebarNavItemsProps {
-  items: SidebarNavItem[];
+  items: NavItem[];
   pathname: string | null;
 }
 

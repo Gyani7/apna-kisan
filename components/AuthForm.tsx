@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { GitHub } from "lucide-react";
+import { Github } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { userAuthSchema } from "@/lib/validations/auth";
@@ -102,7 +102,7 @@ export function AuthForm({ className, ...props }: UserAuthFormProps) {
         {isGitHubLoading ? (
           <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
         ) : (
-          <GitHub className="mr-2 h-4 w-4" />
+          <Github className="mr-2 h-4 w-4" />
         )}{}
         GitHub
       </button>

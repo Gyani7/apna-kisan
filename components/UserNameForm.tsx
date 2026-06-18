@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icons } from "./icons";
-import { User } from "@/lib/session";
+import { User } from "next-auth";
 
 interface UserNameFormProps extends React.HTMLAttributes<HTMLFormElement> {
   user: Pick<User, "id" | "name">;
@@ -85,7 +85,7 @@ export function UserNameForm({
               id="name"
               className="w-[400px]"
               size={32}
-              defaultValue={user.name}
+              defaultValue={user.name ?? ""}
               {...register("name", { required: true })}
             />
             {errors.name && (

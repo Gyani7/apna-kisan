@@ -35,7 +35,7 @@ export function MainNav({ items, children }: MainNavProps) {
                   href={item.href}
                   className={cn(
                     "flex items-center text-lg font-semibold text-muted-foreground sm:text-sm",
-                    item.href.startsWith(`/${pathname.split("/")[1]}`) &&
+                    pathname && item.href.startsWith(`/${pathname.split("/")[1]}`) &&
                       "text-foreground",
                     item.disabled && "cursor-not-allowed opacity-80"
                   )}

@@ -1,10 +1,15 @@
-
 export interface NavItem {
   title: string;
   href: string;
   disabled?: boolean;
+  external?: boolean;
 }
 
-export interface SidebarNavItem extends NavItem {
-  items: SidebarNavItem[];
+export interface SidebarNavItem {
+  title: string;
+  items: NavItem[];
+}
+
+export interface MarketingConfig {
+  mainNav: NavItem[];
 }

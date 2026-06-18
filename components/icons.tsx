@@ -12,7 +12,13 @@ import {
   Loader,
   User,
   Smartphone,
+  Github,
   X,
+  Home,
+  LayoutDashboard,
+  Settings,
+  LogOut,
+  LogIn
 } from 'lucide-react';
 
 export const Icons = {
@@ -26,5 +32,11 @@ export const Icons = {
     spinner: Loader,
     user: User,
     Smartphone: Smartphone,
+    Github: Github,
     X: X,
+    home: Home,
+    dashboard: LayoutDashboard,
+    settings: Settings,
+    logout: LogOut,
+    login: LogIn
 };

@@ -11,7 +11,7 @@ export function SiteFooter() {
           <Link
             href={siteConfig.links.twitter}
             target="_blank"
-d            rel="noreferrer"
+            rel="noreferrer"
             className="font-medium underline underline-offset-4"
           >
             Vaidik
