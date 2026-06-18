@@ -10,7 +10,6 @@ export default function SchemePage({ params }: { params: { scheme: string } }) {
     <Shell>
       <PageHeader
         title={`${schemeName}`}
-        description={`Information about the ${schemeName} government scheme for farmers.`}
       />
       <div className="grid gap-8">
         {/* Add scheme-specific content here */}

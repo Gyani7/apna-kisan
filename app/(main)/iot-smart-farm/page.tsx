@@ -7,7 +7,6 @@ export default function IoTSmartFarmPage() {
     <Shell>
       <PageHeader
         title="IoT Smart Farm System"
-        description="Monitor soil moisture, temperature, humidity, and automate irrigation with smart sensors."
       />
       <div className="grid gap-8">
         <p className="text-center">IoT Smart Farm features coming soon.</p>

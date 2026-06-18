@@ -13,10 +13,6 @@ import {
   User,
   Smartphone,
   X,
-  Facebook,
-  Instagram,
-  Linkedin,
-  Github
 } from 'lucide-react';
 
 export const Icons = {
@@ -31,8 +27,4 @@ export const Icons = {
     user: User,
     Smartphone: Smartphone,
     X: X,
-    Facebook: Facebook,
-    Instagram: Instagram,
-    Linkedin: Linkedin,
-    gitHub: Github
 };

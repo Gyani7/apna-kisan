@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation";
 
 import { authOptions } from "@/lib/auth";
-import { getCurrentUser } from "@/lib/session";
+import { getSession } from "@/lib/session";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { DashboardShell } from "@/components/DashboardShell";
 import { UserNameForm } from "@/components/UserNameForm";
@@ -13,9 +13,9 @@ export const metadata = {
 };
 
 export default async function SettingsPage() {
-  const user = await getCurrentUser();
+  const session = await getSession();
 
-  if (!user) {
+  if (!session?.user) {
     redirect(authOptions?.pages?.signIn || "/login");
   }
 
@@ -26,7 +26,7 @@ export default async function SettingsPage() {
         text="Manage account and website settings."
       />
       <div className="grid gap-10">
-        <UserNameForm user={{ id: user.id, name: user.name || "" }} />
+        <UserNameForm user={{ id: session.user.id, name: session.user.name || "" }} />
       </div>
     </DashboardShell>
   );

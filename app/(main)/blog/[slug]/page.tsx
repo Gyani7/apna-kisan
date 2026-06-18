@@ -11,7 +11,6 @@ export default function BlogPage({ params }: { params: { slug: string } }) {
       <article>
         <PageHeader
           title={blogTitle}
-          description={`An AI-generated blog post about ${blogTitle}.`}
         />
         <div className="grid gap-8">
           {/* Add AI-generated content here */}

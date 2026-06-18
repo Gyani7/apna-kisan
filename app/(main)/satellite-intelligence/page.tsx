@@ -7,7 +7,6 @@ export default function SatelliteIntelligencePage() {
     <Shell>
       <PageHeader
         title="Satellite Intelligence Platform"
-        description="Monitor NDVI, crop health, water stress, drought, floods, and more with satellite data."
       />
       <div className="grid gap-8">
         <p className="text-center">Satellite Intelligence features coming soon.</p>

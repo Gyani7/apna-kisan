@@ -7,7 +7,6 @@ export default function CarbonCreditsPage() {
     <Shell>
       <PageHeader
         title="Carbon Credit Marketplace"
-        description="Access carbon farming analytics, check eligibility, and explore trading opportunities."
       />
       <div className="grid gap-8">
         <p className="text-center">Carbon Credit Marketplace features coming soon.</p>

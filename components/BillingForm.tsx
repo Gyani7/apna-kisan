@@ -73,9 +73,7 @@ export function BillingForm({
         <CardHeader>
           <CardTitle>Subscription Plan</CardTitle>
           <CardDescription>
-            You are currently on the <strong>{subscriptionPlan.name}</strong>{"
-            "}
-            plan.
+            You are currently on the <strong>{subscriptionPlan.name}</strong> plan.
           </CardDescription>
         </CardHeader>
         <CardContent>{subscriptionPlan.description}</CardContent>
