@@ -1,3 +1,4 @@
+
 import { Heart, MessageCircle, Share2, Bookmark, MapPin, MessageSquare, CircleHelp as HelpCircle, BookOpen, Bell, MoveHorizontal as MoreHorizontal } from 'lucide-react';
 import { StaticImageData } from "next/image";
 
@@ -18,6 +19,26 @@ export interface Author {
   username: string;
   full_name: string;
   avatar_url: string;
+}
+
+export interface PostWithAuthor {
+  id: string;
+  user_id: string;
+  title: string | null;
+  content: string | null;
+  image_url: string | null;
+  post_type: 'question' | 'story' | 'reel' | 'product' | 'mandi_rate';
+  category: string | null;
+  tags: string[] | null;
+  slug: string | null;
+  excerpt: string | null;
+  read_time: number | null;
+  is_featured: boolean | null;
+  likes_count: number;
+  comments_count: number;
+  shares_count: number;
+  created_at: string;
+  author: Author;
 }
 
 export interface Answer {

@@ -1,25 +1,25 @@
 
 import { AvatarProps } from "@radix-ui/react-avatar";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/components/AuthProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Icons } from "./icons";
 
 interface UserAvatarProps extends AvatarProps {}
 
 export function UserAvatar({ ...props }: UserAvatarProps) {
-  const { data: session } = useSession();
+  const { user } = useAuth();
 
   return (
     <Avatar {...props}>
-      {session?.user?.image ? (
+      {user?.avatar_url ? (
         <AvatarImage
-          src={session.user.image}
-          alt={session.user.name || ""}
+          src={user.avatar_url}
+          alt={user.full_name || ""}
           referrerPolicy="no-referrer"
         />
       ) : (
         <AvatarFallback>
-          <span className="sr-only">{session?.user?.name}</span>
+          <span className="sr-only">{user?.full_name}</span>
           <Icons.user className="h-4 w-4" />
         </AvatarFallback>
       )}

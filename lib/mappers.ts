@@ -6,8 +6,10 @@ export interface RawPost extends PostRow {
 }
 
 const defaultAuthor: Author = {
+  id: '0',
   username: 'anonymous',
-  reputation: 0,
+  full_name: 'Anonymous',
+  avatar_url: '/default-avatar.png',
 };
 
 export function mapPostToPostWithAuthor(p: RawPost): PostWithAuthor {

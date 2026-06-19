@@ -1,8 +1,8 @@
 
+'use client';
+
 import { redirect } from "next/navigation";
 
-import { authOptions } from "@/lib/auth";
-import { getSession } from "@/lib/session";
 import { stripe } from "@/lib/stripe";
 import { getUserSubscriptionPlan } from "@/lib/subscription";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -10,20 +10,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { BillingForm } from "@/components/BillingForm";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { DashboardShell } from "@/components/DashboardShell";
+import { useAuth } from "@/components/AuthProvider";
 
-export const metadata = {
-  title: "Billing",
-  description: "Manage billing and your subscription plan.",
-};
+export default function BillingPage() {
+  const { user } = useAuth();
 
-export default async function BillingPage() {
-  const session = await getSession();
-
-  if (!session?.user) {
-    redirect(authOptions?.pages?.signIn || "/login");
+  if (!user) {
+    redirect("/login");
   }
 
-  const subscriptionPlan = await getUserSubscriptionPlan(session.user.id);
+  // const subscriptionPlan = await getUserSubscriptionPlan(user.id);
 
   return (
     <DashboardShell>
@@ -39,7 +35,7 @@ export default async function BillingPage() {
             will not be charged.
           </AlertDescription>
         </Alert>
-        <BillingForm subscriptionPlan={subscriptionPlan} />
+        {/* <BillingForm subscriptionPlan={subscriptionPlan} /> */}
       </div>
     </DashboardShell>
   );

@@ -10,12 +10,22 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Icons } from './icons';
+import { useAuth } from './AuthProvider';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 export function UserAccountNav() {
-  const { data: session } = useSession();
+  const { user, profile, loading } = useAuth();
+  const supabase = createBrowserClient();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <DropdownMenu>
@@ -26,8 +36,8 @@ export function UserAccountNav() {
         >
           <Avatar className="h-8 w-8">
             <AvatarImage
-              src={session?.user?.image || ''}
-              alt={session?.user?.name || ''}
+              src={profile?.avatar_url || ''}
+              alt={profile?.full_name || ''}
             />
             <AvatarFallback>
               <Icons.user className="h-4 w-4" />
@@ -38,10 +48,10 @@ export function UserAccountNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuItem className="flex items-center justify-start gap-2">
           <div className="flex flex-col space-y-1 leading-none">
-            {session?.user?.name && <p className="font-medium">{session.user.name}</p>}
-            {session?.user?.email && (
+            {profile?.full_name && <p className="font-medium">{profile.full_name}</p>}
+            {user?.email && (
               <p className="w-[200px] truncate text-sm text-muted-foreground">
-                {session.user.email}
+                {user.email}
               </p>
             )}
           </div>
@@ -49,13 +59,11 @@ export function UserAccountNav() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/dashboard/farmer">
-            {/* <Icons.dashboard className="mr-2 h-4 w-4" /> */}
             <span>Dashboard</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/dashboard/farmer/settings">
-            {/* <Icons.settings className="mr-2 h-4 w-4" /> */}
             <span>Settings</span>
           </Link>
         </DropdownMenuItem>
@@ -64,12 +72,9 @@ export function UserAccountNav() {
           className="cursor-pointer"
           onSelect={(event) => {
             event.preventDefault();
-            signOut({
-              callbackUrl: `${window.location.origin}/login`,
-            });
+            handleSignOut();
           }}
         >
-          {/* <Icons.logout className="mr-2 h-4 w-4" /> */}
           <span>Log out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

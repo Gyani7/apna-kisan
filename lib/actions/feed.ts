@@ -40,31 +40,31 @@ export async function getFeed(page = 1, limit = 10) {
                     query = supabase
                         .from('posts')
                         .select(`id, title, content, created_at, slug, vote_count, post_type, is_featured, author:profiles(id, username, avatar_url, full_name)`)
-                        .in('id', ids);
+                        .in('id', ids as string[]);
                     break;
                 case 'story':
                     query = supabase
                         .from('stories')
                         .select(`id, media_url, media_type, created_at, author:profiles(id, username, avatar_url, full_name)`)
-                        .in('id', ids);
+                        .in('id', ids as string[]);
                     break;
                 case 'reel':
                     query = supabase
                         .from('reels')
                         .select(`id, caption, video_url, created_at, likes_count, comments_count, thumbnail_url, author:profiles(id, username, avatar_url, full_name)`)
-                        .in('id', ids);
+                        .in('id', ids as string[]);
                     break;
                 case 'product':
                     query = supabase
                         .from('products')
                         .select('id, title, price, image_urls, created_at, author:profiles!seller_id(id, username, avatar_url, full_name)')
-                        .in('id', ids);
+                        .in('id', ids as string[]);
                     break;
                 case 'mandi_rate':
                     query = supabase
                         .from('mandi_rates')
                         .select('id, commodity, mandi, state, price, change_percent, updated_at')
-                        .in('id', ids);
+                        .in('id', ids as string[]);
                     break;
                 default:
                     // This case should ideally not be reached if DB and code are in sync
