@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import Link from "next/link"
-import { Icons } from "@/components/icons"
+import { Spinner, SmartphoneIcon } from "@/components/icons"
 
 export function AuthForm({ type }: { type: 'login' | 'register' }) {
 
@@ -63,11 +63,11 @@ export function AuthForm({ type }: { type: 'login' | 'register' }) {
         </div>
         <div className="grid grid-cols-2 gap-4">
              <Button variant="outline" onClick={handleGoogleLogin}>
-                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                <Spinner className="mr-2 h-4 w-4 animate-spin" />
                 Google
             </Button>
             <Button variant="outline" onClick={handleOtpLogin}>
-                <Icons.Smartphone className="mr-2 h-4 w-4" />
+                <SmartphoneIcon className="mr-2 h-4 w-4" />
                 OTP
             </Button>
         </div>

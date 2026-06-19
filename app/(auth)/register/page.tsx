@@ -1,11 +1,14 @@
 
-import { AuthForm } from "@/components/AuthForm";
+import { Suspense } from "react";
+import { UserAuthForm } from "@/components/UserAuthForm";
 import { Shell } from "@/components/shell";
 
 export default function RegisterPage() {
   return (
     <Shell>
-      <AuthForm />
+      <Suspense fallback={<div>Loading...</div>}>
+        <UserAuthForm />
+      </Suspense>
     </Shell>
   );
 }

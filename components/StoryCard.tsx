@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Story, timeAgo } from '@/lib/types';
-import { Icons } from '@/components/icons';
+import { BookOpenIcon } from '@/components/icons';
+import { cn } from '@/lib/utils';
 
 interface StoryCardProps {
   story: Story;
@@ -24,8 +25,8 @@ export default function StoryCard({ story, featured }: StoryCardProps) {
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-4">
-            <span className={clsx('inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full mb-2', 'text-white', 'bg-green-500')}>
-              <Icons.BookOpen size={12} />
+            <span className={cn('inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full mb-2', 'text-white', 'bg-green-500')}>
+              <BookOpenIcon size={12} />
               Story
             </span>
             <h3 className="text-white font-bold text-lg leading-snug group-hover:underline">{story.title}</h3>
@@ -48,8 +49,8 @@ export default function StoryCard({ story, featured }: StoryCardProps) {
         )}
         <div className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className={clsx('inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full', 'text-green-800', 'bg-green-100')}>
-              <Icons.BookOpen size={12} />
+            <span className={cn('inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full', 'text-green-800', 'bg-green-100')}>
+              <BookOpenIcon size={12} />
               Story
             </span>
           </div>
@@ -67,8 +68,4 @@ export default function StoryCard({ story, featured }: StoryCardProps) {
       </article>
     </Link>
   );
-}
-
-function clsx(...args: (string | false | undefined | Record<string, boolean>)[]) {
-  return args.filter(Boolean).join(' ');
 }
