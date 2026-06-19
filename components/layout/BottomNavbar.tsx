@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { buttonVariants } from '../ui/button';
 import { cn } from '@/lib/utils';
-import { HomeIcon, DashboardIcon, SettingsIcon, LogOutIcon, LogInIcon } from '../icons';
+import { Home, LayoutDashboard, Settings, LogOut, LogIn } from 'lucide-react';
 
 export function BottomNavbar() {
   const { data: session } = useSession();
@@ -23,7 +23,7 @@ export function BottomNavbar() {
             pathname === '/' && 'bg-muted'
           )}
         >
-          <HomeIcon className="h-6 w-6" />
+          <Home className="h-6 w-6" />
           <span className="text-xs">Home</span>
         </Link>
         {
@@ -36,7 +36,7 @@ export function BottomNavbar() {
                 pathname === '/dashboard/farmer' && 'bg-muted'
               )}
             >
-              <DashboardIcon className="h-6 w-6" />
+              <LayoutDashboard className="h-6 w-6" />
               <span className="text-xs">Dashboard</span>
             </Link>
           )
@@ -49,7 +49,7 @@ export function BottomNavbar() {
             pathname === '/dashboard/farmer/settings' && 'bg-muted'
           )}
         >
-          <SettingsIcon className="h-6 w-6" />
+          <Settings className="h-6 w-6" />
           <span className="text-xs">Settings</span>
         </Link>
         {
@@ -61,7 +61,7 @@ export function BottomNavbar() {
                 'flex h-full flex-col items-center justify-center gap-1 rounded-none'
               )}
             >
-              <LogOutIcon className="h-6 w-6" />
+              <LogOut className="h-6 w-6" />
               <span className="text-xs">Logout</span>
             </Link>
           ) : (
@@ -73,7 +73,7 @@ export function BottomNavbar() {
                 pathname === '/login' && 'bg-muted'
               )}
             >
-              <LogInIcon className="h-6 w-6" />
+              <LogIn className="h-6 w-6" />
               <span className="text-xs">Login</span>
             </Link>
           )
