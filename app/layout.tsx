@@ -10,6 +10,7 @@ import { BottomNavbar } from '@/components/layout/BottomNavbar';
 import { Footer } from '@/components/layout/Footer';
 import Head from 'next/head';
 import SessionProviderWrapper from './session-provider';
+import { GuestProvider } from './guest-provider';
 
 
 const inter = Inter({ subsets: ['latin'] });
@@ -30,15 +31,17 @@ export default function RootLayout({
       </Head>
       <body className={cn(inter.className, "pb-16 md:pb-0")}>
         <SessionProviderWrapper>
-          <ModalProvider>
-              <div className="relative flex min-h-screen flex-col">
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
-              </div>
-              <BottomNavbar />
-            <Toaster />
-          </ModalProvider>
+          <GuestProvider>
+            <ModalProvider>
+                <div className="relative flex min-h-screen flex-col">
+                  <Header />
+                  <main className="flex-1">{children}</main>
+                  <Footer />
+                </div>
+                <BottomNavbar />
+              <Toaster />
+            </ModalProvider>
+          </GuestProvider>
         </SessionProviderWrapper>
         <script src="https://unpkg.com/mappls-gl/dist/mappls-gl.js"></script>
       </body>

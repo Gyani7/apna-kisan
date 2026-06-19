@@ -9,6 +9,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import withAuthorization from '@/components/withAuthorization';
 
 // Placeholder for icons
 import { Bot, Users } from "lucide-react";
@@ -98,7 +99,7 @@ const CommunityWidget = () => (
     </Card>
 );
 
-export default function FarmerDashboard() {
+function FarmerDashboard() {
   return (
     <div className="p-4 md:p-8 space-y-8">
       <WelcomeHeader />
@@ -156,3 +157,5 @@ export default function FarmerDashboard() {
     </div>
   );
 }
+
+export default withAuthorization(FarmerDashboard, true);

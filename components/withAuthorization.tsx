@@ -1,47 +1,26 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { getUserRole } from '@/lib/user';
-import { Role } from '@/lib/roles';
+import { useSession } from 'next-auth/react';
+import { useGuest } from '../app/guest-provider';
+import PremiumLoginModal from './PremiumLoginModal';
 
-export const withAuthorization = (
-  WrappedComponent: React.ComponentType,
-  allowedRoles: Role[]
-) => {
+const withAuthorization = (WrappedComponent: React.ComponentType<any>, isProtected: boolean) => {
   const WithAuthorization = (props: any) => {
-    const router = useRouter();
-    const [userRole, setUserRole] = useState<Role | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { data: session, status } = useSession();
+    const { isGuest } = useGuest();
 
-    useEffect(() => {
-      const checkUserRole = async () => {
-        const role = await getUserRole();
-        setUserRole(role);
-        setLoading(false);
-      };
-      checkUserRole();
-    }, []);
-
-    useEffect(() => {
-      if (!loading) {
-        if (!userRole || !allowedRoles.includes(userRole)) {
-          router.replace('/');
-        }
-      }
-    }, [loading, userRole, router, allowedRoles]);
-
-    if (loading || !userRole || !allowedRoles.includes(userRole)) {
-      // Render a loading state or null while checking authorization
-      // and before the redirect in useEffect happens.
-      return <div>Loading...</div>;
+    if (status === 'loading') {
+      return <div>Loading...</div>; // Or a loading spinner
     }
 
-    // Render the wrapped component if authorized
+    if (isProtected && (isGuest || !session)) {
+      return <PremiumLoginModal />;
+    }
+
     return <WrappedComponent {...props} />;
   };
-  
-  WithAuthorization.displayName = `withAuthorization(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
-  
+
   return WithAuthorization;
 };
+
+export default withAuthorization;
