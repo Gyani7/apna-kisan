@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
-import { Icons } from '@/components/icons';
+import { Spinner } from '@/components/icons';
 
 export default function NewProductPage() {
   const [name, setName] = useState('');
@@ -69,7 +69,7 @@ export default function NewProductPage() {
           <Input placeholder="Category (e.g., vegetable)" value={category} onChange={(e) => setCategory(e.target.value)} />
         </div>
         <Button onClick={handleAddProduct} disabled={isLoading}>
-          {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}Add Product
+          {isLoading && <Spinner className="mr-2 h-4 w-4 animate-spin" />}Add Product
         </Button>
       </div>
     </div>

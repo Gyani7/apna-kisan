@@ -1,13 +1,10 @@
 
-'use client';
-
 import '../styles/globals.css';
 import { Inter } from 'next/font/google';
 import { GeistSans } from 'geist/font/sans';
-import { ThemeProvider } from '@/components/ThemeProvider';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
-import AuthProvider from '@/components/AuthProvider';
+import { Providers } from '@/components/Providers';
 import { Header } from '@/components/layout/Header';
 import { BottomNavbar } from '@/components/layout/BottomNavbar';
 import { Footer } from '@/components/layout/Footer';
@@ -30,22 +27,15 @@ export default function RootLayout({
         />
       </Head>
       <body className={cn(inter.className, "pb-16 md:pb-0")}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
+        <Providers>
             <div className="relative flex min-h-screen flex-col">
               <Header />
               <main className="flex-1">{children}</main>
               <Footer />
             </div>
             <BottomNavbar />
-          </AuthProvider>
           <Toaster />
-        </ThemeProvider>
+        </Providers>
         <script src="https://unpkg.com/mappls-gl/dist/mappls-gl.js"></script>
       </body>
     </html>

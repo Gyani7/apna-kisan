@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { buttonVariants } from '../ui/button';
 import { cn } from '@/lib/utils';
-import { Icons } from '../icons';
+import { HomeIcon, DashboardIcon, SettingsIcon, LogOutIcon, LogInIcon } from '../icons';
 
 export function BottomNavbar() {
   const { data: session } = useSession();
@@ -23,7 +23,7 @@ export function BottomNavbar() {
             pathname === '/' && 'bg-muted'
           )}
         >
-          <Icons.home className="h-6 w-6" />
+          <HomeIcon className="h-6 w-6" />
           <span className="text-xs">Home</span>
         </Link>
         {
@@ -36,7 +36,7 @@ export function BottomNavbar() {
                 pathname === '/dashboard/farmer' && 'bg-muted'
               )}
             >
-              <Icons.dashboard className="h-6 w-6" />
+              <DashboardIcon className="h-6 w-6" />
               <span className="text-xs">Dashboard</span>
             </Link>
           )
@@ -49,7 +49,7 @@ export function BottomNavbar() {
             pathname === '/dashboard/farmer/settings' && 'bg-muted'
           )}
         >
-          <Icons.settings className="h-6 w-6" />
+          <SettingsIcon className="h-6 w-6" />
           <span className="text-xs">Settings</span>
         </Link>
         {
@@ -61,7 +61,7 @@ export function BottomNavbar() {
                 'flex h-full flex-col items-center justify-center gap-1 rounded-none'
               )}
             >
-              <Icons.logout className="h-6 w-6" />
+              <LogOutIcon className="h-6 w-6" />
               <span className="text-xs">Logout</span>
             </Link>
           ) : (
@@ -73,7 +73,7 @@ export function BottomNavbar() {
                 pathname === '/login' && 'bg-muted'
               )}
             >
-              <Icons.login className="h-6 w-6" />
+              <LogInIcon className="h-6 w-6" />
               <span className="text-xs">Login</span>
             </Link>
           )

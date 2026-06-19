@@ -7,19 +7,19 @@ import { Icons } from "./icons";
 interface UserAvatarProps extends AvatarProps {}
 
 export function UserAvatar({ ...props }: UserAvatarProps) {
-  const { user } = useAuth();
+  const { profile } = useAuth();
 
   return (
     <Avatar {...props}>
-      {user?.avatar_url ? (
+      {profile?.avatar_url ? (
         <AvatarImage
-          src={user.avatar_url}
-          alt={user.full_name || ""}
+          src={profile.avatar_url}
+          alt={profile.full_name || ""}
           referrerPolicy="no-referrer"
         />
       ) : (
         <AvatarFallback>
-          <span className="sr-only">{user?.full_name}</span>
+          <span className="sr-only">{profile?.full_name}</span>
           <Icons.user className="h-4 w-4" />
         </AvatarFallback>
       )}

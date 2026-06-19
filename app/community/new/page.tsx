@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
-import { Icons } from '@/components/icons';
+import { Spinner } from '@/components/icons';
 
 export default function NewPostPage() {
   const [content, setContent] = useState('');
@@ -56,7 +56,7 @@ export default function NewPostPage() {
           rows={5}
         />
         <Button onClick={handlePost} disabled={isLoading || !content.trim()}>
-          {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}Post
+          {isLoading && <Spinner className="mr-2 h-4 w-4 animate-spin" />}Post
         </Button>
       </div>
     </div>

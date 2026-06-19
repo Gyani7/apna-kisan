@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Icons } from "./icons";
+import { Spinner } from "./icons";
 import { User } from "next-auth";
 
 interface UserNameFormProps extends React.HTMLAttributes<HTMLFormElement> {
@@ -98,7 +98,7 @@ export function UserNameForm({
         <CardFooter>
           <Button disabled={isSubmitting}>
             {isSubmitting && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+              <Spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
             <span>Save Changes</span>
           </Button>

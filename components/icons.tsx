@@ -21,22 +21,20 @@ import {
   LogIn
 } from 'lucide-react';
 
-export const Icons = {
-    Sun: SunMedium,
-    Moon: Moon,
-    ChevronLeft: ChevronLeft,
-    logo: Command,
-    Clock: Clock,
-    BookOpen: BookOpen,
-    Laptop: Laptop,
-    spinner: Loader,
-    user: User,
-    Smartphone: Smartphone,
-    Github: Github,
-    X: X,
-    home: Home,
-    dashboard: LayoutDashboard,
-    settings: Settings,
-    logout: LogOut,
-    login: LogIn
-};
+export const Sun = SunMedium;
+export const MoonIcon = Moon;
+export const ChevronLeftIcon = ChevronLeft;
+export const Logo = Command;
+export const ClockIcon = Clock;
+export const BookOpenIcon = BookOpen;
+export const LaptopIcon = Laptop;
+export const Spinner = Loader;
+export const UserIcon = User;
+export const SmartphoneIcon = Smartphone;
+export const GithubIcon = Github;
+export const XIcon = X;
+export const HomeIcon = Home;
+export const DashboardIcon = LayoutDashboard;
+export const SettingsIcon = Settings;
+export const LogoutIcon = LogOut;
+export const LoginIcon = LogIn;

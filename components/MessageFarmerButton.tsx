@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { createConversation } from '@/app/actions/messages';
 import { useTransition } from 'react';
-import { Icons } from './icons';
+import { Loader2 } from 'lucide-react';
 
 export function MessageFarmerButton({ farmerId }: { farmerId: string }) {
   const [isPending, startTransition] = useTransition();
@@ -17,7 +17,7 @@ export function MessageFarmerButton({ farmerId }: { farmerId: string }) {
       }}
     >
       <Button variant="outline" size="sm" disabled={isPending}>
-        {isPending ? <Icons.spinner className="h-4 w-4 animate-spin" /> : 'Message Farmer'}
+        {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Message Farmer'}
       </Button>
     </form>
   );

@@ -1,7 +1,4 @@
-
-'use client';
-
-import { SiteHeader } from '@/components/layout/SiteHeader';
+import { SiteHeaderWithAuth } from '@/components/layout/SiteHeaderWithAuth';
 
 export default function MainLayout({
   children,
@@ -10,7 +7,7 @@ export default function MainLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
+      <SiteHeaderWithAuth />
       <main className="flex-1">{children}</main>
     </div>
   );

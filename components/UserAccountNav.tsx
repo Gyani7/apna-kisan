@@ -11,7 +11,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Icons } from './icons';
+import { User } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { createBrowserClient } from '@/lib/supabase/client';
 
@@ -40,7 +40,7 @@ export function UserAccountNav() {
               alt={profile?.full_name || ''}
             />
             <AvatarFallback>
-              <Icons.user className="h-4 w-4" />
+              <User className="h-4 w-4" />
             </AvatarFallback>
           </Avatar>
         </Button>
