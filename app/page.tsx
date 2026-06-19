@@ -1,192 +1,127 @@
 'use client';
 
-import Link from "next/link";
-import { useAuth } from '@/components/AuthProvider';
+import { Bot, Cloudy, Leaf, Map, Tractor, Users, Wheat, Wind, Calendar, Award, Newspaper, BarChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Bot, Cloudy, Newspaper, Wheat, Users, ShoppingCart, BarChart, CheckCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
+import { motion, Variants } from "framer-motion";
+
+const GlassCard = ({ children, className }: { children: React.ReactNode, className?: string }) => (
+  <div className={`bg-white/10 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 ${className} h-full`}>
+    {children}
+  </div>
+);
+
+const sectionVariant: Variants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+};
+
+const containerVariant: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2, delayChildren: 0.3 }
+  }
+};
+
+const itemVariant: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+};
+
+const GuestAuthForm = () => (
+    <div className="max-w-sm mx-auto">
+      <Card className="bg-transparent border-0">
+        <CardContent className="p-0 space-y-4">
+            <Link href="/feed" passHref>
+                <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-lg">Continue as Guest</Button>
+            </Link>
+            <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-white/30" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                    <span className="bg-gray-900 px-2 text-gray-300">
+                    OR
+                    </span>
+                </div>
+            </div>
+            <Button size="lg" variant="outline" className="w-full bg-white/10 text-white hover:bg-white/20">
+                Sign in with Google
+            </Button>
+            <div className="flex space-x-2 pt-2">
+                <Input type="tel" placeholder="+91" className="w-20 bg-white/10 border-white/20 placeholder:text-gray-300 text-center" />
+                <Input type="tel" placeholder="Enter Mobile Number" className="flex-1 bg-white/10 border-white/20 placeholder:text-gray-300" />
+            </div>
+            <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-700 text-white">Login with OTP</Button>
+        </CardContent>
+      </Card>
+    </div>
+);
+
+const publicFeatures = [
+    { icon: Cloudy, name: "Weather Forecast", description: "Real-time weather updates" },
+    { icon: Wheat, name: "Live Mandi Prices", description: "Latest prices from your mandi" },
+    { icon: Bot, name: "AI Assistant Demo", description: "Get your questions answered" },
+    { icon: Leaf, name: "Disease Detection Demo", description: "Upload a photo to detect crop disease" },
+    { icon: BarChart, name: "Village Statistics", description: "Analytics for your village" },
+    { icon: Newspaper, name: "Agriculture News", description: "Stay updated with the latest news" },
+    { icon: Calendar, name: "Crop Calendar", description: "Personalized crop schedule" },
+    { icon: Award, name: "Success Stories", description: "Inspiring stories from farmers" },
+    { icon: Tractor, name: "Government Schemes", description: "Find schemes you're eligible for" },
+];
 
 export default function Home() {
-  const { user } = useAuth();
   return (
-    <div className="flex flex-col min-h-dvh bg-background text-foreground">
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section id="hero" className="relative w-full pt-20 pb-20 md:pt-32 md:pb-24 text-center overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-background to-background"></div>
-          <div className="absolute inset-0 bg-[url('/grain-pattern.svg')] bg-repeat opacity-[0.02]"></div>
-          <div className="container relative z-10 px-4 md:px-6">
-            <div className="space-y-6 max-w-4xl mx-auto">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter !leading-tight">
-                Empowering India's Farmers with Technology and Community
-              </h1>
-              <p className="max-w-2xl mx-auto text-muted-foreground md:text-xl">
-                Apna Kisan is a premium marketplace and agricultural platform designed to help you sell, learn, and grow. Join a network of successful farmers today.
-              </p>
-              <div className="flex flex-col gap-4 min-[400px]:flex-row justify-center">
-              {user ? (
-                <Button size="lg" asChild className="shadow-lg shadow-primary/20 transform hover:scale-105 transition-transform duration-300">
-                  <Link href="/dashboard">Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" /></Link>
-                </Button>
-              ) : (
-                <Button size="lg" asChild className="shadow-lg shadow-primary/20 transform hover:scale-105 transition-transform duration-300">
-                  <Link href="/register">Join the Community <ArrowRight className="ml-2 h-5 w-5" /></Link>
-                </Button>
-              )}
-              <Button size="lg" asChild variant="outline" className="shadow-lg transform hover:scale-105 transition-transform duration-300">
-                <Link href="/market">Explore Market</Link>
-              </Button>
-            </div>
-            </div>
-          </div>
-        </section>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-900 to-black text-white">
+      <main className="container mx-auto px-4 py-12 md:py-20">
+        <motion.section
+          className="text-center mb-16 md:mb-24"
+          variants={sectionVariant}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.h1 variants={itemVariant} className="text-5xl md:text-7xl font-bold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-500">
+            Apna Kisan
+          </motion.h1>
+          <motion.p variants={itemVariant} className="text-lg md:text-xl text-green-200 mb-8 max-w-3xl mx-auto">
+            India's Agricultural Intelligence Network. Built for the Indian Farmer.
+          </motion.p>
+          <motion.div variants={itemVariant}>
+            <GuestAuthForm />
+          </motion.div>
+        </motion.section>
 
-        {/* Key Stats Section */}
-        <section className="py-12 bg-muted/30">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 text-center">
-              <div className="space-y-2">
-                <h3 className="text-3xl font-bold">10,000+</h3>
-                <p className="text-muted-foreground">Verified Farmers</p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-3xl font-bold">5,000+</h3>
-                <p className="text-muted-foreground">Active Buyers</p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-3xl font-bold">25,000+</h3>
-                <p className="text-muted-foreground">Products Listed</p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-3xl font-bold">₹1 Cr+</h3>
-                <p className="text-muted-foreground">Transactions Facilitated</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section id="features" className="w-full py-20 md:py-28">
-          <div className="container px-4 md:px-6">
-            <div className="text-center space-y-4 mb-16">
-              <span className="text-primary font-semibold tracking-wide">FEATURES</span>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter">The Ultimate Toolkit for Modern Farming</h2>
-              <p className="max-w-3xl mx-auto text-muted-foreground md:text-lg">
-                From market access to AI-powered advice, we've got you covered.
-              </p>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <FeatureCard icon={<ShoppingCart className="h-8 w-8 text-primary" />} title="Direct-to-Buyer Marketplace" description="List your produce and sell directly to a nationwide network of buyers, ensuring better prices and faster payments." />
-              <FeatureCard icon={<Users className="h-8 w-8 text-primary" />} title="Vibrant Farmer Community" description="Connect with peers, share knowledge, and discuss best practices in a supportive and engaging social feed." />
-              <FeatureCard icon={<Bot className="h-8 w-8 text-primary" />} title="AI Kisan Assistant" description="Get instant, expert advice on crop diseases, weather patterns, and government schemes from our intelligent AI bot." />
-              <FeatureCard icon={<BarChart className="h-8 w-8 text-primary" />} title="Live Mandi Rates" description="Access real-time pricing data from markets across India to make informed selling decisions." />
-              <FeatureCard icon={<Newspaper className="h-8 w-8 text-primary" />} title="Scheme Matcher" description="Discover and apply for government schemes you're eligible for, all in one place." />
-              <FeatureCard icon={<CheckCircle className="h-8 w-8 text-primary" />} title="Verified Profiles" description="Build trust with buyers through a verified profile badge, showcasing your credibility and quality." />
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works Section */}
-        <section className="w-full py-20 md:py-28 bg-muted/30">
-          <div className="container px-4 md:px-6">
-            <div className="text-center space-y-4 mb-16">
-              <span className="text-primary font-semibold tracking-wide">HOW IT WORKS</span>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter">Start Selling in 3 Simple Steps</h2>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 text-center">
-              <div className="space-y-4">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border border-primary/20">
-                  <span className="text-3xl font-bold text-primary">1</span>
-                </div>
-                <h3 className="text-xl font-semibold">Create Your Profile</h3>
-                <p className="text-muted-foreground">Sign up and get your profile verified to build trust with buyers.</p>
-              </div>
-              <div className="space-y-4">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border border-primary/20">
-                  <span className="text-3xl font-bold text-primary">2</span>
-                </div>
-                <h3 className="text-xl font-semibold">List Your Products</h3>
-                <p className="text-muted-foreground">Easily upload photos and details of your produce to the marketplace.</p>
-              </div>
-              <div className="space-y-4">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border border-primary/20">
-                  <span className="text-3xl font-bold text-primary">3</span>
-                </div>
-                <h3 className="text-xl font-semibold">Connect & Transact</h3>
-                <p className="text-muted-foreground">Receive inquiries, negotiate prices, and get paid securely.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-
-        {/* Testimonials Section */}
-        <section id="testimonials" className="w-full py-20 md:py-28">
-            <div className="container px-4 md:px-6">
-                 <div className="text-center space-y-4 mb-16">
-                    <span className="text-primary font-semibold tracking-wide">TESTIMONIALS</span>
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter">From Our Community</h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  <TestimonialCard name="Ramesh Kumar" location="Punjab" quote="Apna Kisan helped me get 20% more for my wheat crop. The direct connection to buyers is a game-changer." />
-                  <TestimonialCard name="Sunita Devi" location="Maharashtra" quote="The AI assistant is like having an agronomist in my pocket! It helped me save my tomato crop from blight." />
-                  <TestimonialCard name="Anil Singh" location="Uttar Pradesh" quote="Finally, a platform that understands the needs of Indian farmers. The community section is my favorite part." />
-                </div>
-            </div>
-        </section>
-
-        {/* CTA Section */}
-        <section id="cta" className="w-full py-20 bg-gradient-to-r from-primary to-green-600 text-primary-foreground">
-            <div className="container px-4 md:px-6 text-center">
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Take Your Farm to the Next Level</h2>
-                <p className="mt-3 max-w-xl mx-auto text-lg text-primary-foreground/80">Join thousands of smart farmers who are building a more profitable and sustainable future.</p>
-                <div className="mt-8">
-                    <Button size="lg" asChild variant="secondary" className="text-primary shadow-lg transform hover:scale-105 transition-transform duration-300">
-                        <Link href="/register">Sign Up for Free Today</Link>
-                    </Button>
-                </div>
-            </div>
-        </section>
+        <motion.section
+            variants={sectionVariant}
+            initial="hidden"
+            animate="visible"
+        >
+            <h2 className="text-3xl font-bold text-center mb-10 text-green-300">Explore Public Features</h2>
+            <motion.div
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                variants={containerVariant}
+                initial="hidden"
+                animate="visible"
+            >
+                {publicFeatures.map((feature, i) => (
+                    <motion.div key={i} variants={itemVariant}>
+                        <GlassCard className="p-6 flex flex-col items-center text-center">
+                            <feature.icon className="w-12 h-12 mb-4 text-green-300" />
+                            <h3 className="text-xl font-bold mb-2">{feature.name}</h3>
+                            <p className="text-gray-300">{feature.description}</p>
+                        </GlassCard>
+                    </motion.div>
+                ))}
+            </motion.div>
+        </motion.section>
       </main>
     </div>
-  )
-}
-
-// Helper component for Feature Cards
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
-  return (
-    <Card className="bg-transparent border-border/50 shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300 group">
-      <CardHeader>
-        <div className="flex items-center gap-4">
-          <div className="bg-primary/10 p-3 rounded-full group-hover:bg-primary/20 transition-colors">
-            {icon}
-          </div>
-          <CardTitle className="text-lg font-semibold tracking-tight">{title}</CardTitle>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground">{description}</p>
-      </CardContent>
-    </Card>
-  )
-}
-
-// Helper component for Testimonial Cards
-function TestimonialCard({ name, location, quote }: { name: string, location: string, quote: string }) {
-  return (
-    <Card className="bg-muted/30 border-none p-6">
-      <CardContent className="p-0">
-        <p className="mb-4">"{quote}"</p>
-        <div className="flex items-center gap-3">
-           <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
-            {name.charAt(0)}
-           </div>
-           <div>
-             <p className="font-semibold">{name}</p>
-             <p className="text-sm text-muted-foreground">{location}</p>
-           </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
+  );
 }

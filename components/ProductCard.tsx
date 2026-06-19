@@ -11,6 +11,7 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { Heart, ShoppingCart, Trash2, Edit } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
+import { useModal } from '@/components/Providers';
 
 interface ProductCardProps {
   product: Product;
@@ -21,6 +22,7 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
   const [isOwner, setIsOwner] = useState(false);
   const supabase = createBrowserClient();
   const { toast } = useToast();
+  const { showPremiumModal } = useModal();
 
   useEffect(() => {
     const checkOwnership = async () => {
@@ -53,6 +55,13 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
     toast({ title: 'Product added to wishlist' });
   };
 
+  const handleEditClick = (e: React.MouseEvent) => {
+    if (!isOwner) {
+      e.preventDefault();
+      showPremiumModal();
+    }
+  };
+
   return (
     <Card className="overflow-hidden group">
       <div className="relative">
@@ -72,7 +81,7 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
         </div>
         {isOwner && (
           <div className="absolute top-2 left-2 flex gap-2">
-            <Link href={`/my-products/edit/${product.id}`}>
+            <Link href={`/my-products/edit/${product.id}`} onClick={handleEditClick}>
               <Button size="icon" variant="outline" className="rounded-full bg-background/70 backdrop-blur-sm">
                 <Edit className="h-5 w-5" />
               </Button>

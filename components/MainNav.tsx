@@ -8,6 +8,7 @@ import { buttonVariants } from "./ui/button";
 import { Logo } from "./icons";
 import { NavItem } from "@/types/nav";
 import { UserAccountNav } from "./UserAccountNav";
+import { useModal } from "@/components/Providers";
 
 interface MainNavProps {
   items?: NavItem[];
@@ -15,6 +16,9 @@ interface MainNavProps {
 
 export function MainNav({ items }: MainNavProps) {
   const { data: session } = useSession();
+  const { showPremiumModal } = useModal();
+
+  const protectedRoutes = ['/dashboard/farmer'];
 
   return (
     <div className="flex gap-6 md:gap-10">
@@ -27,19 +31,37 @@ export function MainNav({ items }: MainNavProps) {
       {items?.length ? (
         <nav className="flex gap-6">
           {items?.map(
-            (item, index) =>
-              item.href && (
-                <Link
-                  key={index}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center text-sm font-medium text-muted-foreground",
-                    item.disabled && "cursor-not-allowed opacity-80"
-                  )}
-                >
-                  {item.title}
-                </Link>
+            (item, index) => {
+              const isProtected = protectedRoutes.includes(item.href || '');
+              if (isProtected && !session) {
+                return (
+                  <button
+                    key={index}
+                    className={cn(
+                      "flex items-center text-sm font-medium text-muted-foreground cursor-pointer",
+                      item.disabled && "cursor-not-allowed opacity-80"
+                    )}
+                    onClick={showPremiumModal}
+                  >
+                    {item.title}
+                  </button>
+                );
+              }
+              return (
+                item.href && (
+                  <Link
+                    key={index}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center text-sm font-medium text-muted-foreground",
+                      item.disabled && "cursor-not-allowed opacity-80"
+                    )}
+                  >
+                    {item.title}
+                  </Link>
+                )
               )
+            }
           )}
         </nav>
       ) : null}

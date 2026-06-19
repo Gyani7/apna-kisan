@@ -4,11 +4,13 @@ import { Inter } from 'next/font/google';
 import { GeistSans } from 'geist/font/sans';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
-import { Providers } from '@/components/Providers';
+import { ModalProvider } from '@/components/Providers';
 import { Header } from '@/components/layout/Header';
 import { BottomNavbar } from '@/components/layout/BottomNavbar';
 import { Footer } from '@/components/layout/Footer';
 import Head from 'next/head';
+import SessionProviderWrapper from './session-provider';
+
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,15 +29,17 @@ export default function RootLayout({
         />
       </Head>
       <body className={cn(inter.className, "pb-16 md:pb-0")}>
-        <Providers>
-            <div className="relative flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
-            <BottomNavbar />
-          <Toaster />
-        </Providers>
+        <SessionProviderWrapper>
+          <ModalProvider>
+              <div className="relative flex min-h-screen flex-col">
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </div>
+              <BottomNavbar />
+            <Toaster />
+          </ModalProvider>
+        </SessionProviderWrapper>
         <script src="https://unpkg.com/mappls-gl/dist/mappls-gl.js"></script>
       </body>
     </html>
