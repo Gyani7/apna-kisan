@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { createClient } from '@/utils/supabase/client';
-import { withAuthorization } from '@/components/withAuthorization';
+import withAuthorization from '@/components/withAuthorization';
+import { UserRole } from '@/lib/types';
 
 function SellPage() {
   const [title, setTitle] = useState('');
@@ -108,4 +109,4 @@ function SellPage() {
   );
 }
 
-export default withAuthorization(SellPage, ['farmer']);
+export default withAuthorization(SellPage, [UserRole.USER, UserRole.PRO_USER]);

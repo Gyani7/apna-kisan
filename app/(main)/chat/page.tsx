@@ -5,7 +5,8 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import { getUser } from '@/lib/user';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { withAuthorization } from '@/components/withAuthorization';
+import withAuthorization from '@/components/withAuthorization';
+import { UserRole } from '@/lib/types';
 
 function ChatPage() {
   const [conversations, setConversations] = useState<any[]>([]);
@@ -63,4 +64,4 @@ function ChatPage() {
   );
 }
 
-export default withAuthorization(ChatPage, ['farmer', 'expert', 'buyer']);
+export default withAuthorization(ChatPage, [UserRole.FARMER, UserRole.EXPERT, UserRole.BUYER]);

@@ -1,24 +1,67 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import { useGuest } from '../app/guest-provider';
-import PremiumLoginModal from './PremiumLoginModal';
+import { ComponentType, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/use-toast';
+import { getUser } from '@/lib/user';
+import { UserRole } from '@/lib/types';
+import { useModal } from '@/components/Providers';
 
-const withAuthorization = (WrappedComponent: React.ComponentType<any>, isProtected: boolean) => {
-  const WithAuthorization = (props: any) => {
-    const { data: session, status } = useSession();
-    const { isGuest } = useGuest();
+const withAuthorization = <P extends object>(
+  WrappedComponent: ComponentType<P>,
+  allowedRoles: UserRole[]
+) => {
+  const WithAuthorization = (props: P) => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    const router = useRouter();
+    const { toast } = useToast();
+    const { showPremiumModal } = useModal();
 
-    if (status === 'loading') {
+    useEffect(() => {
+      const checkAuth = async () => {
+        const user = await getUser();
+
+        if (!user) {
+          showPremiumModal();
+          // Optional: redirect to a login page if modal is not preferred
+          // router.push('/login'); 
+          return;
+        }
+
+        const userRole = user.user_metadata?.role as UserRole;
+
+        if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
+          toast({
+            title: 'Access Denied',
+            description: "You don't have permission to view this page.",
+            variant: 'destructive',
+          });
+          router.push('/'); // Redirect to a safe page
+        } else {
+          setIsAuthorized(true);
+        }
+        setIsLoading(false);
+      };
+
+      checkAuth();
+    }, [router, toast, showPremiumModal, allowedRoles]);
+
+    if (isLoading) {
       return <div>Loading...</div>; // Or a loading spinner
     }
 
-    if (isProtected && (isGuest || !session)) {
-      return <PremiumLoginModal />;
+    if (!isAuthorized) {
+      // This will be briefly visible before the modal or redirect happens
+      return null; 
     }
 
     return <WrappedComponent {...props} />;
   };
+
+  // To make debugging easier
+  const displayName = WrappedComponent.displayName || WrappedComponent.name || 'Component';
+  WithAuthorization.displayName = `WithAuthorization(${displayName})`;
 
   return WithAuthorization;
 };

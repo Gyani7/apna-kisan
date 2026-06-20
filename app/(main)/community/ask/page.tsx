@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { getUser } from '@/lib/user';
-import { withAuthorization } from '@/components/withAuthorization';
+import withAuthorization from '@/components/withAuthorization';
+import { UserRole } from '@/lib/types';
 
 function AskQuestionPage() {
   const [title, setTitle] = useState('');
@@ -71,4 +72,4 @@ function AskQuestionPage() {
   );
 }
 
-export default withAuthorization(AskQuestionPage, ['farmer', 'expert', 'buyer']);
+export default withAuthorization(AskQuestionPage, [UserRole.FARMER, UserRole.EXPERT, UserRole.BUYER]);

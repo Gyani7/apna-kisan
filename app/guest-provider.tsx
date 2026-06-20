@@ -1,19 +1,14 @@
-'use client';
+ 'use client';
 
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-type GuestContextType = {
-  isGuest: boolean;
-  setIsGuest: (isGuest: boolean) => void;
-};
-
-const GuestContext = createContext<GuestContextType | undefined>(undefined);
+const GuestContext = createContext<{ guestId: string | null; setGuestId: (id: string | null) => void } | undefined>(undefined);
 
 export function GuestProvider({ children }: { children: ReactNode }) {
-  const [isGuest, setIsGuest] = useState(false);
+  const [guestId, setGuestId] = useState<string | null>(null);
 
   return (
-    <GuestContext.Provider value={{ isGuest, setIsGuest }}>
+    <GuestContext.Provider value={{ guestId, setGuestId }}>
       {children}
     </GuestContext.Provider>
   );
@@ -26,3 +21,4 @@ export function useGuest() {
   }
   return context;
 }
+ 

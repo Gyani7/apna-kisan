@@ -1,15 +1,13 @@
-'use client';
-
-import { createClient } from '@/utils/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 export async function getUser() {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
     const { data: { user } } = await supabase.auth.getUser();
     return user;
 }
 
 export async function getUserProfile() {
-    const supabase = createClient();
+    const supabase = createBrowserClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -44,4 +42,26 @@ export async function getUserRole() {
     } else {
         return role.name || null;
     }
+}
+
+export async function getUnreadNotificationsCount() {
+    const supabase = createBrowserClient();
+    const user = await getUser();
+
+    if (!user) {
+        return 0;
+    }
+
+    const { count, error } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+
+    if (error) {
+        console.error('Error fetching unread notifications count:', error);
+        return 0;
+    }
+
+    return count || 0;
 }

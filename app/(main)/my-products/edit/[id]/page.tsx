@@ -8,8 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { createClient } from '@/utils/supabase/client';
-import { withAuthorization } from '@/components/withAuthorization';
-import { Product } from '@/lib/types';
+import withAuthorization from '@/components/withAuthorization';
+import { Product, UserRole } from '@/lib/types';
 
 function EditProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
@@ -122,4 +122,4 @@ function EditProductPage() {
   );
 }
 
-export default withAuthorization(EditProductPage, ['farmer']);
+export default withAuthorization(EditProductPage, [UserRole.FARMER]);

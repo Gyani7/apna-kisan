@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { getUser } from '@/lib/user';
-import { withAuthorization } from '@/components/withAuthorization';
+import withAuthorization from '@/components/withAuthorization';
+import { UserRole } from '@/lib/types';
 
 function CreateReelPage() {
   const [caption, setCaption] = useState('');
@@ -96,4 +97,4 @@ function CreateReelPage() {
   );
 }
 
-export default withAuthorization(CreateReelPage, ['farmer', 'expert', 'buyer']);
+export default withAuthorization(CreateReelPage, [UserRole.FARMER, UserRole.EXPERT, UserRole.BUYER]);

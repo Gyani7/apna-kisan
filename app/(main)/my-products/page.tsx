@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
-import { withAuthorization } from '@/components/withAuthorization';
-import { Product } from '@/lib/types';
+import withAuthorization from '@/components/withAuthorization';
+import { Product, UserRole } from '@/lib/types';
 import { getUser } from '@/lib/user';
 import { ProductCard } from '@/components/ProductCard';
 
@@ -57,4 +57,4 @@ function MyProductsPage() {
   );
 }
 
-export default withAuthorization(MyProductsPage, ['farmer']);
+export default withAuthorization(MyProductsPage, [UserRole.FARMER]);

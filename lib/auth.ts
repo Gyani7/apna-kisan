@@ -18,7 +18,7 @@ async function sendVerificationRequest(params) {
     text: text({ url, host }),
     html: html({ url, host, email: identifier }),
   });
-  const failed = result.rejected.concat(result.pending).filter(Boolean);
+  const failed = result.rejected.filter(Boolean);
   if (failed.length) {
     throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
   }
@@ -94,6 +94,7 @@ export const authOptions: NextAuthOptions = {
         if (credentials?.phone && credentials?.otp) {
           const user: User = {
             id: credentials.phone, // Using phone number as ID for this example
+            // @ts-ignore
             phone: credentials.phone,
             email: null, // No email when signing in with phone
           };

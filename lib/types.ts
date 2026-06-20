@@ -1,6 +1,46 @@
-
-import { Heart, MessageCircle, Share2, Bookmark, MapPin, MessageSquare, CircleHelp as HelpCircle, BookOpen, Bell, MoveHorizontal as MoreHorizontal } from 'lucide-react';
+ import { Heart, MessageCircle, Share2, Bookmark, MapPin, MessageSquare, CircleHelp as HelpCircle, BookOpen, Bell, MoveHorizontal as MoreHorizontal } from 'lucide-react';
 import { StaticImageData } from "next/image";
+
+export enum UserRole {
+    ADMIN = 'admin',
+    USER = 'user',
+    PRO_USER = 'pro_user',
+    FARMER = 'farmer',
+    EXPERT = 'expert',
+    BUYER = 'buyer',
+}
+
+export enum NotificationType {
+    WELCOME = 'welcome',
+    NEW_USER = 'new_user',
+    NEW_LIKE = 'new_like',
+    NEW_COMMENT = 'new_comment',
+    NEW_ANSWER = 'new_answer',
+}
+
+export interface WelcomeNotificationMetadata {}
+export interface NewUserNotificationMetadata { new_user_id: string; }
+export interface NewLikeNotificationMetadata { post_id: string; liked_by_user_id: string; }
+export interface NewCommentNotificationMetadata { post_id: string; comment_id: string; commented_by_user_id: string; }
+export interface NewAnswerNotificationMetadata { question_id: string; answer_id: string; answered_by_user_id: string; }
+
+export type NotificationMetadata =
+    | WelcomeNotificationMetadata
+    | NewUserNotificationMetadata
+    | NewLikeNotificationMetadata
+    | NewCommentNotificationMetadata
+    | NewAnswerNotificationMetadata;
+
+
+export interface Notification {
+    id: string;
+    user_id: string;
+    message: string;
+    is_read: boolean;
+    created_at: string;
+    type: NotificationType;
+    metadata: NotificationMetadata;
+}
 
 export interface Product {
   id: string;
@@ -140,4 +180,4 @@ export function formatCount(count: number): string {
     return (count / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
   }
   return count.toString();
-}
+} 

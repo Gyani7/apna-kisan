@@ -1,14 +1,12 @@
-import { SiteHeaderWithAuth } from '@/components/layout/SiteHeaderWithAuth';
+import { Navbar } from "@/components/layout/Navbar";
+import { BottomNavbar } from "@/components/layout/BottomNavbar";
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col">
-      <SiteHeaderWithAuth />
-      <main className="flex-1">{children}</main>
-    </div>
+    <>
+      <Navbar />
+      <main className="mb-16">{children}</main>
+      <BottomNavbar />
+    </>
   );
 }

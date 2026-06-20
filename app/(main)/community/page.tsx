@@ -1,29 +1,21 @@
+import { CreatePost } from "@/components/community/CreatePost";
+import { PostList } from "@/components/community/PostList";
+import { TrendingTopics } from "@/components/community/TrendingTopics";
 
-import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/PageHeader";
-import { Shell } from "@/components/shell";
-import { getFeed } from "@/lib/actions/feed";
-import { CreatePostDialog } from "@/components/community/CreatePostDialog";
-import { Feed } from "@/components/community/Feed";
-
-export default async function CommunityPage() {
-  const { data: initialPosts, error } = await getFeed(1, 10);
-
-  if (error) {
-    return <div>Error loading feed: {error}</div>;
-  }
-
+export default function CommunityPage() {
   return (
-    <Shell>
-      <PageHeader>
-        <PageHeaderHeading>Community Feed</PageHeaderHeading>
-        <PageHeaderDescription>
-          Connect with other farmers, ask questions, and share your knowledge.
-        </PageHeaderDescription>
-      </PageHeader>
-      <div className="flex justify-end mb-4">
-        <CreatePostDialog />
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-2">
+          <CreatePost />
+          <div className="mt-8">
+            <PostList />
+          </div>
+        </div>
+        <div>
+          <TrendingTopics />
+        </div>
       </div>
-      <Feed items={initialPosts || []} />
-    </Shell>
+    </div>
   );
 }

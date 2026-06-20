@@ -3,31 +3,34 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { PremiumLoginModal } from '@/components/PremiumLoginModal';
 
-type ModalContextType = {
+interface ModalContextType {
+  isPremiumModalOpen: boolean;
   showPremiumModal: () => void;
   hidePremiumModal: () => void;
-};
+}
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
 export const useModal = () => {
   const context = useContext(ModalContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useModal must be used within a ModalProvider');
   }
   return context;
 };
 
-export const ModalProvider = ({ children }: { children: ReactNode }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export function ModalProvider({ children }: { children: ReactNode }) {
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
 
-  const showPremiumModal = () => setIsModalOpen(true);
-  const hidePremiumModal = () => setIsModalOpen(false);
+  const showPremiumModal = () => setIsPremiumModalOpen(true);
+  const hidePremiumModal = () => setIsPremiumModalOpen(false);
 
   return (
-    <ModalContext.Provider value={{ showPremiumModal, hidePremiumModal }}>
+    <ModalContext.Provider
+      value={{ isPremiumModalOpen, showPremiumModal, hidePremiumModal }}
+    >
       {children}
-      <PremiumLoginModal isOpen={isModalOpen} onClose={hidePremiumModal} />
+      <PremiumLoginModal />
     </ModalContext.Provider>
   );
-};
+}

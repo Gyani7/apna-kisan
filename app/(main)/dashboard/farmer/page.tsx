@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import withAuthorization from '@/components/withAuthorization';
+import { UserRole } from "@/lib/types";
 
 // Placeholder for icons
 import { Bot, Users } from "lucide-react";
@@ -102,60 +103,60 @@ const CommunityWidget = () => (
 function FarmerDashboard() {
   return (
     <div className="p-4 md:p-8 space-y-8">
-      <WelcomeHeader />
+      {/* <WelcomeHeader /> */}
 
       {/* Section 1: At a Glance */}
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-4">At a Glance</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <MyFarmWidget />
-          </div>
-          <div className="space-y-6">
-            <AssistantWidget />
-            <CommunityWidget />
-          </div>
-        </div>
-      </div>
+      {/* <div> */}
+        {/* <h2 className="text-2xl font-bold tracking-tight mb-4">At a Glance</h2> */}
+        {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6"> */}
+          {/* <div className="lg:col-span-2"> */}
+            {/* <MyFarmWidget /> */}
+          {/* </div> */}
+          {/* <div className="space-y-6"> */}
+            {/* <AssistantWidget /> */}
+            {/* <CommunityWidget /> */}
+          {/* </div> */}
+        {/* </div> */}
+      {/* </div> */}
 
-      <Separator />
+      {/* <Separator /> */}
 
       {/* Section 2: Farm Intelligence */}
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-4">Farm Intelligence</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <WeatherCard />
-            <CropInsightsCard />
-        </div>
-        <div className="mt-6">
-            <CropIntelligence />
-        </div>
-      </div>
+      {/* <div> */}
+        {/* <h2 className="text-2xl font-bold tracking-tight mb-4">Farm Intelligence</h2> */}
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> */}
+            {/* <WeatherCard /> */}
+            {/* <CropInsightsCard /> */}
+        {/* </div> */}
+        {/* <div className="mt-6"> */}
+            {/* <CropIntelligence /> */}
+        {/* </div> */}
+      {/* </div> */}
 
-      <Separator />
+      {/* <Separator /> */}
 
       {/* Section 3: Market & Community Insights */}
-       <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-4">Market & Community</h2>
-        <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <MandiRatesCard />
-                <Marketplace />
-            </div>
-            <TopFarmerLeaderboard />
-        </div>
-      </div>
+       {/* <div> */}
+        {/* <h2 className="text-2xl font-bold tracking-tight mb-4">Market & Community</h2> */}
+        {/* <div className="space-y-6"> */}
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> */}
+                {/* <MandiRatesCard /> */}
+                {/* <Marketplace /> */}
+            {/* </div> */}
+            {/* <TopFarmerLeaderboard /> */}
+        {/* </div> */}
+      {/* </div> */}
 
-      <Separator />
+      {/* <Separator /> */}
 
       {/* Section 4: Village Analytics */}
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-4">Village View</h2>
-        <VillageIntelligence />
-      </div>
+      {/* <div> */}
+        {/* <h2 className="text-2xl font-bold tracking-tight mb-4">Village View</h2> */}
+        {/* <VillageIntelligence /> */}
+      {/* </div> */}
 
     </div>
   );
 }
 
-export default withAuthorization(FarmerDashboard, true);
+export default withAuthorization(FarmerDashboard, [UserRole.FARMER]);

@@ -11,7 +11,7 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { Heart, ShoppingCart, Trash2, Edit } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
-import { useModal } from '@/components/Providers';
+import { useModal } from './Providers';
 
 interface ProductCardProps {
   product: Product;

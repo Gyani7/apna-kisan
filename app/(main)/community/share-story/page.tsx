@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { getUser } from '@/lib/user';
-import { withAuthorization } from '@/components/withAuthorization';
+import withAuthorization from '@/components/withAuthorization';
+import { UserRole } from '@/lib/types';
 
 function ShareStoryPage() {
   const [content, setContent] = useState('');
@@ -93,4 +94,4 @@ function ShareStoryPage() {
   );
 }
 
-export default withAuthorization(ShareStoryPage, ['farmer', 'expert', 'buyer']);
+export default withAuthorization(ShareStoryPage, [UserRole.FARMER, UserRole.EXPERT, UserRole.BUYER]);

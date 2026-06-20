@@ -9,8 +9,9 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { getUser } from '@/lib/user';
-import { withAuthorization } from '@/components/withAuthorization';
+import withAuthorization from '@/components/withAuthorization';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserRole } from '@/lib/types';
 
 function EditProfilePage() {
   const [username, setUsername] = useState('');
@@ -139,4 +140,4 @@ function EditProfilePage() {
   );
 }
 
-export default withAuthorization(EditProfilePage, ['farmer', 'expert', 'buyer']);
+export default withAuthorization(EditProfilePage, [UserRole.FARMER, UserRole.EXPERT, UserRole.BUYER]);

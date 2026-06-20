@@ -7,9 +7,10 @@ import { useParams } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { withAuthorization } from '@/components/withAuthorization';
+import withAuthorization from '@/components/withAuthorization';
 import { ArrowLeft, Send } from 'lucide-react';
 import Link from 'next/link';
+import { UserRole } from '@/lib/types';
 
 function ConversationPage() {
   const [messages, setMessages] = useState<any[]>([]);
@@ -140,4 +141,4 @@ function ConversationPage() {
   );
 }
 
-export default withAuthorization(ConversationPage, ['farmer', 'expert', 'buyer']);
+export default withAuthorization(ConversationPage, [UserRole.FARMER, UserRole.EXPERT, UserRole.BUYER]);

@@ -1,34 +1,31 @@
-
-import { siteConfig } from '@/config/site';
-import { Logo } from '@/components/icons';
-
 export function Footer() {
   return (
-    <footer className="hidden border-t bg-background py-6 md:block md:py-0">
-      <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-        <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-          <Logo className="h-6 w-6" />
-          <p className="text-center text-sm leading-loose md:text-left">
-            Built by{" "}
-            <a
-              href={siteConfig.links.twitter}
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium underline underline-offset-4"
-            >
-              Apna Kisan
-            </a>
-            . The source code is available on{" "}
-            <a
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium underline underline-offset-4"
-            >
-              GitHub
-            </a>
-            .
-          </p>
+    <footer className="bg-gray-800 text-white py-8">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div>
+            <h3 className="font-bold mb-4">Apna Kisan</h3>
+            <p>India's Digital Agriculture Network</p>
+          </div>
+          <div>
+            <h3 className="font-bold mb-4">Quick Links</h3>
+            <ul>
+              <li><a href="/about">About Us</a></li>
+              <li><a href="/contact">Contact</a></li>
+              <li><a href="/faq">FAQ</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-bold mb-4">Legal</h3>
+            <ul>
+              <li><a href="/terms">Terms of Service</a></li>
+              <li><a href="/privacy">Privacy Policy</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-bold mb-4">Follow Us</h3>
+            {/* Social media links */}
+          </div>
         </div>
       </div>
     </footer>
