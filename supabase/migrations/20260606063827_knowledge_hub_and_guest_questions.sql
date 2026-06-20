@@ -1,5 +1,13 @@
 -- APNA KISAN V2.5 - Knowledge Hub & Public Community Migration
 -- Target: Supabase / PostgreSQL
+-- This script is now idempotent and can be re-run safely.
+
+-- 0. CLEANUP PREVIOUS FAILED MIGRATIONS
+DROP TABLE IF EXISTS public.questions CASCADE;
+DROP TABLE IF EXISTS public.answers CASCADE;
+DROP TABLE IF EXISTS public.answer_votes CASCADE;
+DROP TABLE IF EXISTS public.community_questions CASCADE;
+DROP FUNCTION IF EXISTS public.update_updated_at_column();
 
 -- 1. Create Questions Table
 CREATE TABLE IF NOT EXISTS public.questions (
@@ -9,7 +17,6 @@ CREATE TABLE IF NOT EXISTS public.questions (
     slug TEXT UNIQUE NOT NULL,
     content TEXT NOT NULL,
     tags TEXT[] DEFAULT '{}',
-    status TEXT NOT NULL DEFAULT 'published' CHECK (status IN ('pending', 'published', 'archived')),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -46,7 +53,10 @@ CREATE TABLE IF NOT EXISTS public.community_questions (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. Enable Row Level Security (RLS)
+-- 5. Add status column to questions table if it doesn't exist
+ALTER TABLE public.questions ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'published' CHECK (status IN ('pending', 'published', 'archived'));
+
+-- 6. Enable Row Level Security (RLS)
 ALTER TABLE public.questions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.answers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.answer_votes ENABLE ROW LEVEL SECURITY;
@@ -97,7 +107,7 @@ USING (
   )
 );
 
--- 6. Performance & SEO Indexing
+-- 7. Performance & SEO Indexing
 CREATE INDEX idx_questions_slug ON public.questions(slug);
 CREATE INDEX idx_questions_status ON public.questions(status);
 CREATE INDEX idx_answers_question_id ON public.answers(question_id);

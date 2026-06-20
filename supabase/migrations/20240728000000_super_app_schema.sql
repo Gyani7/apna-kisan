@@ -1,3 +1,26 @@
+-- This script is now idempotent and can be re-run safely.
+
+-- 0. CLEANUP PREVIOUS FAILED MIGRATIONS
+DROP TABLE IF EXISTS public.roles CASCADE;
+DROP TABLE IF EXISTS public.products CASCADE;
+DROP TABLE IF EXISTS public.orders CASCADE;
+DROP TABLE IF EXISTS public.order_items CASCADE;
+DROP TABLE IF EXISTS public.carts CASCADE;
+DROP TABLE IF EXISTS public.cart_items CASCADE;
+DROP TABLE IF EXISTS public.wishlists CASCADE;
+DROP TABLE IF EXISTS public.wishlist_items CASCADE;
+DROP TABLE IF EXISTS public.kyc_verifications CASCADE;
+DROP TABLE IF EXISTS public.notifications CASCADE;
+DROP TABLE IF EXISTS public.announcements CASCADE;
+DROP TABLE IF EXISTS public.subscriptions CASCADE;
+DROP TABLE IF EXISTS public.featured_listings CASCADE;
+DROP TABLE IF EXISTS public.advertisements CASCADE;
+DROP TABLE IF EXISTS public.chats CASCADE;
+DROP TABLE IF EXISTS public.chat_participants CASCADE;
+DROP TABLE IF EXISTS public.chat_messages CASCADE;
+DROP TABLE IF EXISTS public.crop_disease_detections CASCADE;
+DROP TYPE IF EXISTS public.user_role;
+
 -- Create the role type
 CREATE TYPE user_role AS ENUM ('super_admin', 'admin', 'farmer', 'buyer', 'expert');
 

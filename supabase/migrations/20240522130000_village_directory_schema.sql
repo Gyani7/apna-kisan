@@ -1,5 +1,22 @@
 -- APNA KISAN V2.3: VILLAGE DIRECTORY LAYER SCHEMA
--- This script establishes the hyper-local directory, linking farmers to villages and villages to markets.
+-- This script is now idempotent and can be re-run safely.
+
+-- ----------------------------------------
+-- 0. CLEANUP PREVIOUS FAILED MIGRATIONS
+-- ----------------------------------------
+
+-- Drop dependent columns and functions first.
+ALTER TABLE public.profiles DROP COLUMN IF EXISTS village_id;
+DROP FUNCTION IF EXISTS public.get_village_farmer_count(UUID);
+
+-- Drop tables, using CASCADE to handle dependencies.
+-- The ALTER for fk_nearby_mandi is not needed because CASCADE handles it.
+DROP TABLE IF EXISTS public.mandi_rates CASCADE;
+DROP TABLE IF EXISTS public.mandis CASCADE;
+DROP TABLE IF EXISTS public.villages CASCADE;
+DROP TABLE IF EXISTS public.blocks CASCADE;
+DROP TABLE IF EXISTS public.districts CASCADE;
+DROP TABLE IF EXISTS public.states CASCADE;
 
 -- ----------------------------------------
 -- 1. GEOGRAPHIC HIERARCHY TABLES
@@ -112,22 +129,17 @@ ALTER TABLE public.mandis ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.mandi_rates ENABLE ROW LEVEL SECURITY;
 
 -- Public read-only access for all directory and market data.
-CREATE POLICY "Geographic and Market data is public." ON public.states FOR SELECT USING (true);
-CREATE POLICY "Geographic and Market data is public." ON public.districts FOR SELECT USING (true);
-CREATE POLICY "Geographic and Market data is public." ON public.blocks FOR SELECT USING (true);
-CREATE POLICY "Geographic and Market data is public." ON public.villages FOR SELECT USING (true);
-CREATE POLICY "Geographic and Market data is public." ON public.mandis FOR SELECT USING (true);
-CREATE POLICY "Geographic and Market data is public." ON public.mandi_rates FOR SELECT USING (true);
+CREATE POLICY "Geographic and Market data is public on states." ON public.states FOR SELECT USING (true);
+CREATE POLICY "Geographic and Market data is public on districts." ON public.districts FOR SELECT USING (true);
+CREATE POLICY "Geographic and Market data is public on blocks." ON public.blocks FOR SELECT USING (true);
+CREATE POLICY "Geographic and Market data is public on villages." ON public.villages FOR SELECT USING (true);
+CREATE POLICY "Geographic and Market data is public on mandis." ON public.mandis FOR SELECT USING (true);
+CREATE POLICY "Geographic and Market data is public on mandi_rates." ON public.mandi_rates FOR SELECT USING (true);
 
 -- Admin override for all operations.
-CREATE POLICY "Admins have full access." ON public.states FOR ALL USING (public.is_admin(auth.uid()));
-CREATE POLICY "Admins have full access." ON public.districts FOR ALL USING (public.is_admin(auth.uid()));
-CREATE POLICY "Admins have full access." ON public.blocks FOR ALL USING (public.is_admin(auth.uid()));
-CREATE POLICY "Admins have full access." ON public.villages FOR ALL USING (public.is_admin(auth.uid()));
-CREATE POLICY "Admins have full access." ON public.mandis FOR ALL USING (public.is_admin(auth.uid()));
-CREATE POLICY "Admins have full access." ON public.mandi_rates FOR ALL USING (public.is_admin(auth.uid()));
-
--- Restrict write access on villages to verified residents (future).
--- For now, writes are admin-only. A trigger or function will be needed to validate residency for user updates.
--- e.g., CREATE POLICY "Verified residents can update their village details." ON public.villages FOR UPDATE
--- USING (auth.uid() IN (SELECT user_id FROM verified_residents WHERE village_id = id));
+CREATE POLICY "Admins have full access on states" ON public.states FOR ALL USING (public.is_admin(auth.uid()));
+CREATE POLICY "Admins have full access on districts" ON public.districts FOR ALL USING (public.is_admin(auth.uid()));
+CREATE POLICY "Admins have full access on blocks" ON public.blocks FOR ALL USING (public.is_admin(auth.uid()));
+CREATE POLICY "Admins have full access on villages" ON public.villages FOR ALL USING (public.is_admin(auth.uid()));
+CREATE POLICY "Admins have full access on mandis" ON public.mandis FOR ALL USING (public.is_admin(auth.uid()));
+CREATE POLICY "Admins have full access on mandi_rates" ON public.mandi_rates FOR ALL USING (public.is_admin(auth.uid()));

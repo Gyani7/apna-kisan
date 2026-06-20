@@ -1,7 +1,27 @@
 -- APNA KISAN V2.8: Enterprise Edge Video Layer
 -- MIGRATION SCRIPT: Create tables and RPCs for reel interactions.
+-- This script is now idempotent and can be re-run safely.
 
--- 1. Create the reel_likes table
+-- 0. CLEANUP PREVIOUS FAILED MIGRATIONS
+DROP TABLE IF EXISTS public.reels CASCADE;
+DROP TABLE IF EXISTS public.reel_likes CASCADE;
+DROP TABLE IF EXISTS public.reel_comments CASCADE;
+DROP FUNCTION IF EXISTS public.toggle_reel_like(UUID, UUID);
+DROP FUNCTION IF EXISTS public.add_reel_comment(UUID, UUID, TEXT);
+
+-- 1. Create the reels table
+CREATE TABLE public.reels (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  video_url text NOT NULL,
+  thumbnail_url text,
+  caption text,
+  likes_count integer DEFAULT 0,
+  comments_count integer DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
+-- 2. Create the reel_likes table
 -- This table uses a composite primary key to natively prevent duplicate likes.
 CREATE TABLE public.reel_likes (
   reel_id UUID NOT NULL REFERENCES public.reels(id) ON DELETE CASCADE,
@@ -17,7 +37,7 @@ CREATE INDEX idx_reel_likes_user_id ON public.reel_likes(user_id);
 COMMENT ON TABLE public.reel_likes IS 'Tracks user likes on individual reels. Composite PK ensures a user can only like a reel once.';
 
 
--- 2. Create the reel_comments table
+-- 3. Create the reel_comments table
 -- Linked with foreign keys for data integrity and cascading deletes.
 CREATE TABLE public.reel_comments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -33,7 +53,7 @@ CREATE INDEX idx_reel_comments_reel_id_created_at ON public.reel_comments(reel_i
 COMMENT ON TABLE public.reel_comments IS 'Stores comments made by users on reels.';
 
 
--- 3. Create RPC function to atomically toggle a like and update the count
+-- 4. Create RPC function to atomically toggle a like and update the count
 -- This prevents race conditions and keeps the likes_count synchronized.
 CREATE OR REPLACE FUNCTION toggle_reel_like(p_reel_id UUID, p_user_id UUID)
 RETURNS JSONB
@@ -72,7 +92,7 @@ $$;
 
 COMMENT ON FUNCTION toggle_reel_like(UUID, UUID) IS 'Atomically adds or removes a like from a reel and updates the total likes_count.';
 
--- 4. Create RPC function to atomically add a comment and update the count
+-- 5. Create RPC function to atomically add a comment and update the count
 CREATE OR REPLACE FUNCTION add_reel_comment(p_reel_id UUID, p_user_id UUID, p_content TEXT)
 RETURNS VOID
 LANGUAGE plpgsql

@@ -1,21 +1,25 @@
 -- APNA KISAN V2.5: INITIAL SCHEMA MIGRATION
--- This script sets up the core tables, relationships, and security policies.
+-- This script is now idempotent and can be re-run safely.
 
 -- ----------------------------------------
--- 1. HELPER FUNCTIONS
+-- 0. CLEANUP PREVIOUS FAILED MIGRATIONS
 -- ----------------------------------------
 
--- Helper function to check if a user is an admin. To be used in RLS policies.
-CREATE OR REPLACE FUNCTION public.is_admin(user_id uuid)
-RETURNS boolean AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM profiles WHERE profiles.id = user_id AND profiles.role = 'admin'
-  );
-$$ LANGUAGE sql SECURITY DEFINER;
+-- Drop dependent functions and triggers first.
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user();
+DROP FUNCTION IF EXISTS public.is_admin(uuid);
 
+-- Drop tables, cascading to policies, etc.
+DROP TABLE IF EXISTS public.profiles CASCADE;
+DROP TABLE IF EXISTS public.questions CASCADE;
+DROP TABLE IF EXISTS public.answers CASCADE;
+DROP TABLE IF EXISTS public.answer_votes CASCADE;
+DROP TABLE IF EXISTS public.community_questions CASCADE;
+DROP TABLE IF EXISTS public.verification_requests CASCADE;
 
 -- ----------------------------------------
--- 2. PROFILES & USER MANAGEMENT
+-- 1. PROFILES & USER MANAGEMENT
 -- ----------------------------------------
 
 -- Create the profiles table to store public-facing user data and app-specific attributes.
@@ -58,6 +62,18 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- ----------------------------------------
+-- 2. HELPER FUNCTIONS
+-- ----------------------------------------
+
+-- Helper function to check if a user is an admin. To be used in RLS policies.
+CREATE OR REPLACE FUNCTION public.is_admin(user_id uuid)
+RETURNS boolean AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM profiles WHERE profiles.id = user_id AND profiles.role = 'admin'
+  );
+$$ LANGUAGE sql SECURITY DEFINER;
 
 
 -- ----------------------------------------
@@ -149,18 +165,22 @@ CREATE POLICY "Admins can manage all profiles." ON public.profiles FOR ALL USING
 -- Questions RLS
 CREATE POLICY "Questions are viewable by everyone." ON public.questions FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can insert questions." ON public.questions FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Users can update and delete their own questions." ON public.questions FOR (UPDATE, DELETE) USING (auth.uid() = user_id);
+CREATE POLICY "Users can update their own questions." ON public.questions FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own questions." ON public.questions FOR DELETE USING (auth.uid() = user_id);
 CREATE POLICY "Admins can manage all questions." ON public.questions FOR ALL USING (public.is_admin(auth.uid()));
 
 -- Answers RLS
 CREATE POLICY "Answers are viewable by everyone." ON public.answers FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can insert answers." ON public.answers FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Users can update and delete their own answers." ON public.answers FOR (UPDATE, DELETE) USING (auth.uid() = user_id);
+CREATE POLICY "Users can update their own answers." ON public.answers FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own answers." ON public.answers FOR DELETE USING (auth.uid() = user_id);
 CREATE POLICY "Admins can manage all answers." ON public.answers FOR ALL USING (public.is_admin(auth.uid()));
 
 -- Answer Votes RLS
 CREATE POLICY "Answer votes are viewable by everyone." ON public.answer_votes FOR SELECT USING (true);
-CREATE POLICY "Authenticated users can insert and modify their own votes." ON public.answer_votes FOR (INSERT, UPDATE, DELETE) USING (auth.uid() = user_id);
+CREATE POLICY "Authenticated users can insert their own votes." ON public.answer_votes FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Authenticated users can update their own votes." ON public.answer_votes FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Authenticated users can delete their own votes." ON public.answer_votes FOR DELETE USING (auth.uid() = user_id);
 CREATE POLICY "Admins can manage all votes." ON public.answer_votes FOR ALL USING (public.is_admin(auth.uid()));
 
 -- Community Questions RLS (Guests cannot write directly; this is for admins)
@@ -168,7 +188,8 @@ CREATE POLICY "Approved community questions are public." ON public.community_que
 CREATE POLICY "Admins can manage community questions." ON public.community_questions FOR ALL USING (public.is_admin(auth.uid()));
 
 -- Verification Requests RLS (Highly restricted)
-CREATE POLICY "Users can view and create their own verification requests." ON public.verification_requests FOR (SELECT, INSERT) USING (auth.uid() = user_id);
+CREATE POLICY "Users can view their own verification requests." ON public.verification_requests FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can create their own verification requests." ON public.verification_requests FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Admins can manage all verification requests." ON public.verification_requests FOR ALL USING (public.is_admin(auth.uid()));
 
 
@@ -185,14 +206,3 @@ INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', tru
 
 -- Bucket for private verification documents.
 INSERT INTO storage.buckets (id, name, public) VALUES ('verification-docs', 'verification-docs', false) ON CONFLICT (id) DO NOTHING;
-
--- Storage RLS policies need to be created separately in the Supabase Dashboard
--- Example Policy for Avatars (on storage.objects):
--- Allow public read access: `FOR SELECT USING ( bucket_id = 'avatars' )`
--- Allow authenticated users to upload their own avatar: `FOR INSERT WITH CHECK ( bucket_id = 'avatars' AND auth.uid() = owner )`
-
--- Example Policy for Verification Docs (on storage.objects):
--- Deny all public access.
--- Allow users to upload to their own folder: `FOR INSERT WITH CHECK ( bucket_id = 'verification-docs' AND auth.uid() = owner )`
--- Allow admins to read all documents: `FOR SELECT USING ( bucket_id = 'verification-docs' AND public.is_admin(auth.uid()) )`
-
