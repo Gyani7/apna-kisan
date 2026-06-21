@@ -1,4 +1,3 @@
-'''
 "use client";
 
 import { useRef, useEffect } from 'react';
@@ -72,4 +71,3 @@ export function ReelsPlayer({ reels }: ReelsPlayerProps) {
         </div>
     );
 }
-'''
