@@ -11,6 +11,7 @@ import { Footer } from '@/components/layout/Footer';
 import Head from 'next/head';
 import SessionProviderWrapper from './session-provider';
 import { GuestProvider } from './guest-provider';
+import 'geist/font/sans';
 
 
 const inter = Inter({ subsets: ['latin'] });

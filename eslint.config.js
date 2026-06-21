@@ -1,30 +1,39 @@
-const typescriptParser = require('@typescript-eslint/parser');
-const typescriptPlugin = require('@typescript-eslint/eslint-plugin');
-const nextPlugin = require('@next/eslint-plugin-next');
-const jsxA11yPlugin = require('eslint-plugin-jsx-a11y');
+
+const { FlatCompat } = require("@eslint/eslintrc");
+const nxEslintPlugin = require("@nx/eslint-plugin");
+const js = require("@eslint/js");
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+});
 
 module.exports = [
   {
-    files: ['**/*.{ts,tsx,js,jsx}'],
-    languageOptions: {
-      parser: typescriptParser,
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
-    },
     plugins: {
-      '@typescript-eslint': typescriptPlugin,
-      '@next/next': nextPlugin,
-      'jsx-a11y': jsxA11yPlugin,
+      "@nx": nxEslintPlugin,
     },
+  },
+  ...compat.config({
+    extends: [
+      "plugin:@nx/typescript",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:react/recommended",
+      "plugin:react-hooks/recommended",
+      "plugin:@next/next/recommended",
+    ],
     rules: {
-      ...typescriptPlugin.configs.recommended.rules,
-      ...nextPlugin.configs.recommended.rules,
-      ...nextPlugin.configs['core-web-vitals'].rules,
-      ...jsxA11yPlugin.configs.recommended.rules,
-      "@next/next/no-img-element": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "react/react-in-jsx-scope": "off",
+      "react/prop-types": "off",
     },
+  }),
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    rules: {},
+  },
+  {
+    files: ["**/*.js", "**/*.jsx"],
+    rules: {},
   },
 ];
