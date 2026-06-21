@@ -25,7 +25,7 @@ const topFarmers = [
   // Add more mock data here...
 ];
 
-export function FarmerLeaderboard() {
+export function FarmerLeaderboard({ villageId }: { villageId?: string }) {
   return (
     <Card className="bg-gray-800/50 text-white backdrop-blur-sm mt-4">
       <CardHeader>

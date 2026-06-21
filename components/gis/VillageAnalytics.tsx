@@ -2,7 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export function VillageAnalytics() {
+interface VillageAnalyticsProps {
+  villageId?: string;
+}
+
+export function VillageAnalytics({ villageId }: VillageAnalyticsProps) {
   // Mock data for a single village
   const villageData = {
     name: 'Anandpur',

@@ -32,11 +32,11 @@ const marketData = {
 const TrendIcon = ({ trend }: { trend: string }) => 
   trend === 'up' ? <TrendingUp className="w-4 h-4 text-green-500" /> : <TrendingDown className="w-4 h-4 text-red-500" />;
 
-export function MarketIntelligence() {
+export function MarketIntelligence({ district }: { district?: string }) {
   return (
     <Card className="bg-gray-800/50 text-white backdrop-blur-sm">
       <CardHeader>
-        <CardTitle>Market Intelligence</CardTitle>
+        <CardTitle>Market Intelligence {district ? `- ${district}` : ''}</CardTitle>
       </CardHeader>
       <CardContent>
 

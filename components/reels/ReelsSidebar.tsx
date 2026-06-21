@@ -1,8 +1,13 @@
 import { Button } from "@/components/ui/button";
+import type { Reel } from "@/lib/types";
 
-export function ReelsSidebar() {
-    // Mock data
-    const stats = { likes: 123, comments: 45, shares: 67 };
+interface ReelsSidebarProps {
+  reel: Reel;
+}
+
+export function ReelsSidebar({ reel }: ReelsSidebarProps) {
+  // Mock data or use reel stats if available in the type
+  const stats = { likes: 123, comments: 45, shares: 67 };
 
   return (
     <div className="flex flex-col space-y-4">

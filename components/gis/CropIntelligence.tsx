@@ -2,7 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CropRotation } from "./CropRotation";
 import { PestControl } from "./PestControl";
 
-export function CropIntelligence() {
+interface CropIntelligenceProps {
+  villageId?: string;
+}
+
+export function CropIntelligence({ villageId }: CropIntelligenceProps) {
   return (
     <Card>
       <CardHeader>
