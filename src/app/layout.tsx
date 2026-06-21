@@ -1,4 +1,3 @@
-
 import '../styles/globals.css';
 import { Inter } from 'next/font/google';
 import { GeistSans } from 'geist/font/sans';
@@ -8,13 +7,16 @@ import { ModalProvider } from '@/components/Providers';
 import { Header } from '@/components/layout/Header';
 import { BottomNavbar } from '@/components/layout/BottomNavbar';
 import { Footer } from '@/components/layout/Footer';
-import Head from 'next/head';
 import SessionProviderWrapper from './session-provider';
 import { GuestProvider } from './guest-provider';
+import AuthProvider from '@/components/AuthProvider';
 import 'geist/font/sans';
 
-
 const inter = Inter({ subsets: ['latin'] });
+
+export const metadata = {
+  manifest: '/manifest.json',
+};
 
 export default function RootLayout({
   children,
@@ -23,28 +25,29 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={cn('font-sans', GeistSans.variable)}>
-      <Head>
-        <link rel="manifest" href="/manifest.json" />
+      <head>
         <link
           rel="stylesheet"
           href="https://unpkg.com/mappls-gl/dist/mappls-gl.css"
         />
-      </Head>
+      </head>
       <body className={cn(inter.className, "pb-16 md:pb-0")}>
         <SessionProviderWrapper>
           <GuestProvider>
-            <ModalProvider>
+            <AuthProvider>
+              <ModalProvider>
                 <div className="relative flex min-h-screen flex-col">
                   <Header />
                   <main className="flex-1">{children}</main>
                   <Footer />
                 </div>
                 <BottomNavbar />
-              <Toaster />
-            </ModalProvider>
+                <Toaster />
+              </ModalProvider>
+            </AuthProvider>
           </GuestProvider>
         </SessionProviderWrapper>
-        <script src="https://unpkg.com/mappls-gl/dist/mappls-gl.js"></script>
+        <script src="https://unpkg.com/mappls-gl/dist/mappls-gl.js" defer></script>
       </body>
     </html>
   );
