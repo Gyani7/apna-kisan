@@ -1,18 +1,41 @@
 
-'use client';
-import { MainNav } from '@/components/MainNav';
-import { UserNav } from '@/components/common/UserNav';
+import { siteConfig } from "@/config/site";
+import { cn } from "@/lib/utils";
+import { MainNav } from "@/components/MainNav";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { buttonVariants } from "@/components/ui/button";
+import { Icons } from "@/components/icons";
+import Link from "next/link";
 
-export default function Header() {
-
+export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur-sm">
-        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-            <MainNav />
-            <div className="flex flex-1 items-center justify-end space-x-4">
-                <UserNav />
-            </div>
+    <header className="supports-backdrop-blur:bg-background/60 sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">
+      <div className="container flex h-16 items-center">
+        <MainNav />
+        <div className="flex flex-1 items-center justify-end space-x-4">
+          <nav className="flex items-center space-x-2">
+            <Link
+              href={siteConfig.links.github}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <div
+                className={cn(
+                  buttonVariants({
+                    size: "sm",
+                    variant: "ghost",
+                  }),
+                  "w-9 px-0"
+                )}
+              >
+                <Icons.github className="h-5 w-5" />
+                <span className="sr-only">GitHub</span>
+              </div>
+            </Link>
+            <ThemeToggle />
+          </nav>
         </div>
+      </div>
     </header>
   );
 }
