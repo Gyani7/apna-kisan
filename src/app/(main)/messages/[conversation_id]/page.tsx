@@ -1,10 +1,11 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/icons';
+import { Icons } from '@/components/icons';
 import { toast } from '@/components/ui/use-toast';
 
 export default function ConversationPage({ params }: { params: { conversation_id: string } }) {
@@ -109,7 +110,7 @@ export default function ConversationPage({ params }: { params: { conversation_id
           onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
         />
         <Button onClick={handleSendMessage} disabled={isLoading}>
-          {isLoading ? <Spinner className="h-4 w-4 animate-spin" /> : 'Send'}
+          {isLoading ? <Icons.spinner className="h-4 w-4 animate-spin" /> : 'Send'}
         </Button>
       </div>
     </div>

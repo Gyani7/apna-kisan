@@ -1,50 +1,37 @@
+
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Users, SquarePen as PenSquare, Compass, User } from 'lucide-react';
-import clsx from 'clsx';
+import Link from 'next/link';
+import { siteConfig } from '@/config/site';
+import { Icons } from '@/components/icons';
+import { cn } from '@/lib/utils';
 
-const NAV_ITEMS = [
-  { label: 'Home', href: '/', icon: Home },
-  { label: 'Community', href: '/community', icon: Users },
-  { label: 'Write', href: '/create', icon: PenSquare, isAction: true },
-  { label: 'Explore', href: '/explore', icon: Compass },
-  { label: 'Profile', href: '/profile', icon: User },
-];
-
-export default function BottomNav() {
+export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 dark:border-gray-700 glass safe-bottom">
-      <div className="max-w-lg mx-auto px-2">
-        <div className="flex items-center justify-around h-16">
-          {NAV_ITEMS.map(({ label, href, icon: Icon, isAction }) => {
-            const isActive = pathname === href;
-
-            if (isAction) {
-              return (
-                <Link key={href} href={href} aria-label={label} className="relative -mt-5">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 shadow-xl flex items-center justify-center active:scale-95 transition-all duration-200">
-                    <Icon size={24} className="text-white" />
-                  </div>
-                </Link>
-              );
-            }
-
-            return (
-              <Link key={href} href={href} aria-label={label} className="flex flex-col items-center justify-center flex-1 py-1 relative">
-                {isActive && <span className="absolute top-0 w-10 h-1 rounded-full bg-brand-600" />}
-                <Icon size={22} className={clsx('transition-all duration-200', isActive ? 'text-brand-600 scale-110' : 'text-gray-400 dark:text-gray-500')} />
-                <span className={clsx('text-[11px] font-medium mt-1 transition-colors', isActive ? 'text-brand-600' : 'text-gray-400 dark:text-gray-500')}>
-                  {label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
+    <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background/80 backdrop-blur-sm border-t border-border/40">
+      <div className="grid h-full max-w-lg grid-cols-5 mx-auto font-medium">
+        {siteConfig.mainNav.map((item) => {
+          const Icon = Icons[item.icon as keyof typeof Icons];
+          return (
+            <Link
+              key={item.title}
+              href={item.href}
+              className={cn(
+                'inline-flex flex-col items-center justify-center px-5 hover:bg-muted/50 group',
+                pathname === item.href
+                  ? 'text-primary'
+                  : 'text-muted-foreground'
+              )}
+            >
+              <Icon className="w-6 h-6 mb-1" />
+              <span className="text-xs font-medium tracking-wide">{item.title}</span>
+            </Link>
+          );
+        })}
       </div>
-    </nav>
+    </div>
   );
 }

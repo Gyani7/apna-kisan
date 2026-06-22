@@ -1,9 +1,12 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { Sun, Droplets, TrendingUp, TrendingDown, Trophy, ArrowUpRight } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from '@/components/ui/button';
+import { Icons } from '@/components/icons';
 import { createBrowserClient } from '@/lib/supabase/client';
 import type { MandiRateRow, ProfileRow } from '@/lib/database.types';
 
@@ -44,80 +47,83 @@ export default function RightSidebar() {
   }, []);
 
   return (
-    <aside className="hidden xl:flex flex-col gap-4 w-72 shrink-0 sticky top-20">
+    <aside className="hidden xl:flex flex-col gap-6 w-80 shrink-0 sticky top-24">
       {/* Weather */}
-      <div className="bg-gradient-to-br from-brand-600 to-brand-700 dark:from-brand-800 dark:to-brand-900 rounded-2xl p-4 text-white">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <p className="text-xs text-brand-200 font-medium">{WEATHER_DATA.location}</p>
-            <div className="flex items-end gap-1 mt-1">
-              <span className="text-4xl font-bold">{WEATHER_DATA.temp}&deg;</span>
-              <span className="text-sm text-brand-200 mb-1">C</span>
-            </div>
-            <p className="text-sm text-brand-100">{WEATHER_DATA.condition}</p>
-          </div>
-          <Sun size={48} className="text-yellow-300 opacity-90" />
-        </div>
-        <div className="flex items-center gap-1 text-brand-200 text-xs mt-2">
-          <Droplets size={12} />
-          <span>Humidity: {WEATHER_DATA.humidity}%</span>
-        </div>
-      </div>
+       <Card className="glass-card">
+            <CardHeader>
+                <CardTitle className="text-primary flex items-center justify-between">
+                    <span>Weather</span>
+                    <Icons.weather className="w-6 h-6 text-secondary" />
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+                <p className="text-lg text-muted-foreground">{WEATHER_DATA.location}</p>
+                <p className="text-6xl font-bold text-primary my-2">{WEATHER_DATA.temp}°C</p>
+                <p className="text-md text-muted-foreground">{WEATHER_DATA.condition}</p>
+                <p className="text-sm text-muted-foreground/80 mt-4">Humidity: {WEATHER_DATA.humidity}%</p>
+            </CardContent>
+        </Card>
 
       {/* Mandi Bhav */}
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Mandi Bhav</h3>
-          <Link href="/explore" className="text-xs text-brand-600 dark:text-brand-400 font-medium flex items-center gap-0.5 hover:underline">Sab dekhen <ArrowUpRight size={12} /></Link>
-        </div>
-        <div className="flex flex-col gap-2.5">
+      <Card className="glass-card">
+        <CardHeader>
+            <CardTitle className="text-primary flex items-center justify-between">
+                <span>Mandi Prices</span>
+                 <Link href="/explore" className="text-sm font-medium text-secondary hover:underline flex items-center gap-1">
+                    View All <Icons.arrowUpRight size={16} />
+                </Link>
+            </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
           {rates.slice(0, 4).map((rate) => (
-            <div key={rate.id} className="flex items-center justify-between">
+            <div key={rate.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-primary/5">
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{rate.commodity}</p>
-                <p className="text-[11px] text-gray-400">{rate.mandi}, {rate.state}</p>
+                <p className="font-semibold text-foreground">{rate.commodity}</p>
+                <p className="text-xs text-muted-foreground">{rate.mandi}, {rate.state}</p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">&₹{rate.price.toLocaleString()}</p>
-                <span className={`text-[11px] font-medium flex items-center gap-0.5 justify-end ${rate.change_percent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
-                  {rate.change_percent >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                <p className="font-bold text-primary">&₹{rate.price.toLocaleString()}</p>
+                <span className={`text-xs font-medium flex items-center gap-1 justify-end ${rate.change_percent >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {rate.change_percent >= 0 ? <Icons.trendingUp size={12} /> : <Icons.trendingDown size={12} />}
                   {Math.abs(rate.change_percent)}%
                 </span>
               </div>
             </div>
           ))}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Leaderboard */}
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Top Kisans</h3>
-          <Trophy size={16} className="text-earth-500" />
-        </div>
-        <div className="flex flex-col gap-2.5">
+      <Card className="glass-card">
+        <CardHeader>
+             <CardTitle className="text-primary flex items-center justify-between">
+                <span>Top Farmers</span>
+                <Icons.award className="w-6 h-6 text-secondary" />
+            </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
           {leaders.length === 0 && (
-            <p className="text-xs text-gray-400 text-center py-4">Leaderboard jald banega</p>
+            <p className="text-sm text-muted-foreground text-center py-4">Leaderboard is being prepared!</p>
           )}
           {leaders.map((leader, i) => (
-            <Link key={leader.id} href={`/profile/${leader.id}`} className="flex items-center justify-between group">
-              <div className="flex items-center gap-2.5">
-                <span className={`w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center ${i === 0 ? 'bg-earth-400 text-white' : i === 1 ? 'bg-gray-300 text-white' : i === 2 ? 'bg-soil-400 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>{i + 1}</span>
-                {leader.avatar_url ? (
-                  <Image src={leader.avatar_url} alt="" width={32} height={32} className="rounded-full object-cover" />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white text-[10px] font-bold">{(leader.full_name ?? leader.username)[0]}</div>
-                )}
-                <div>
-                  <p className="text-xs font-semibold text-gray-900 dark:text-gray-100 leading-tight group-hover:underline">{leader.full_name ?? leader.username}</p>
-                  <p className="text-[11px] text-gray-400">{leader.reputation} pts</p>
+            <Link key={leader.id} href={`/profile/${leader.id}`} className="flex items-center justify-between group p-2 rounded-lg hover:bg-primary/5">
+                <div className="flex items-center gap-3">
+                     <Avatar className="h-10 w-10 border-2 border-secondary">
+                        <AvatarImage src={leader.avatar_url!} alt={leader.full_name ?? leader.username!} />
+                        <AvatarFallback>{(leader.full_name ?? leader.username!)[0]}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <p className="font-semibold text-foreground group-hover:text-primary transition-colors">{leader.full_name ?? leader.username}</p>
+                        <p className="text-sm text-muted-foreground">{leader.reputation} XP</p>
+                    </div>
                 </div>
-              </div>
-              <span className="badge bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">{leader.badge}</span>
+                 <span className={`font-bold text-lg ${i === 0 ? 'text-yellow-500' : i === 1 ? 'text-slate-400' : i === 2 ? 'text-orange-400' : 'text-muted-foreground'}`}>
+                    #{i + 1}
+                </span>
             </Link>
           ))}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </aside>
   );
 }

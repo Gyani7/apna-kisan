@@ -1,7 +1,8 @@
 import { createServerClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { MainNav } from '@/components/MainNav';
-import { UserNav } from '@/components/common/UserNav';
+import Header from '@/components/Header';
+import { LeftSidebar } from '@/components/LeftSidebar';
+import RightSidebar from '@/components/RightSidebar';
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   const supabase = createServerClient();
@@ -12,12 +13,15 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <div className="flex flex-col h-screen">
-      <header className="flex h-16 items-center justify-between px-4 border-b">
-        <MainNav />
-        <UserNav />
-      </header>
-      <main className="flex-1 overflow-y-auto">{children}</main>
+    <div className="min-h-screen bg-background font-sans antialiased">
+      <Header />
+       <div className="container mx-auto grid grid-cols-1 md:grid-cols-[256px_1fr] lg:grid-cols-[256px_1fr_320px] gap-6 px-4 py-6">
+        <LeftSidebar />
+        <main className="-mx-4 md:mx-0">
+          {children}
+        </main>
+        <RightSidebar />
+      </div>
     </div>
   );
 }

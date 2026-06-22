@@ -1,52 +1,49 @@
+
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Users, SquarePen as PenSquare, Compass, User, Moon, Sun } from 'lucide-react';
-import clsx from 'clsx';
-import { useTheme } from 'next-themes';
-import { CATEGORIES } from '@/lib/config';
+import { siteConfig } from '@/config/site';
+import { cn } from '@/lib/utils';
+import { Icons } from '@/components/icons';
+import { Button } from '@/components/ui/button';
 
-const NAV = [
-  { label: 'Home', href: '/', icon: Home },
-  { label: 'Community', href: '/community', icon: Users },
-  { label: 'Write', href: '/create', icon: PenSquare },
-  { label: 'Explore', href: '/explore', icon: Compass },
-  { label: 'Profile', href: '/profile', icon: User },
-];
-
-export default function LeftSidebar() {
+export function LeftSidebar() {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
 
   return (
-    <aside className="hidden lg:flex flex-col gap-1 w-56 shrink-0 sticky top-20">
-      {NAV.map(({ label, href, icon: Icon }) => (
-        <Link key={href} href={href} className={clsx(
-          'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
-          pathname === href ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-        )}>
-          <Icon size={20} />
-          <span>{label}</span>
-        </Link>
-      ))}
-
-      <hr className="my-2 border-gray-200 dark:border-gray-700" />
-
-      <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Categories</p>
-      {CATEGORIES.slice(0, 6).map((cat) => (
-        <Link key={cat.slug} href={`/category/${cat.slug}`} className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-          <span className="text-base">{cat.icon}</span>
-          <span>{cat.nameHi}</span>
-        </Link>
-      ))}
-
-      <hr className="my-2 border-gray-200 dark:border-gray-700" />
-
-      <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-        <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
-      </button>
-    </aside>
+    <div className="hidden md:flex flex-col w-64 shrink-0 sticky top-0 h-screen ">
+      <div className="flex items-center h-20 px-6">
+        <Icons.logo />
+        <span className="ml-3 text-xl font-bold text-primary">{siteConfig.name}</span>
+      </div>
+      <nav className="flex-1 px-4 py-4 space-y-3">
+        {siteConfig.sidebarNav.map((item) => {
+          const Icon = Icons[item.icon as keyof typeof Icons];
+          const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+          return (
+            <Link
+              key={item.title}
+              href={item.href}
+              className={cn(
+                'flex items-center px-4 py-3 text-base font-semibold rounded-lg transition-all duration-200',
+                isActive
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+              )}
+            >
+              <Icon className={cn("w-6 h-6 mr-4", isActive ? "text-primary" : "text-muted-foreground/80")} />
+              <span>{item.title}</span>
+            </Link>
+          );
+        })}
+      </nav>
+       <div className="px-4 py-6">
+            <Button size="lg" className="w-full premium-button rounded-full">
+                <Icons.add className="w-5 h-5 mr-2" />
+                Create Post
+            </Button>
+        </div>
+    </div>
   );
 }

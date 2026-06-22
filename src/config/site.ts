@@ -14,68 +14,79 @@ export const siteConfig = {
     {
       title: "Home",
       href: "/",
-    },
-    {
-      title: "Marketplace",
-      href: "/market",
+      icon: "home",
     },
     {
       title: "Community",
       href: "/community",
+      icon: "community",
     },
     {
-      title: "Dashboard",
-      href: "/dashboard/farmer",
+      title: "Reels",
+      href: "/reels",
+      icon: "reels",
+    },
+    {
+      title: "AI",
+      href: "/ai-assistant",
+      icon: "ai",
+    },
+    {
+      title: "Profile",
+      href: "/profile",
+      icon: "profile",
     },
   ],
   sidebarNav: [
     {
-      title: "Farmer",
-      items: [
-        {
-          title: "My Products",
-          href: "/dashboard/farmer/products",
-        },
-        {
-          title: "Sell Product",
-          href: "/dashboard/farmer/products/new",
-        },
-        {
-          title: "Orders",
-          href: "/dashboard/farmer/orders",
-        },
-        {
-          title: "Analytics",
-          href: "/dashboard/farmer/analytics",
-        },
-        {
-          title: "Settings",
-          href: "/dashboard/farmer/settings",
-        },
-      ],
+      title: "Home",
+      href: "/",
+      icon: "home",
     },
     {
-      title: "Buyer",
-      items: [
-        {
-          title: "Browse Products",
-          href: "/market",
-        },
-        {
-          title: "My Orders",
-          href: "/dashboard/buyer/orders",
-        },
-        {
-          title: "Wishlist",
-          href: "/dashboard/buyer/wishlist",
-        },
-        {
-          title: "Settings",
-          href: "/dashboard/buyer/settings",
-        },
-      ],
+      title: "Weather",
+      href: "/weather",
+      icon: "weather",
+    },
+    {
+      title: "Community",
+      href: "/community",
+      icon: "community",
+    },
+    {
+      title: "Village Explorer",
+      href: "/explore",
+      icon: "village",
+    },
+    {
+      title: "Market",
+      href: "/market",
+      icon: "market",
+    },
+    {
+      title: "Govt Schemes",
+      href: "/schemes",
+      icon: "schemes",
+    },
+    {
+      title: "AI Doctor",
+      href: "/disease-prediction",
+      icon: "aiDoctor",
+    },
+    {
+      title: "Messages",
+      href: "/messages",
+      icon: "messages",
+    },
+    {
+      title: "Dashboard",
+      href: "/dashboard",
+      icon: "dashboard",
+    },
+    {
+      title: "Settings",
+      href: "/profile/settings",
+      icon: "settings",
     },
   ] as SidebarNavItem[],
 };
-
-export type SiteConfig = typeof siteConfig;

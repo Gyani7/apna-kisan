@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { ModalProvider } from '@/components/Providers';
 import { Header } from '@/components/common/Header';
-import BottomNav from '@/components/BottomNav';
+import { BottomNav } from '@/components/BottomNav';
 import { SiteFooter } from '@/components/SiteFooter';
 import SessionProviderWrapper from './session-provider';
 import { GuestProvider } from './guest-provider';
