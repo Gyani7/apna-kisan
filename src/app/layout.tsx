@@ -4,7 +4,7 @@ import { GeistSans } from 'geist/font/sans';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { ModalProvider } from '@/components/Providers';
-import { Header } from '@/components/common/Header';
+import { SiteHeader } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { SiteFooter } from '@/components/SiteFooter';
 import SessionProviderWrapper from './session-provider';
@@ -37,7 +37,7 @@ export default function RootLayout({
             <AuthProvider>
               <ModalProvider>
                 <div className="relative flex min-h-screen flex-col">
-                  <Header />
+                  <SiteHeader />
                   <main className="flex-1">{children}</main>
                   <SiteFooter />
                 </div>
