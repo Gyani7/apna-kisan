@@ -1,13 +1,34 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { VALID_ROUTES } from '@/lib/routes';
+import { getToken } from 'next-auth/jwt';
+import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const { pathname } = req.nextUrl;
 
-  // Check if the route is valid
-  if (!VALID_ROUTES.includes(pathname)) {
-    return NextResponse.redirect(new URL('/not-found', request.url));
+  const protectedRoutes = [
+    '/dashboard',
+    '/profile',
+    '/sell',
+    '/messages',
+    '/my-products',
+    '/admin',
+  ];
+
+  const authRoutes = ['/login', '/register', '/otp'];
+
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+
+  if (token) {
+    if (isAuthRoute) {
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+    return NextResponse.next();
+  }
+
+  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+
+  if (isProtectedRoute) {
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
   return NextResponse.next();
@@ -15,7 +36,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all routes except for the API, Next.js internal routes, and static files
-    '/((?!api|_next/static|_next/image|favicon.ico)._)',
+    '/((?!api|_next/static|_next/image|favicon.ico|sw.js).*)',
   ],
 };
