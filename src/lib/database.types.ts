@@ -138,29 +138,145 @@ export interface Database {
       mandi_rates: {
         Row: {
           id: string;
+          market: string;
           commodity: string;
-          mandi: string;
-          state: string;
           price: number;
+          date: string;
+          state: string;
           change_percent: number;
           updated_at: string;
         };
         Insert: {
           id?: string;
+          market: string;
           commodity: string;
-          mandi: string;
-          state: string;
           price: number;
-          change_percent: number;
+          date: string;
+          state: string;
+          change_percent?: number;
           updated_at?: string;
         };
         Update: {
           id?: string;
+          market?: string;
           commodity?: string;
-          mandi?: string;
-          state?: string;
           price?: number;
+          date?: string;
+          state?: string;
           change_percent?: number;
+          updated_at?: string;
+        };
+      };
+      verified_farmers: {
+        Row: {
+          id: string;
+          user_id: string;
+          status: 'pending' | 'verified' | 'rejected';
+          documents: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          status?: 'pending' | 'verified' | 'rejected';
+          documents: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          status?: 'pending' | 'verified' | 'rejected';
+          documents?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      village_data: {
+        Row: {
+          id: string;
+          name: string;
+          district: string;
+          state: string;
+          soil_health: Json;
+          crop_stats: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          district: string;
+          state: string;
+          soil_health?: Json;
+          crop_stats?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          district?: string;
+          state?: string;
+          soil_health?: Json;
+          crop_stats?: Json;
+          created_at?: string;
+        };
+      };
+      schemes: {
+        Row: {
+          id: string;
+          name: string;
+          eligibility_criteria: Json;
+          benefit: string;
+          category: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          eligibility_criteria: Json;
+          benefit: string;
+          category: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          eligibility_criteria?: Json;
+          benefit?: string;
+          category?: string;
+          created_at?: string;
+        };
+      };
+      user_crops: {
+        Row: {
+          id: string;
+          user_id: string;
+          crop_type: string;
+          planting_date: string;
+          health_score: number;
+          location: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          crop_type: string;
+          planting_date: string;
+          health_score?: number;
+          location: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          crop_type?: string;
+          planting_date?: string;
+          health_score?: number;
+          location?: Json;
+          created_at?: string;
           updated_at?: string;
         };
       };
@@ -176,3 +292,7 @@ export type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 export type PostRow = Database['public']['Tables']['posts']['Row'];
 export type FarmingTipRow = Database['public']['Tables']['farming_tips']['Row'];
 export type MandiRateRow = Database['public']['Tables']['mandi_rates']['Row'];
+export type VerifiedFarmerRow = Database['public']['Tables']['verified_farmers']['Row'];
+export type VillageDataRow = Database['public']['Tables']['village_data']['Row'];
+export type SchemeRow = Database['public']['Tables']['schemes']['Row'];
+export type UserCropRow = Database['public']['Tables']['user_crops']['Row'];

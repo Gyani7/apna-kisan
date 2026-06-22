@@ -1,4 +1,3 @@
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
@@ -23,6 +22,15 @@ module.exports = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        kisan: {
+          dark: "#004D40",
+          green: "#2E7D32",
+          light: "#81C784",
+          gold: "#FFD700",
+          amber: "#FBC02D",
+          earth: "#795548",
+          clay: "#A1887F",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -66,10 +74,31 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
+        "fade-in-up": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(10px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "glass-shine": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in-up": "fade-in-up 0.4s ease-out forwards",
+        "glass-shine": "glass-shine 1.5s infinite",
+      },
+      backgroundImage: {
+        'kisan-gradient': 'linear-gradient(135deg, #004D40 0%, #2E7D32 100%)',
+        'gold-gradient': 'linear-gradient(135deg, #FFD700 0%, #FBC02D 100%)',
+        'glass-gradient': 'linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
       },
     },
   },

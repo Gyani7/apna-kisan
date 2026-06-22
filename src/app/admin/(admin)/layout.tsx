@@ -1,6 +1,6 @@
 'use client';
 
-import { AdminHeader } from '@/components/layout/AdminHeader';
+import AdminSidebar from '@/components/admin/AdminSidebar';
 
 export default function AdminLayout({
   children,
@@ -9,7 +9,7 @@ export default function AdminLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col">
-      <AdminHeader />
+      <AdminSidebar />
       <main className="flex-1">{children}</main>
     </div>
   );

@@ -1,158 +1,255 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Send, Sprout, Bug, TrendingUp, HeartPulse, Camera, MapPin, ShieldCheck, Zap, Users } from "lucide-react"
+import { 
+  Send, Sprout, Bug, TrendingUp, HeartPulse, Camera, 
+  MapPin, ShieldCheck, Zap, Mic, Volume2, Info, 
+  AlertTriangle, CheckCircle2, Leaf
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Message {
   role: "user" | "assistant"
   content: string
+  analysis?: {
+    disease: string
+    confidence: number
+    recommendations: string[]
+    status: "healthy" | "warning" | "critical"
+  }
 }
 
 export default function AiAssistantPage() {
-  // Simulated user profile data based on public.profiles schema
   const userProfile = {
     reputation: 850,
     is_verified: true,
     location: "Karnal, Haryana",
-    village_id: "V-12345",
     badge: "Expert Farmer",
-    bio: "Paddy and Wheat specialist in Karnal district."
   }
 
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: `Namaste! I am your Apna Kisan AI. I have synchronized with the village data for ${userProfile.location}. As a ${userProfile.badge} with ${userProfile.reputation} Reputation XP, how can I assist your farm today?`
+      content: "Namaste! I am your AI Crop Doctor. You can upload a photo of your crop's leaf or ask me any farming question in Hindi or English. How can I help you today?"
     }
   ])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isRecording, setIsRecording] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleSend = async () => {
-    if (!input.trim()) return
+  const handleSend = async (text?: string) => {
+    const messageText = text || input
+    if (!messageText.trim()) return
 
-    const userMessage: Message = { role: "user", content: input }
+    const userMessage: Message = { role: "user", content: messageText }
     setMessages((prev) => [...prev, userMessage])
-    const currentInput = input;
     setInput("")
     setIsLoading(true)
 
-    // Simulating Agri-LLM Processing with OS context
+    // Simulate AI Processing
     setTimeout(() => {
-      let responseContent = `Analysis complete for ${userProfile.location}. Based on your reputation of ${userProfile.reputation} XP and your status as a ${userProfile.badge}, I recommend adjusting your nitrogen application for the upcoming week.`;
-      
-      if (currentInput.toLowerCase().includes("pest") || currentInput.toLowerCase().includes("disease")) {
-        responseContent = `I see you're concerned about pests. I've cross-referenced local reports in ${userProfile.location}. There's an increase in Yellow Rust sightings nearby. Since you are a Verified farmer, I can prioritize your scan in the 'crop_disease_detections' queue if you upload a photo.`;
-      } else if (currentInput.toLowerCase().includes("mandi") || currentInput.toLowerCase().includes("rate")) {
-        responseContent = `Current Mandi rates in Karnal for Basmati Paddy are trending at ₹4,200/quintal. Your 'Expert Farmer' badge allows you to see predictive trends for next week.`;
-      }
-
       const aiResponse: Message = { 
         role: "assistant", 
-        content: responseContent 
+        content: `Based on my analysis for ${userProfile.location}, your crop needs specific attention.` 
       }
       setMessages((prev) => [...prev, aiResponse])
       setIsLoading(false)
     }, 1500)
   }
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsLoading(true)
+    // Simulate Image Analysis
+    setTimeout(() => {
+      const analysisMessage: Message = {
+        role: "assistant",
+        content: "I have analyzed the image you uploaded. Here are the findings:",
+        analysis: {
+          disease: "Yellow Rust (Puccinia striiformis)",
+          confidence: 94.8,
+          status: "warning",
+          recommendations: [
+            "Apply Propiconazole 25% EC @ 200ml per acre.",
+            "Monitor humidity levels in the field.",
+            "Avoid excessive nitrogenous fertilizers for now."
+          ]
+        }
+      }
+      setMessages((prev) => [...prev, analysisMessage])
+      setIsLoading(false)
+    }, 2000)
+  }
+
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] bg-slate-50">
-      {/* 1. OS Header */}
-      <div className="bg-white border-b px-4 py-3 flex items-center justify-between shadow-sm sticky top-0 z-10">
+    <div className="flex flex-col h-[calc(100vh-64px)] bg-[#002B24] text-white">
+      {/* Premium Header */}
+      <div className="glass-morphism border-b border-white/10 px-4 py-4 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-            <Sprout className="w-6 h-6 text-green-600" />
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#B8860B] p-[2px]">
+            <div className="w-full h-full rounded-full bg-[#002B24] flex items-center justify-center">
+              <Leaf className="w-6 h-6 text-[#FFD700]" />
+            </div>
           </div>
           <div>
-            <h1 className="font-bold text-slate-900 leading-none">Agri-OS Assistant</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs font-medium px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full flex items-center gap-1">
-                <Zap className="w-3 h-3" /> {userProfile.reputation} XP
+            <h1 className="font-bold text-lg text-white">AI Crop Doctor</h1>
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-tighter text-[#FFD700]">
+                <ShieldCheck className="w-3 h-3" /> Expert Analysis
               </span>
-              {userProfile.is_verified && (
-                <span className="text-xs font-medium px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3" /> Verified
-                </span>
-              )}
             </div>
           </div>
         </div>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Camera className="w-4 h-4" />
-          Scan Crop
-        </Button>
+        <div className="flex items-center gap-2">
+           <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10">
+              <Volume2 className="w-5 h-5" />
+           </Button>
+        </div>
       </div>
 
-      {/* 2. Intelligence Feed / Chat Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Chat Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-hide">
         {messages.map((message, index) => (
-          <div
-            key={index}
-            className={cn(
-              "max-w-[85%] rounded-2xl p-4 flex gap-3",
-              message.role === "user" 
-                ? "bg-blue-600 text-white ml-auto" 
-                : "bg-white border border-slate-200 text-slate-800"
-            )}
-          >
-            {message.role === "assistant" && (
-              <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                <Sprout className="w-4 h-4 text-green-600" />
+          <div key={index} className={cn("flex flex-col", message.role === "user" ? "items-end" : "items-start")}>
+            <div
+              className={cn(
+                "max-w-[85%] rounded-2xl p-4 shadow-xl backdrop-blur-md border",
+                message.role === "user" 
+                  ? "bg-white/10 border-white/20 text-white rounded-tr-none" 
+                  : "bg-gradient-to-br from-[#2E7D32]/40 to-[#004D40]/40 border-[#2E7D32]/30 text-white rounded-tl-none"
+              )}
+            >
+              <p className="text-sm leading-relaxed">{message.content}</p>
+            </div>
+
+            {/* Analysis Results Section */}
+            {message.analysis && (
+              <div className="mt-4 w-full space-y-4">
+                <div className="glass-morphism border-[#FFD700]/30 rounded-2xl p-4 overflow-hidden relative">
+                  <div className="absolute top-0 right-0 p-2 opacity-10">
+                    <Bug className="w-16 h-16" />
+                  </div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#FFD700] animate-pulse" />
+                      <span className="text-[10px] font-bold text-[#FFD700] uppercase tracking-widest">Diagnostic Result</span>
+                    </div>
+                    <span className="text-xs font-bold text-white/80">{message.analysis.confidence}% Confidence</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-1">{message.analysis.disease}</h3>
+                  <div className="flex gap-2 mt-2">
+                    <span className={cn(
+                      "px-3 py-1 rounded-full text-[10px] font-bold uppercase border",
+                      message.analysis.status === "warning" ? "bg-orange-500/20 text-orange-400 border-orange-500/30" : "bg-red-500/20 text-red-400 border-red-500/30"
+                    )}>
+                      Status: {message.analysis.status.toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                  {message.analysis.recommendations.map((rec, i) => (
+                    <div key={i} className="glass-morphism bg-white/5 border-white/10 rounded-xl p-3 flex gap-3 items-start">
+                      <div className="mt-1">
+                        <CheckCircle2 className="w-4 h-4 text-[#FFD700]" />
+                      </div>
+                      <p className="text-xs text-white/90 leading-relaxed">{rec}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
-            <p className="text-sm leading-relaxed">{message.content}</p>
           </div>
         ))}
         {isLoading && (
-          <div className="bg-white border border-slate-200 text-slate-800 max-w-[85%] rounded-2xl p-4 flex gap-3 animate-pulse">
-            <div className="w-6 h-6 rounded-full bg-slate-100 shrink-0" />
-            <div className="space-y-2 flex-1">
-              <div className="h-2 bg-slate-200 rounded w-3/4" />
-              <div className="h-2 bg-slate-200 rounded w-1/2" />
+          <div className="flex gap-2 items-center text-white/50 text-xs italic ml-2">
+            <div className="flex gap-1">
+              <div className="w-1 h-1 bg-white/50 rounded-full animate-bounce" />
+              <div className="w-1 h-1 bg-white/50 rounded-full animate-bounce [animation-delay:0.2s]" />
+              <div className="w-1 h-1 bg-white/50 rounded-full animate-bounce [animation-delay:0.4s]" />
             </div>
+            AI Doctor is thinking...
           </div>
         )}
       </div>
 
-      {/* 3. Contextual Action OS (Quick Actions) */}
-      <div className="px-4 pb-2">
-        <div className="grid grid-cols-2 gap-2">
-          <Button variant="outline" className="h-auto py-3 flex-col gap-1 bg-white" onClick={() => setInput("Check for pests in my paddy field")}>
-            <Bug className="w-5 h-5 text-red-500" />
-            <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Pest Diagnosis</span>
+      {/* Input Section */}
+      <div className="p-4 glass-morphism border-t border-white/10 space-y-4">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="rounded-full bg-white/5 border-white/10 text-white/80 hover:bg-white/10 text-[10px]"
+            onClick={() => handleSend("Hindi: गेहूं में पीला रतुआ का इलाज क्या है?")}
+          >
+            Hindi Help
           </Button>
-          <Button variant="outline" className="h-auto py-3 flex-col gap-1 bg-white" onClick={() => setInput("Current Mandi rates in Karnal")}>
-            <TrendingUp className="w-5 h-5 text-green-500" />
-            <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Market Intelligence</span>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="rounded-full bg-white/5 border-white/10 text-white/80 hover:bg-white/10 text-[10px]"
+            onClick={() => handleSend("Identify this disease")}
+          >
+            Disease ID
           </Button>
-          <Button variant="outline" className="h-auto py-3 flex-col gap-1 bg-white" onClick={() => setInput("Soil health report for my village")}>
-            <HeartPulse className="w-5 h-5 text-orange-500" />
-            <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Soil Health</span>
-          </Button>
-          <Button variant="outline" className="h-auto py-3 flex-col gap-1 bg-white" onClick={() => setInput("Eligible government schemes")}>
-            <ShieldCheck className="w-5 h-5 text-blue-500" />
-            <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Govt Schemes</span>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="rounded-full bg-white/5 border-white/10 text-white/80 hover:bg-white/10 text-[10px]"
+            onClick={() => handleSend("Treatment for Paddy blast")}
+          >
+            Paddy Treatment
           </Button>
         </div>
-      </div>
 
-      {/* 4. Input OS */}
-      <div className="p-4 bg-white border-t">
-        <div className="flex gap-2 max-w-4xl mx-auto">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Ask your farming expert..."
-            className="flex-1 bg-slate-50 border-slate-200"
+        <div className="flex items-center gap-2">
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
           />
-          <Button onClick={handleSend} disabled={isLoading || !input.trim()} className="bg-green-600 hover:bg-green-700">
-            <Send className="w-4 h-4" />
+          <Button 
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-full w-12 h-12 bg-white/10 border border-white/20 hover:bg-white/20 text-white shrink-0"
+          >
+            <Camera className="w-5 h-5" />
+          </Button>
+          
+          <div className="relative flex-1">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              placeholder="Ask anything..."
+              className="w-full bg-white/10 border-white/20 text-white placeholder:text-white/40 rounded-full pr-12 focus:ring-[#FFD700]/50"
+            />
+            <Button 
+              size="icon" 
+              className="absolute right-1 top-1 rounded-full w-8 h-8 bg-[#FFD700] hover:bg-[#FBC02D] text-[#002B24]"
+              onClick={() => handleSend()}
+              disabled={isLoading || !input.trim()}
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <Button 
+            onClick={() => setIsRecording(!isRecording)}
+            className={cn(
+              "rounded-full w-12 h-12 shrink-0 transition-all duration-300",
+              isRecording 
+                ? "bg-red-500 hover:bg-red-600 animate-pulse" 
+                : "bg-gradient-to-br from-[#FFD700] to-[#B8860B] hover:opacity-90 text-[#002B24]"
+            )}
+          >
+            <Mic className="w-5 h-5" />
           </Button>
         </div>
       </div>
