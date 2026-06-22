@@ -1,6 +1,6 @@
 import { createServerClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import Header from '@/components/Header';
+import { Header } from '@/components/common/Header';
 import { LeftSidebar } from '@/components/LeftSidebar';
 import RightSidebar from '@/components/RightSidebar';
 

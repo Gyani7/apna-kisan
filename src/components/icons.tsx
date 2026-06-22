@@ -46,7 +46,8 @@ import {
   MapPin,
   Scaling,
   Sprout,
-  BarChart
+  BarChart,
+  Download
 } from "lucide-react";
 
 export const Icons = {
@@ -95,5 +96,6 @@ export const Icons = {
   pin: MapPin,
   soil: Scaling,
   plant: Sprout,
-  analytics: BarChart
+  analytics: BarChart,
+  download: Download
 };
