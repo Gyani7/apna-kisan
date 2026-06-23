@@ -34,7 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials, req) {
         // This is where you would verify the OTP
-        // In this example, we'll just accept any OTP for demonstration purposes
+        // In this example, we'''ll just accept any OTP for demonstration purposes
         if (credentials?.phone && credentials?.otp) {
           const user = {
             id: credentials.phone, // Using phone number as ID for this example
@@ -54,26 +54,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   }),
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async session({ session, token }) {
+    async session({ session, user }) {
       if (session.user) {
+        session.user.id = user.id;
         // @ts-ignore
-        session.user.id = token.sub!;
-        // @ts-ignore
-        session.user.phone = token.phone;
+        session.user.phone = user.phone;
       }
       return session;
-    },
-    async jwt({ token, user, account }) {
-      if (user) {
-        token.id = user.id;
-        // @ts-ignore
-        token.phone = user.phone;
-
-      }
-      if (account) {
-        token.accessToken = account.access_token;
-      }
-      return token;
     },
   },
   pages: {
