@@ -1,3 +1,4 @@
+"use client";
 
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";

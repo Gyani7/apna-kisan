@@ -1,3 +1,4 @@
+
 import withPWAInit from "next-pwa";
 
 const withPWA = withPWAInit({
@@ -24,16 +25,9 @@ const nextConfig = {
   },
   // Ensure transpilePackages is correct for lucide-react
   transpilePackages: ['lucide-react'],
-  webpack(config) {
-    config.experiments = { ...config.experiments, topLevelAwait: true };
-    return config;
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true, // Optional: useful if deployment is blocked by minor type issues
   }
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;

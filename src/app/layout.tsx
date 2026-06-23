@@ -10,7 +10,6 @@ import { SiteFooter } from '@/components/SiteFooter';
 import SessionProviderWrapper from './session-provider';
 import { GuestProvider } from './guest-provider';
 import AuthProvider from '@/components/AuthProvider';
-import 'geist/font/sans';
 
 const inter = Inter({ subsets: ['latin'] });
 
