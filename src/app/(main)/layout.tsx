@@ -1,15 +1,8 @@
-import { getSession } from '@/lib/session';
-import { redirect } from 'next/navigation';
 import { Header } from '@/components/common/Header';
 import { LeftSidebar } from '@/components/LeftSidebar';
 import RightSidebar from '@/components/RightSidebar';
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
-  const session = await getSession();
-
-  if (!session?.user) {
-    redirect('/login');
-  }
 
   return (
     <div className="min-h-screen bg-background font-sans antialiased">
