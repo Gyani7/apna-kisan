@@ -9,10 +9,9 @@ import {
   AlertTriangle, CheckCircle2, Leaf
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Message as MessageType } from "ai/react"
 
-interface Message {
-  role: "user" | "assistant"
-  content: string
+interface Message extends MessageType {
   analysis?: {
     disease: string
     confidence: number
@@ -31,6 +30,7 @@ export default function AiAssistantPage() {
 
   const [messages, setMessages] = useState<Message[]>([
     {
+      id: "1",
       role: "assistant",
       content: "Namaste! I am your AI Crop Doctor. You can upload a photo of your crop's leaf or ask me any farming question in Hindi or English. How can I help you today?"
     }
@@ -44,7 +44,7 @@ export default function AiAssistantPage() {
     const messageText = text || input
     if (!messageText.trim()) return
 
-    const userMessage: Message = { role: "user", content: messageText }
+    const userMessage: Message = { id: "2", role: "user", content: messageText }
     setMessages((prev) => [...prev, userMessage])
     setInput("")
     setIsLoading(true)
@@ -52,6 +52,7 @@ export default function AiAssistantPage() {
     // Simulate AI Processing
     setTimeout(() => {
       const aiResponse: Message = { 
+        id: "3",
         role: "assistant", 
         content: `Based on my analysis for ${userProfile.location}, your crop needs specific attention.` 
       }
@@ -68,6 +69,7 @@ export default function AiAssistantPage() {
     // Simulate Image Analysis
     setTimeout(() => {
       const analysisMessage: Message = {
+        id: "4",
         role: "assistant",
         content: "I have analyzed the image you uploaded. Here are the findings:",
         analysis: {
