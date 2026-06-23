@@ -7,7 +7,7 @@ export const siteConfig = {
     "A modern AgriTech Super Platform for farmers, buyers, traders, and administrators.",
   links: {
     twitter: "https://twitter.com/apnakisan",
-    github: "https://github.com/apnakisan/apnakisan-platform",
+    github: "https://github.com/Gyani7/apna-kisan",
     docs: "https://apnakisan.com/docs",
   },
   mainNav: [
