@@ -1,11 +1,11 @@
-import NextAuth from "next-auth";
+import { NextAuthOptions } from "next-auth";
 import { SupabaseAdapter } from "@next-auth/supabase-adapter";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import EmailProvider from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -33,13 +33,11 @@ export default NextAuth({
         otp: { label: "OTP", type: "text", placeholder: "Enter your OTP" },
       },
       async authorize(credentials, req) {
-        // This is where you would verify the OTP
-        // In this example, we'''ll just accept any OTP for demonstration purposes
         if (credentials?.phone && credentials?.otp) {
           const user = {
-            id: credentials.phone, // Using phone number as ID for this example
+            id: credentials.phone,
             phone: credentials.phone,
-            email: null, // No email when signing in with phone
+            email: null,
           };
           // @ts-ignore
           return user;
@@ -81,4 +79,4 @@ export default NextAuth({
   pages: {
     signIn: '/login',
   }
-});
+};
