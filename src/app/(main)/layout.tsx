@@ -1,14 +1,13 @@
-import { createServerClient } from '@/utils/supabase/server';
+import { getSession } from '@/lib/session';
 import { redirect } from 'next/navigation';
 import { Header } from '@/components/common/Header';
 import { LeftSidebar } from '@/components/LeftSidebar';
 import RightSidebar from '@/components/RightSidebar';
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const session = await getSession();
 
-  if (!user) {
+  if (!session?.user) {
     redirect('/login');
   }
 
