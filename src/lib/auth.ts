@@ -1,11 +1,11 @@
 import NextAuth from "next-auth";
-import { SupabaseAdapter } from "@auth/supabase-adapter";
+import { SupabaseAdapter } from "@next-auth/supabase-adapter";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import EmailProvider from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export default NextAuth({
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -53,14 +53,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
   }),
   secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
-    async session({ session, user }) {
+    async session({ session, token }) {
       if (session.user) {
-        session.user.id = user.id;
+        session.user.id = token.sub!;
         // @ts-ignore
-        session.user.phone = user.phone;
+        session.user.phone = token.phone;
       }
       return session;
+    },
+    async jwt({ token, user, account }) {
+      if (user) {
+        token.id = user.id;
+        // @ts-ignore
+        token.phone = user.phone;
+
+      }
+      if (account) {
+        token.accessToken = account.access_token;
+      }
+      return token;
     },
   },
   pages: {
