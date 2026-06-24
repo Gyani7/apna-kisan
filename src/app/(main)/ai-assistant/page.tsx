@@ -1,4 +1,4 @@
-"use client"
+ki"use client"
 
 import { useState, useRef } from "react"
 import { useChat } from "@ai-sdk/react"
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { 
   Send, Sprout, Bug, TrendingUp, HeartPulse, Camera, 
   MapPin, ShieldCheck, Zap, Mic, Volume2, Info, 
-  AlertTriangle, CheckCircle2, Leaf
+  AlertTriangle, CheckCircle2, Leaf, X
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -16,13 +16,49 @@ export default function AiAssistantPage() {
     messages,
     input,
     handleInputChange,
-    handleSubmit,
+    append,
     isLoading,
     setInput
   } = useChat()
 
   const [isRecording, setIsRecording] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!input.trim() && !imagePreview) return
+
+    const content: Array<{ type: 'text' | 'image'; text?: string; image?: string }> = [];
+    if (input.trim()) {
+        content.push({ type: 'text', text: input });
+    }
+    if (imagePreview) {
+        content.push({ type: 'image', image: imagePreview });
+    }
+
+    await append({
+      role: 'user',
+      content: content as any
+    })
+
+    setInput('')
+    setImagePreview(null)
+    if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+    }
+  }
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] bg-[#002B24] text-white">
@@ -86,7 +122,27 @@ export default function AiAssistantPage() {
       </div>
 
       {/* Input Section */}
-      <form onSubmit={handleSubmit} className="p-4 glass-morphism border-t border-white/10 space-y-4">
+      <form onSubmit={handleFormSubmit} className="p-4 glass-morphism border-t border-white/10 space-y-4">
+        {imagePreview && (
+          <div className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-white/20">
+            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+            <Button
+              type="button"
+              size="icon"
+              variant="destructive"
+              className="absolute top-1 right-1 w-6 h-6 rounded-full"
+              onClick={() => {
+                setImagePreview(null)
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = ''
+                }
+              }}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
+
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           <Button 
             type="button"
@@ -123,6 +179,7 @@ export default function AiAssistantPage() {
             accept="image/*"
             className="hidden"
             ref={fileInputRef}
+            onChange={handleFileChange}
           />
           <Button 
             type="button"
@@ -136,14 +193,14 @@ export default function AiAssistantPage() {
             <Input
               value={input}
               onChange={handleInputChange}
-              placeholder="Ask anything..."
+              placeholder="Ask anything or upload an image..."
               className="w-full bg-white/10 border-white/20 text-white placeholder:text-white/40 rounded-full pr-12 focus:ring-[#FFD700]/50"
             />
             <Button 
               type="submit"
               size="icon" 
               className="absolute right-1 top-1 rounded-full w-8 h-8 bg-[#FFD700] hover:bg-[#FBC02D] text-[#002B24]"
-              disabled={isLoading || !input.trim()}
+              disabled={isLoading || (!input.trim() && !imagePreview)}
             >
               <Send className="w-4 h-4" />
             </Button>
