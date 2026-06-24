@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getSession } from "@/lib/session";
@@ -6,13 +5,13 @@ import { db } from "@/lib/db";
 
 export async function PATCH(
   req: NextRequest,
-  context: { params: { userId: string } }
+  context: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = context.params;
+    const { userId } = await context.params;
 
     const session = await getSession();
-    if (!session?.user || userId !== session?.user.id) {
+    if (!session?.user || userId !== session.user.id) {
       return new Response(null, { status: 403 });
     }
 
