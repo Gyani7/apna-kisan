@@ -4,21 +4,15 @@ import { z } from "zod";
 import { getSession } from "@/lib/session";
 import { db } from "@/lib/db";
 
-const routeContextSchema = z.object({
-  params: z.object({
-    userId: z.string(),
-  }),
-});
-
 export async function PATCH(
   req: NextRequest,
-  context: z.infer<typeof routeContextSchema>
+  context: { params: { userId: string } }
 ) {
   try {
-    const { params } = routeContextSchema.parse(context);
+    const { userId } = context.params;
 
     const session = await getSession();
-    if (!session?.user || params.userId !== session?.user.id) {
+    if (!session?.user || userId !== session?.user.id) {
       return new Response(null, { status: 403 });
     }
 
