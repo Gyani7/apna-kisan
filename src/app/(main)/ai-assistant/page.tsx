@@ -1,4 +1,4 @@
-ki"use client"
+"use client"
 
 import { useState, useRef } from "react"
 import { useChat } from "@ai-sdk/react"
@@ -133,7 +133,7 @@ export default function AiAssistantPage() {
               className="absolute top-1 right-1 w-6 h-6 rounded-full"
               onClick={() => {
                 setImagePreview(null)
-                if (fileInputRef.current) {
+                if (fileInputCible at the beginning of the file. I've removed it, and I'll push the fix to your Git repository so you can try redeploying.urrent) {
                   fileInputRef.current.value = ''
                 }
               }}
