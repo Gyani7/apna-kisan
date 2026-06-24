@@ -23,11 +23,6 @@ const nextConfig = {
       },
     ],
   },
-  // Ensure transpilePackages is correct for lucide-react
-  transpilePackages: ['lucide-react'],
-  typescript: {
-    ignoreBuildErrors: true, // Optional: useful if deployment is blocked by minor type issues
-  }
 };
 
 export default nextConfig;
