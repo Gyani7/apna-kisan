@@ -19,11 +19,12 @@ import { cn } from '@/lib/utils'
 export default function AiAssistantPage() {
   const {
     messages,
+    input,
+    setInput,
     append,
     isLoading,
   } = useChat({ api: '/api/chat', experimental_multimodal: true });
 
-  const [input, setInput] = useState("");
   const [isRecording, setIsRecording] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -113,8 +114,9 @@ export default function AiAssistantPage() {
                     return <p key={index} className='text-sm leading-relaxed'>{content.text}</p>
                   }
                   if (content.type === 'image') {
-                    return <img key={index} src={content.image} alt="" className="w-full h-auto rounded-lg" />
+                    return <img key={index} src={content.image as string} alt="" className="w-full h-auto rounded-lg" />
                   }
+                  return null;
                 })
               )}
             </div>
