@@ -1,5 +1,4 @@
 import { createNotification, notifyAdminsOfNewUser, notifyOfNewLike } from '@/lib/notifications';
-import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { NotificationType } from '@/lib/types';
 
@@ -7,8 +6,7 @@ import { NotificationType } from '@/lib/types';
 const WEBHOOK_SECRET = process.env.SUPABASE_WEBHOOK_SECRET;
 
 export async function POST(req: NextRequest) {
-  const headersList = headers();
-  const signature = headersList.get('x-supabase-signature');
+  const signature = req.headers.get('x-supabase-signature');
 
   // if (!signature || !WEBHOOK_SECRET) {
   //   return new NextResponse('Signature or secret not found', { status: 401 });
