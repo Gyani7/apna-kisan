@@ -21,7 +21,7 @@ export default function AiAssistantPage() {
     messages,
     append,
     isLoading,
-  } = useChat({ experimental_multimodal: true });
+  } = useChat({ api: '/api/chat', experimental_multimodal: true });
 
   const [input, setInput] = useState("");
   const [isRecording, setIsRecording] = useState(false)
