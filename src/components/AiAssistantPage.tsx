@@ -19,12 +19,11 @@ import { cn } from '@/lib/utils'
 export default function AiAssistantPage() {
   const {
     messages,
-    input,
-    setInput,
     append,
     isLoading,
-  } = useChat({ api: '/api/chat', experimental_multimodal: true });
+  } = useChat({ api: '/api/chat' });
 
+  const [input, setInput] = useState("");
   const [isRecording, setIsRecording] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
