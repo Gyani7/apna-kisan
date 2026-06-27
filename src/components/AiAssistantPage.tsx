@@ -19,11 +19,13 @@ import { cn } from '@/lib/utils'
 export default function AiAssistantPage() {
   const {
     messages,
-    append,
+    input,
+    handleInputChange,
+    handleSubmit,
     isLoading,
+    setInput
   } = useChat({ api: '/api/chat' });
 
-  const [input, setInput] = useState("");
   const [isRecording, setIsRecording] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -43,15 +45,16 @@ export default function AiAssistantPage() {
     e.preventDefault()
     if (!input.trim() && !imagePreview) return
 
-    await append(
-        {
-            role: 'user',
-            content: [
-                { type: 'text', text: input },
-                ...(imagePreview ? [{ type: 'image', image: imagePreview }] : []),
-            ],
-        }
-    );
+    const content: any[] = [{ type: 'text', text: input }]
+    if (imagePreview) {
+      content.push({ type: 'image', image: imagePreview })
+    }
+
+    handleSubmit(e, {
+      data: {
+        imageUrl: imagePreview
+      }
+    })
 
     setInput("")
     setImagePreview(null)
@@ -204,7 +207,7 @@ export default function AiAssistantPage() {
           <div className='relative flex-1'>
             <Input
               value={input}
-              onChange={e => setInput(e.target.value)}
+              onChange={handleInputChange}
               placeholder='Ask anything or upload an image...'
               className='w-full bg-white/10 border-white/20 text-white placeholder:text-white/40 rounded-full pr-12 focus:ring-[#FFD700]/50'
             />

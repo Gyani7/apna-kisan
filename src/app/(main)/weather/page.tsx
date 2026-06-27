@@ -1,8 +1,9 @@
 import { getWeatherData } from "@/lib/supabase/app-features";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { WeatherData } from "@/lib/weather";
 
 export default async function WeatherPage() {
-  const weather = await getWeatherData();
+  const weather: WeatherData = await getWeatherData();
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
