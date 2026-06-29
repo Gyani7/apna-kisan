@@ -44,13 +44,13 @@ export interface Notification {
 
 export interface Product {
   id: string;
-  seller_id: string;
+  farmer_id: string;
   title: string;
   description?: string;
   price: number;
   category?: string;
-  image_urls?: string[];
-  is_featured?: boolean;
+  image_url?: string;
+  stock: number;
   created_at?: string;
 }
 
@@ -180,4 +180,12 @@ export function formatCount(count: number): string {
     return (count / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
   }
   return count.toString();
-} 
+}
+
+export interface Profile {
+  id: string;
+  username: string;
+  full_name: string;
+  avatar_url: string;
+  premium: boolean;
+}

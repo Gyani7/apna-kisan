@@ -1,82 +1,50 @@
-import { NextAuthOptions } from "next-auth";
-import { SupabaseAdapter } from "@next-auth/supabase-adapter";
-import GoogleProvider from "next-auth/providers/google";
-import GithubProvider from "next-auth/providers/github";
-import EmailProvider from "next-auth/providers/email";
-import CredentialsProvider from "next-auth/providers/credentials";
 
-export const authOptions: NextAuthOptions = {
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    GithubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    }),
-    EmailProvider({
-      from: process.env.EMAIL_FROM,
-      server: {
-        host: process.env.EMAIL_SERVER_HOST,
-        port: Number(process.env.EMAIL_SERVER_PORT),
-        auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD,
-        },
-      },
-    }),
-    CredentialsProvider({
-      name: 'Phone',
-      credentials: {
-        phone: { label: "Phone", type: "text", placeholder: "Enter your phone number" },
-        otp: { label: "OTP", type: "text", placeholder: "Enter your OTP" },
-      },
-      async authorize(credentials, req) {
-        if (credentials?.phone && credentials?.otp) {
-          const user = {
-            id: credentials.phone,
-            phone: credentials.phone,
-            email: null,
-          };
-          // @ts-ignore
-          return user;
-        }
-        return null;
-      },
-    }),
-  ],
-  adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  }),
-  secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-  },
-  callbacks: {
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.sub!;
-        // @ts-ignore
-        session.user.phone = token.phone;
-      }
-      return session;
-    },
-    async jwt({ token, user, account }) {
-      if (user) {
-        token.id = user.id;
-        // @ts-ignore
-        token.phone = user.phone;
+import { auth } from "./firebase";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  UserInfo,
+  signInWithRedirect,
+  getRedirectResult
+} from "firebase/auth";
 
-      }
-      if (account) {
-        token.accessToken = account.access_token;
-      }
-      return token;
-    },
-  },
-  pages: {
-    signIn: '/login',
+export const signInWithGoogle = async () => {
+  const provider = new GoogleAuthProvider();
+  try {
+    await signInWithRedirect(auth, provider);
+  } catch (error) {
+    console.error("Error signing in with Google: ", error);
   }
+};
+
+export const signOut = async () => {
+  try {
+    await firebaseSignOut(auth);
+  } catch (error) {
+    console.error("Error signing out: ", error);
+  }
+};
+
+export const getRedirectResultAfterSignIn = async () => {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result) {
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential?.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      return { user, token };
+    }
+    return { user: null, token: null };
+  } catch (error) {
+    console.error("Error getting redirect result: ", error);
+    return { user: null, token: null };
+  }
+}
+
+export const onAuthStateChangedHelper = (callback: (user: UserInfo | null) => void) => {
+  return onAuthStateChanged(auth, callback);
 };

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { siteConfig } from "@/config/site";
@@ -7,8 +8,14 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { buttonVariants } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import Link from "next/link";
+import { useAuth } from "./AuthProvider";
+import { signOut } from "@/lib/auth";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { LogIn } from "lucide-react";
 
 export function SiteHeader() {
+  const { user, loading } = useAuth();
+
   return (
     <header className="supports-backdrop-blur:bg-background/60 sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">
       <div className="container flex h-16 items-center">
@@ -34,6 +41,24 @@ export function SiteHeader() {
               </div>
             </Link>
             <ThemeToggle />
+            {!loading && (
+              <>
+                {user ? (
+                  <div className="flex items-center gap-4">
+                    <Avatar>
+                      <AvatarImage src={user.photoURL!} alt={user.displayName!} />
+                      <AvatarFallback>{user.displayName?.[0]}</AvatarFallback>
+                    </Avatar>
+                    <button onClick={signOut}>Sign out</button>
+                  </div>
+                ) : (
+                  <Link href="/login" className={cn(buttonVariants({ size: "sm" }), "gap-1")}>
+                    <LogIn className="h-5 w-5" />
+                    <span>Login</span>
+                  </Link>
+                )}
+              </>
+            )}
           </nav>
         </div>
       </div>

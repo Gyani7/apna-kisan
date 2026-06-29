@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createClient } from '@/utils/supabase/client';
 import { getUser } from '@/lib/user';
 import { useParams } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -17,7 +17,7 @@ function ConversationPage() {
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [otherUser, setOtherUser] = useState<any>(null);
-  const supabase = createBrowserClient();
+  const supabase = createClient();
   const params = useParams();
   const conversationId = params?.conversationId as string;
   const messagesEndRef = useRef<null | HTMLDivElement>(null);

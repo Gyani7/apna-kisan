@@ -6,45 +6,40 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Product } from '@/lib/types';
 import { getUser } from '@/lib/user';
-import { useEffect, useState } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { useEffect, useState, useTransition } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Heart, ShoppingCart, Trash2, Edit } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { useModal } from './Providers';
+import { deleteProduct } from '@/app/(main)/my-products/actions';
 
 interface ProductCardProps {
   product: Product;
-  onDelete?: (productId: string) => void;
 }
 
-export function ProductCard({ product, onDelete }: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
   const [isOwner, setIsOwner] = useState(false);
-  const supabase = createBrowserClient();
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const { showPremiumModal } = useModal();
 
   useEffect(() => {
     const checkOwnership = async () => {
       const currentUser = await getUser();
-      setIsOwner(currentUser?.id === product.seller_id);
+      setIsOwner(currentUser?.id === product.farmer_id);
     };
     checkOwnership();
-  }, [product.seller_id]);
+  }, [product.farmer_id]);
 
-  const handleDelete = async () => {
-    if (!isOwner) return;
-
-    const { error } = await supabase.from('products').delete().eq('id', product.id);
-
-    if (error) {
-      toast({ title: 'Error deleting product', variant: 'destructive' });
-    } else {
-      toast({ title: 'Product deleted' });
-      if (onDelete) {
-        onDelete(product.id);
+  const handleDelete = () => {
+    startTransition(async () => {
+      const result = await deleteProduct(product.id);
+      if (result.success) {
+        toast({ title: result.message });
+      } else {
+        toast({ title: result.message, variant: 'destructive' });
       }
-    }
+    });
   };
 
   const handleAddToCart = () => {
@@ -62,13 +57,15 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
     }
   };
 
+  const { title = '', category = '', price = 0 } = product;
+
   return (
     <Card className="overflow-hidden group">
       <div className="relative">
         <Link href={`/market/product/${product.id}`} className="block">
           <Image
-            src={product.image_urls?.[0] || '/placeholder.svg'}
-            alt={product.title}
+            src={product.image_url || '/placeholder.svg'}
+            alt={title}
             width={500}
             height={400}
             className="object-cover w-full h-48 transition-transform duration-300 group-hover:scale-105"
@@ -86,20 +83,22 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
                 <Edit className="h-5 w-5" />
               </Button>
             </Link>
-            <Button size="icon" variant="destructive" className="rounded-full" onClick={handleDelete}>
-              <Trash2 className="h-5 w-5" />
-            </Button>
+            <form action={handleDelete}>
+              <Button size="icon" variant="destructive" className="rounded-full" disabled={isPending}>
+                <Trash2 className="h-5 w-5" />
+              </Button>
+            </form>
           </div>
         )}
       </div>
       <CardContent className="p-4">
-        <p className="text-sm text-muted-foreground">{product.category}</p>
+        <p className="text-sm text-muted-foreground">{category}</p>
         <h3 className="text-lg font-semibold leading-tight mt-1 mb-2 truncate">
-          <Link href={`/market/product/${product.id}`}>{product.title}</Link>
+          <Link href={`/market/product/${product.id}`}>{title}</Link>
         </h3>
       </CardContent>
       <CardFooter className="flex justify-between items-center p-4 border-t">
-        <p className="text-xl font-bold text-primary">{formatPrice(product.price)}</p>
+        <p className="text-xl font-bold text-primary">{formatPrice(price)}</p>
         <Button onClick={handleAddToCart}>
           <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
         </Button>

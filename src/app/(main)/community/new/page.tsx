@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,7 +12,7 @@ import { Icons } from '@/components/icons';
 export default function NewPostPage() {
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = createBrowserClient();
+  const supabase = createSupabaseClient();
   const router = useRouter();
 
   const handlePost = async () => {

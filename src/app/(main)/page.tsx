@@ -1,8 +1,9 @@
 
-import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/icons';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from \'@/components/ui/button\';
+import { Icons } from \'@/components/icons\';
+import { Card, CardContent, CardHeader, CardTitle } from \'@/components/ui/card\';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const featureItems = [
     { icon: Icons.market, title: "Marketplace", description: "Buy and sell crops, seeds, and equipment at the best prices directly from your phone." },
@@ -10,7 +11,7 @@ const featureItems = [
     { icon: Icons.weather, title: "Hyperlocal Weather", description: "Get accurate weather forecasts for your specific farm location to plan your activities." },
     { icon: Icons.schemes, title: "Government Schemes", description: "Discover and apply for government schemes and subsidies you are eligible for." },
     { icon: Icons.community, title: "Farmer Community", description: "Connect with other farmers, share knowledge, and solve problems together." },
-    { icon: Icons.analytics, title: "Farm Analytics", description: "Track your farm's performance, expenses, and income to make data-driven decisions." }
+    { icon: Icons.analytics, title: "Farm Analytics", description: "Track your farm\'s performance, expenses, and income to make data-driven decisions." }
 ];
 
 const whyChooseUsItems = [
@@ -24,7 +25,7 @@ const testimonials = [
         name: "Ramesh Patel",
         village: "Anand, Gujarat",
         image: "/images/ramesh-patel.jpg",
-        quote: "Apna Kisan has transformed my farming. The AI Doctor saved my cotton crop from a disease I couldn't identify. I sold my produce at a 20% higher price through the marketplace."
+        quote: "Apna Kisan has transformed my farming. The AI Doctor saved my cotton crop from a disease I couldn\'t identify. I sold my produce at a 20% higher price through the marketplace."
     },
     {
         name: "Sunita Devi",
@@ -40,7 +41,11 @@ const testimonials = [
     }
 ];
 
-const HomePage = () => {
+const HomePage = async () => {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: profile } = await supabase.from(\'profiles\').select(\'*\').eq(\'id\', user?.id).single();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/10 via-background to-background text-foreground">
       <main className="container mx-auto px-4">
@@ -48,14 +53,14 @@ const HomePage = () => {
         <section className="relative text-center py-20 md:py-32">
           <div 
             className="absolute inset-0 bg-cover bg-center opacity-10 blur-sm" 
-            style={{backgroundImage: "url('/images/agri-background.jpg')"}} />
+            style={{backgroundImage: "url(\'/images/agri-background.jpg\')"}} />
 
           <div className="relative z-10 animate-fade-in-up">
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-primary mb-4">
               🌾 Welcome to Apna Kisan
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              India's Digital Agriculture Network
+              India\'s Digital Agriculture Network
             </p>
             
             <div className="flex flex-wrap justify-center gap-4 text-lg text-foreground mb-12">
@@ -104,6 +109,15 @@ const HomePage = () => {
                 ))}
             </div>
         </section>
+        
+        {profile?.premium && (
+          <section className="py-20">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold tracking-tight text-primary">Premium Content</h2>
+              <p className="text-lg text-muted-foreground mt-2">Welcome to the premium section!</p>
+            </div>
+          </section>
+        )}
 
         {/* Why Choose Us Section */}
         <section className="py-20 bg-primary/5">
@@ -151,7 +165,7 @@ const HomePage = () => {
                             </div>
                         </CardContent>
                     </Card>
-                ))}
+                ))}\
             </div>
         </section>
 

@@ -1,13 +1,18 @@
-import { ProfileHeader } from "@/components/profile/ProfileHeader";
-import { UserPosts } from "@/components/profile/UserPosts";
 
-export default function ProfilePage() {
+import { getUser } from "@/lib/user";
+import { redirect } from "next/navigation";
+
+export default async function ProfilePage() {
+  const user = await getUser();
+
+  if (!user) {
+    return redirect("/login");
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <ProfileHeader />
-      <div className="mt-8">
-        <UserPosts />
-      </div>
+    <div>
+      <h1>Profile</h1>
+      <p>This is the profile page.</p>
     </div>
   );
 }

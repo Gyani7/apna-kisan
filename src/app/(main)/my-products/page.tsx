@@ -1,60 +1,71 @@
-'use client';
 
-import { useEffect, useState } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
-import withAuthorization from '@/components/withAuthorization';
-import { Product, UserRole } from '@/lib/types';
-import { getUser } from '@/lib/user';
-import { ProductCard } from '@/components/ProductCard';
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { Product, UserRole } from "@/lib/types";
+import { ProductCard } from "@/components/ProductCard";
+import { redirect } from "next/navigation";
+import { Shell } from "@/components/Shell";
+import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { PlusCircle } from 'lucide-react';
 
-function MyProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const supabase = createBrowserClient();
+async function MyProductsPage() {
+  const supabase = createSupabaseServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const user = await getUser();
-      if (!user) {
-        setIsLoading(false);
-        return;
-      }
+  if (!session) {
+    redirect("/login");
+  }
 
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('seller_id', user.id)
-        .order('created_at', { ascending: false });
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .single();
 
-      if (error) {
-        console.error('Error fetching products:', error);
-      } else {
-        setProducts(data);
-      }
-      setIsLoading(false);
-    };
+  if (profile?.role !== UserRole.FARMER) {
+    redirect("/");
+  }
 
-    fetchProducts();
-  }, [supabase]);
+  const { data: products, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('farmer_id', session.user.id)
+    .order('created_at', { ascending: false });
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (error) {
+    console.error('Error fetching products:', error);
+    // Handle error state, maybe show a toast or an error message
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">My Products</h1>
-      {products.length === 0 ? (
-        <p>You haven't listed any products yet.</p>
-      ) : (
+    <Shell>
+      <PageHeader>
+        <div className="flex justify-between items-center">
+          <div>
+            <PageHeaderHeading>My Products</PageHeaderHeading>
+            <PageHeaderDescription>Manage your listed products.</PageHeaderDescription>
+          </div>
+          <Link href="/my-products/add">
+            <Button>
+              <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
+            </Button>
+          </Link>
+        </div>
+      </PageHeader>
+      {products && products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product as Product} />
           ))}
         </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed rounded-lg">
+          <p className="text-lg text-muted-foreground">You haven't listed any products yet.</p>
+        </div>
       )}
-    </div>
+    </Shell>
   );
 }
 
-export default withAuthorization(MyProductsPage, [UserRole.FARMER]);
+export default MyProductsPage;

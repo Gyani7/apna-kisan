@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -7,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import { getUser } from '@/lib/user';
 import withAuthorization from '@/components/withAuthorization';
 import { UserRole } from '@/lib/types';
@@ -18,7 +19,7 @@ function CreateReelPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const supabase = createBrowserClient();
+  const supabase = createSupabaseClient();
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

@@ -1,67 +1,28 @@
-import { createBrowserClient } from '@/lib/supabase/client';
+
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { Profile } from "@/lib/types";
 
 export async function getUser() {
-    const supabase = createBrowserClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
-}
+  const supabase = createSupabaseServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
 
-export async function getUserProfile() {
-    const supabase = createBrowserClient();
-    const { data: { user } } = await supabase.auth.getUser();
+  if (!session) {
+    return null;
+  }
 
-    if (!user) {
-        return null;
-    }
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", session.user.id)
+    .single();
 
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('*, role:roles(name)')
-        .eq('id', user.id)
-        .single();
+  if (error) {
+    console.error("Error getting user profile:", error);
+    return session.user;
+  }
 
-    if (error) {
-        console.error('Error fetching user profile:', error);
-        return null;
-    }
-
-    return data;
-}
-
-export async function getUserRole() {
-    const profile = await getUserProfile();
-
-    if (!profile || !profile.role) {
-        return null;
-    }
-
-    const role = profile.role;
-
-    if (Array.isArray(role)) {
-        return role[0]?.name || null;
-    } else {
-        return role.name || null;
-    }
-}
-
-export async function getUnreadNotificationsCount() {
-    const supabase = createBrowserClient();
-    const user = await getUser();
-
-    if (!user) {
-        return 0;
-    }
-
-    const { count, error } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false);
-
-    if (error) {
-        console.error('Error fetching unread notifications count:', error);
-        return 0;
-    }
-
-    return count || 0;
+  return {
+    ...session.user,
+    profile: profile as Profile,
+  };
 }

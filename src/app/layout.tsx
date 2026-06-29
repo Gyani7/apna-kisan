@@ -1,3 +1,4 @@
+
 import '../styles/globals.css';
 import { Inter } from 'next/font/google';
 import { GeistSans } from 'geist/font/sans';
@@ -7,9 +8,7 @@ import { ModalProvider } from '@/components/Providers';
 import { SiteHeader } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { SiteFooter } from '@/components/SiteFooter';
-import SessionProviderWrapper from './session-provider';
-import { GuestProvider } from './guest-provider';
-import AuthProvider from '@/components/AuthProvider';
+import { AuthProvider } from '@/components/AuthProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -31,21 +30,17 @@ export default function RootLayout({
         />
       </head>
       <body className={cn(inter.className, "pb-16 md:pb-0")}>
-        <SessionProviderWrapper>
-          <GuestProvider>
-            <AuthProvider>
-              <ModalProvider>
-                <div className="relative flex min-h-screen flex-col">
-                  <SiteHeader />
-                  <main className="flex-1">{children}</main>
-                  <SiteFooter />
-                </div>
-                <BottomNav />
-                <Toaster />
-              </ModalProvider>
-            </AuthProvider>
-          </GuestProvider>
-        </SessionProviderWrapper>
+        <AuthProvider>
+          <ModalProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <SiteHeader />
+              <main className="flex-1">{children}</main>
+              <SiteFooter />
+            </div>
+            <BottomNav />
+            <Toaster />
+          </ModalProvider>
+        </AuthProvider>
         <script src="https://unpkg.com/mappls-gl/dist/mappls-gl.js" defer></script>
       </body>
     </html>

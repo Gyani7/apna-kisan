@@ -1,7 +1,8 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import { getUser } from '@/lib/user';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,7 +12,7 @@ import { UserRole } from '@/lib/types';
 function ChatPage() {
   const [conversations, setConversations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createBrowserClient();
+  const supabase = createSupabaseClient();
 
   useEffect(() => {
     const fetchConversations = async () => {
