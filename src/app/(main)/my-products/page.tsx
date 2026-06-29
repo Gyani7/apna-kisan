@@ -10,7 +10,7 @@ import Link from "next/link";
 import { PlusCircle } from 'lucide-react';
 
 async function MyProductsPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {

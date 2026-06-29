@@ -1,27 +1,32 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
 import { createSupabaseClient } from '@/lib/supabase/client';
-import { getUser } from '@/lib/user';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import withAuthorization from '@/components/withAuthorization';
 import { UserRole } from '@/lib/types';
+import { User } from '@supabase/supabase-js';
 
 function ChatPage() {
   const [conversations, setConversations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
   const supabase = createSupabaseClient();
 
   useEffect(() => {
-    const fetchConversations = async () => {
-      const user = await getUser();
-      if (!user) {
-        setIsLoading(false);
-        return;
-      }
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
 
+    fetchUser();
+  }, [supabase]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchConversations = async () => {
       const { data, error } = await supabase
         .from('conversations')
         .select(`
@@ -39,7 +44,7 @@ function ChatPage() {
     };
 
     fetchConversations();
-  }, [supabase]);
+  }, [supabase, user]);
 
   if (isLoading) {
     return <div>Loading...</div>;

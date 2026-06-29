@@ -1,12 +1,12 @@
-
 'use server';
 
-import { getUser } from "@/lib/user";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 
 export async function createCheckoutSession() {
-  const user = await getUser();
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return redirect("/login");

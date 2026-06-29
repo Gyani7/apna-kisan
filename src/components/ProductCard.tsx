@@ -5,13 +5,14 @@ import Image from 'next/image';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Product } from '@/lib/types';
-import { getUser } from '@/lib/user';
 import { useEffect, useState, useTransition } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Heart, ShoppingCart, Trash2, Edit } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { useModal } from './Providers';
 import { deleteProduct } from '@/app/(main)/my-products/actions';
+import { createSupabaseClient } from '@/lib/supabase/client';
+import { User } from '@supabase/supabase-js';
 
 interface ProductCardProps {
   product: Product;
@@ -20,16 +21,24 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const [isOwner, setIsOwner] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   const { showPremiumModal } = useModal();
+  const supabase = createSupabaseClient();
 
   useEffect(() => {
-    const checkOwnership = async () => {
-      const currentUser = await getUser();
-      setIsOwner(currentUser?.id === product.farmer_id);
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
     };
-    checkOwnership();
-  }, [product.farmer_id]);
+    fetchUser();
+  }, [supabase]);
+
+  useEffect(() => {
+    if (user) {
+      setIsOwner(user.id === product.farmer_id);
+    }
+  }, [user, product.farmer_id]);
 
   const handleDelete = () => {
     startTransition(async () => {

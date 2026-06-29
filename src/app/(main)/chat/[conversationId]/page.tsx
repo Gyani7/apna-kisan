@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import { getUser } from '@/lib/user';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import { useParams } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -11,13 +10,15 @@ import withAuthorization from '@/components/withAuthorization';
 import { ArrowLeft, Send } from 'lucide-react';
 import Link from 'next/link';
 import { UserRole } from '@/lib/types';
+import { User } from '@supabase/supabase-js';
 
 function ConversationPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [otherUser, setOtherUser] = useState<any>(null);
-  const supabase = createClient();
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createSupabaseClient();
   const params = useParams();
   const conversationId = params?.conversationId as string;
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
@@ -31,12 +32,17 @@ function ConversationPage() {
   }, [messages]);
 
   useEffect(() => {
-    if (!conversationId) return;
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    fetchUser();
+  }, [supabase]);
+
+  useEffect(() => {
+    if (!conversationId || !user) return;
 
     const fetchConversationDetails = async () => {
-      const user = await getUser();
-      if (!user) return;
-
       const { data: convData, error: convError } = await supabase
         .from('conversations')
         .select('*, user1:profiles!conversations_user_1_id_fkey(*), user2:profiles!conversations_user_2_id_fkey(*)')
@@ -45,6 +51,7 @@ function ConversationPage() {
       
       if (convError || !convData) {
         console.error('Error fetching conversation details:', convError);
+        setIsLoading(false);
         return;
       }
 
@@ -67,24 +74,33 @@ function ConversationPage() {
 
     fetchConversationDetails();
 
+    const handleNewMessage = async (payload: any) => {
+      const { data: newMessage, error } = await supabase
+        .from('messages')
+        .select('*, author:profiles(*)')
+        .eq('id', payload.new.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching new message:', error);
+      } else if (newMessage) {
+        setMessages((currentMessages) => [...currentMessages, newMessage]);
+      }
+    };
+
     const subscription = supabase
       .channel(`messages:${conversationId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
-        setMessages((currentMessages) => [...currentMessages, payload.new]);
-      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, handleNewMessage)
       .subscribe();
 
     return () => {
       supabase.removeChannel(subscription);
     };
-  }, [conversationId, supabase]);
+  }, [conversationId, supabase, user]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !conversationId) return;
-
-    const user = await getUser();
-    if (!user) return;
+    if (!newMessage.trim() || !conversationId || !user) return;
 
     const { error } = await supabase.from('messages').insert({
       conversation_id: conversationId,

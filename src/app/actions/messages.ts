@@ -1,26 +1,41 @@
 'use server';
 
-import { createSupabaseClient } from "@/lib/supabase/client";
-import { getUser } from "@/lib/user";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 export async function createConversation(recipientId: string) {
-    const supabase = createSupabaseClient();
-    const user = await getUser();
+  const supabase = await createSupabaseServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
 
-    if (!user) {
-        return redirect("/login");
-    }
+  if (!session) {
+    return redirect("/login");
+  }
 
-    const { data: conversation, error } = await supabase
-        .from("conversations")
-        .insert([{ user_1: user.id, user_2: recipientId }])
-        .select();
+  const user = session.user;
 
-    if (error) {
-        console.error("Error creating conversation", error);
-        return;
-    }
+  const { data: conversation, error } = await supabase
+    .from("conversations")
+    .select("id")
+    .or(`user1.eq.${user.id},user2.eq.${user.id}`)
+    .or(`user1.eq.${recipientId},user2.eq.${recipientId}`)
+    .single();
 
-    redirect(`/messages/${conversation[0].id}`);
+  if (conversation) {
+    return redirect(`/messages/${conversation.id}`);
+  }
+
+  const { data: newConversation, error: newConversationError } = await supabase
+    .from("conversations")
+    .insert([{ user1: user.id, user2: recipientId }])
+    .select("id")
+    .single();
+
+  if (newConversationError) {
+    console.error("Error creating conversation:", newConversationError);
+    return { error: "Could not create conversation." };
+  }
+
+  if (newConversation) {
+    redirect(`/messages/${newConversation.id}`);
+  }
 }

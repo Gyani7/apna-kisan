@@ -8,7 +8,7 @@ import { removeItemFromWishlist } from "./actions";
 import { Button } from "@/components/ui/button";
 
 export default async function WishlistPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {

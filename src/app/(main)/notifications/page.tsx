@@ -2,24 +2,30 @@
 
 import { useEffect, useState } from 'react';
 import { createSupabaseClient } from '@/lib/supabase/client';
-import { getUser } from '@/lib/user';
 import { Notification, NotificationType, POST_TYPE_CONFIG, NewLikeNotificationMetadata } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { User } from '@supabase/supabase-js';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
   const supabase = createSupabaseClient();
 
   useEffect(() => {
-    const fetchNotifications = async () => {
-      const user = await getUser();
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
 
+    fetchUser();
+  }, [supabase]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchNotifications = async () => {
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
@@ -35,7 +41,7 @@ export default function NotificationsPage() {
     };
 
     fetchNotifications();
-  }, [supabase]);
+  }, [supabase, user]);
 
   const handleNotificationClick = async (notification: Notification) => {
     if (!notification.is_read) {
@@ -55,7 +61,6 @@ export default function NotificationsPage() {
   };
 
   const markAllAsRead = async () => {
-    const user = await getUser();
     if (!user) return;
 
     const { error } = await supabase

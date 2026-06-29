@@ -3,9 +3,10 @@
 import { ComponentType, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
-import { getUser } from '@/lib/user';
+import { User, createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { UserRole } from '@/lib/types';
 import { useModal } from '@/components/Providers';
+import { createSupabaseClient } from '@/lib/supabase/client';
 
 const withAuthorization = <P extends object>(
   WrappedComponent: ComponentType<P>,
@@ -14,13 +15,23 @@ const withAuthorization = <P extends object>(
   const WithAuthorization = (props: P) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthorized, setIsAuthorized] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
     const router = useRouter();
     const { toast } = useToast();
     const { showPremiumModal } = useModal();
+    const supabase = createSupabaseClient();
 
     useEffect(() => {
+        const fetchUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        fetchUser();
+    }, [supabase]);
+
+    useEffect(() => {
+      if (!user) return;
       const checkAuth = async () => {
-        const user = await getUser();
 
         if (!user) {
           showPremiumModal();
@@ -45,7 +56,7 @@ const withAuthorization = <P extends object>(
       };
 
       checkAuth();
-    }, [router, toast, showPremiumModal, allowedRoles]);
+    }, [router, toast, showPremiumModal, allowedRoles, user]);
 
     if (isLoading) {
       return <div>Loading...</div>; // Or a loading spinner

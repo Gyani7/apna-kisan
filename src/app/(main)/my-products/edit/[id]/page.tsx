@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { updateProduct } from "@/app/(main)/my-products/actions";
-import { getUser } from "@/lib/user";
 
 interface EditProductPageProps {
   params: {
@@ -18,8 +17,8 @@ interface EditProductPageProps {
 }
 
 export default async function EditProductPage({ params }: EditProductPageProps) {
-  const supabase = createSupabaseServerClient();
-  const user = await getUser();
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect("/login");

@@ -8,10 +8,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { createSupabaseClient } from '@/lib/supabase/client';
-import { getUser } from '@/lib/user';
 import withAuthorization from '@/components/withAuthorization';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserRole } from '@/lib/types';
+import { User } from '@supabase/supabase-js';
 
 function EditProfilePage() {
   const [username, setUsername] = useState('');
@@ -20,13 +20,23 @@ function EditProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createSupabaseClient();
 
   useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    fetchUser();
+  }, [supabase]);
+
+  useEffect(() => {
+    if (!user) return;
+
     const fetchProfile = async () => {
-      const user = await getUser();
       if (!user) {
         router.push('/login');
         return;
@@ -52,7 +62,7 @@ function EditProfilePage() {
     };
 
     fetchProfile();
-  }, [router, supabase, toast]);
+  }, [user, router, supabase, toast]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -64,10 +74,8 @@ function EditProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    const user = await getUser();
     if (!user) return;
+    setIsSubmitting(true);
 
     let newAvatarUrl = avatarUrl;
     if (avatarFile) {

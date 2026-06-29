@@ -8,7 +8,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 // Updated Stories component to fetch real data
 async function Stories() {
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { data: profiles, error } = await supabase
         .from('profiles')
         .select('id, name, avatar_url')
@@ -42,7 +42,7 @@ async function Stories() {
 
 // Updated VillageHub component to fetch real data
 async function VillageHub({ user }: { user: any }) {
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     // Fetch top farmers - assuming a 'rank' column in profiles
     const { data: topFarmers, error: farmersError } = await supabase
         .from('profiles')
@@ -101,7 +101,7 @@ async function VillageHub({ user }: { user: any }) {
 
 // Updated CommunityInsights to fetch real data
 async function CommunityInsights() {
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { data: insights, error } = await supabase
         .from('community_insights')
         .select('trending_discussions, live_qa, success_stories')
@@ -138,7 +138,7 @@ async function CommunityInsights() {
 }
 
 export default async function CommunityPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   return (

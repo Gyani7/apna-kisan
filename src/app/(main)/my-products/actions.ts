@@ -1,18 +1,15 @@
-
 'use server';
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getUser } from "@/lib/user";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function updateProduct(productId: string, formData: FormData) {
-    const user = await getUser();
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
         redirect("/login");
     }
-
-    const supabase = createSupabaseServerClient();
 
     const { data: product, error: fetchError } = await supabase
         .from("products")
@@ -65,12 +62,12 @@ export async function updateProduct(productId: string, formData: FormData) {
 
 
 export async function deleteProduct(productId: string) {
-  const user = await getUser();
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     redirect("/login");
   }
 
-  const supabase = createSupabaseServerClient();
 
   // First, verify that the user owns the product
   const { data: product, error: fetchError } = await supabase
@@ -81,12 +78,18 @@ export async function deleteProduct(productId: string) {
 
   if (fetchError || !product) {
     console.error("Product not found");
-    return;
+    return {
+        success: false,
+        message: "Product not found"
+    };
   }
 
   if (product.farmer_id !== user.id) {
     console.error("You are not authorized to delete this product");
-    return;
+    return {
+        success: false,
+        message: "You are not authorized to delete this product"
+    };
   }
 
   // If authorized, proceed with deletion
@@ -94,8 +97,16 @@ export async function deleteProduct(productId: string) {
 
   if (deleteError) {
     console.error("Error deleting product:", deleteError);
+    return {
+        success: false,
+        message: "Error deleting product"
+    };
   } else {
     revalidatePath("/my-products");
     revalidatePath("/market"); // Also revalidate the main market page
+    return {
+        success: true,
+        message: "Product deleted successfully"
+    };
   }
 }

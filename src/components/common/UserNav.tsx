@@ -1,3 +1,4 @@
+'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -10,12 +11,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getUser } from "@/lib/user";
-import { SignOut } from "@/components/SignOutButton";
+import { SignOutButton } from "@/components/SignOutButton";
 import Link from "next/link";
+import { createSupabaseClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
 
-export async function UserNav() {
-  const user = await getUser();
+export function UserNav() {
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createSupabaseClient();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, [supabase.auth]);
 
   if (!user) {
     return null;
@@ -51,15 +63,10 @@ export async function UserNav() {
           <DropdownMenuItem asChild>
             <Link href="/settings">Settings</Link>
           </DropdownMenuItem>
-          {!user.profile?.premium && (
-            <DropdownMenuItem asChild>
-              <Link href="/checkout">Go Premium</Link>
-            </DropdownMenuItem>
-          )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <SignOut />
+          <SignOutButton />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

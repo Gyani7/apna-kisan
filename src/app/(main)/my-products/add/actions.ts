@@ -1,13 +1,12 @@
-
 'use server';
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getUser } from "@/lib/user";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function addProduct(formData: FormData) {
-  const user = await getUser();
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect("/login");
@@ -22,8 +21,6 @@ export async function addProduct(formData: FormData) {
     image_url: formData.get("image_url") as string,
     farmer_id: user.id,
   };
-
-  const supabase = createSupabaseServerClient();
 
   const { error } = await supabase.from("products").insert([productData]);
 

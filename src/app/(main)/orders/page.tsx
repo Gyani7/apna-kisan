@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 
 export default async function OrdersPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {

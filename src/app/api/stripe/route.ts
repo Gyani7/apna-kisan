@@ -35,10 +35,12 @@ export async function POST(req: Request) {
         }
       );
 
-    await supabase
-      .from("profiles")
-      .update({ premium: true })
-      .eq("id", session.customer_details.email);
+    if (session.customer_details && session.customer_details.email) {
+        await supabase
+          .from("profiles")
+          .update({ premium: true })
+          .eq("id", session.customer_details.email);
+    }
   }
 
   return NextResponse.json({ received: true });

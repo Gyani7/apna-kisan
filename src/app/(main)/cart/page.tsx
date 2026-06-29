@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 import { removeItem } from "./actions";
 
 export default async function CartPage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {

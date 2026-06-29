@@ -12,7 +12,7 @@ const productSchema = z.object({
 });
 
 export async function createProduct(productData: unknown) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
@@ -50,7 +50,7 @@ export async function createProduct(productData: unknown) {
 }
 
 export async function updateProduct(productId: string, productData: unknown) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
