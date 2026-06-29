@@ -1,4 +1,4 @@
-import { getMandiRates } from "@/lib/supabase/app-features";
+import { mandiRates as getMandiRates } from "@/lib/supabase/app-features";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 

@@ -1,4 +1,4 @@
-import { getAdvisory } from "@/lib/supabase/app-features";
+import { cropAdvisory as getAdvisory } from "@/lib/supabase/app-features";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 

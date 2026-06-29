@@ -7,10 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import type { MandiRateRow, ProfileRow } from '@/lib/database.types';
 
-const supabase = createBrowserClient();
+const supabase = createSupabaseClient();
 
 async function getMandiRates() {
     const { data } = await supabase.from('mandi_rates').select('*').order('updated_at', { ascending: false }).limit(4);

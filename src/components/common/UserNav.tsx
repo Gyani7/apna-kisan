@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getUser } from "@/lib/user";
-import { SignOut } from "@/components/auth/buttons";
+import { SignOut } from "@/components/SignOutButton";
 import Link from "next/link";
 
 export async function UserNav() {

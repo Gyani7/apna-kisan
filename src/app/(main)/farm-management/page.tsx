@@ -1,4 +1,4 @@
-import { getFarmData } from "@/lib/supabase/app-features";
+import { farmManagementData as getFarmData } from "@/lib/supabase/app-features";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 

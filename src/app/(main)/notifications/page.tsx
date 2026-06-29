@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import { getUser } from '@/lib/user';
 import { Notification, NotificationType, POST_TYPE_CONFIG, NewLikeNotificationMetadata } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createBrowserClient();
+  const supabase = createSupabaseClient();
 
   useEffect(() => {
     const fetchNotifications = async () => {

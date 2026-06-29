@@ -1,9 +1,9 @@
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Product, UserRole } from "@/lib/types";
-import { ProductCard } from "@/components/ProductCard";
+import { ProductCard } from "@/components/marketplace/ProductCard";
 import { redirect } from "next/navigation";
-import { Shell } from "@/components/Shell";
+import { Shell } from "@/components/shell";
 import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";

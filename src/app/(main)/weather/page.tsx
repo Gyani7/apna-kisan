@@ -1,4 +1,4 @@
-import { getWeatherData } from "@/lib/supabase/app-features";
+import { weatherData as getWeatherData } from "@/lib/supabase/app-features";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WeatherData } from "@/lib/weather";
 

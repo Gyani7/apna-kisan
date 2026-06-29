@@ -1,4 +1,4 @@
-import { getAllSchemes } from "@/lib/supabase/app-features";
+import { schemes as getAllSchemes } from "@/lib/supabase/app-features";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
