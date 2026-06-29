@@ -37,7 +37,7 @@ export default async function WishlistPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {wishlistItems.map((item) => (
             <div key={item.id} className="relative">
-              {item.products && <ProductCard product={item.products} />}
+              {item.products && <ProductCard product={item.products[0]} />}
               <form action={async () => { 
                 'use server';
                 await removeItemFromWishlist(item.id);

@@ -2,8 +2,8 @@ import { loans as getAllLoans } from "@/lib/supabase/app-features";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-export default async function LoansPage() {
-  const loans = await getAllLoans();
+export default function LoansPage() {
+  const loans = getAllLoans;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

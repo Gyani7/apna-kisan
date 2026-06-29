@@ -1,3 +1,4 @@
+
 'use server';
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -29,9 +30,8 @@ export async function addProduct(formData: FormData) {
   if (error) {
     console.error("Error adding product:", error);
     // Optionally, return an error message to the form
-    return { success: false, message: "Failed to add product." };
+  } else {
+    revalidatePath("/my-products");
+    redirect("/my-products");
   }
-
-  revalidatePath("/my-products");
-  redirect("/my-products");
 }

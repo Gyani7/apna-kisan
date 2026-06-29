@@ -30,7 +30,7 @@ export default async function CartPage() {
   }
 
   const totalPrice = cartItems?.reduce((acc, item) => {
-    const productPrice = item.products?.price || 0;
+    const productPrice = item.products?.[0]?.price || 0;
     return acc + productPrice * item.quantity;
   }, 0) || 0;
 
@@ -54,10 +54,10 @@ export default async function CartPage() {
             <TableBody>
               {cartItems.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell>{item.products?.title}</TableCell>
-                  <TableCell>₹{item.products?.price}</TableCell>
+                  <TableCell>{item.products?.[0]?.title}</TableCell>
+                  <TableCell>₹{item.products?.[0]?.price}</TableCell>
                   <TableCell>{item.quantity}</TableCell>
-                  <TableCell>₹{(item.products?.price || 0) * item.quantity}</TableCell>
+                  <TableCell>₹{(item.products?.[0]?.price || 0) * item.quantity}</TableCell>
                   <TableCell>
                     <form action={async () => { 
                       'use server';

@@ -1,11 +1,11 @@
 'use server';
 
-import { createBrowserClient } from "@/lib/supabase/client";
+import { createSupabaseClient } from "@/lib/supabase/client";
 import { getUser } from "@/lib/user";
 import { redirect } from "next/navigation";
 
 export async function createConversation(recipientId: string) {
-    const supabase = createBrowserClient();
+    const supabase = createSupabaseClient();
     const user = await getUser();
 
     if (!user) {

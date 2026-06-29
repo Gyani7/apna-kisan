@@ -7,8 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, CheckCircle2, ArrowRight } from "lucide-react";
 
-export default async function SchemesPage() {
-  const schemes = await getAllSchemes();
+export default function SchemesPage() {
+  const schemes = getAllSchemes;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50/30 dark:from-slate-950 dark:to-emerald-950/20 py-8">

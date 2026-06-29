@@ -1,9 +1,9 @@
-import { cropAdvisory as getAdvisory } from "@/lib/supabase/app-features";
+import { cropAdvisory as getAdvisoryData } from "@/lib/supabase/app-features";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-export default async function CropAdvisoryPage() {
-  const advisory = await getAdvisory();
+export default function CropAdvisoryPage() {
+  const advisory = getAdvisoryData;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

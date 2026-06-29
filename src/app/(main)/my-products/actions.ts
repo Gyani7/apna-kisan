@@ -1,3 +1,4 @@
+
 'use server';
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -20,11 +21,13 @@ export async function updateProduct(productId: string, formData: FormData) {
         .single();
 
     if (fetchError || !product) {
-        return { success: false, message: "Product not found." };
+        console.error("Product not found");
+        return;
     }
 
     if (product.farmer_id !== user.id) {
-        return { success: false, message: "You are not authorized to edit this product." };
+        console.error("You are not authorized to edit this product.");
+        return;
     }
 
     const title = formData.get('title') as string;
@@ -35,7 +38,8 @@ export async function updateProduct(productId: string, formData: FormData) {
     const image_url = formData.get('image_url') as string;
 
     if (!title || !description || isNaN(price) || isNaN(stock) || !category) {
-        return { success: false, message: "Invalid form data." };
+        console.error("Invalid form data.");
+        return;
     }
 
     const { error: updateError } = await supabase
@@ -52,12 +56,11 @@ export async function updateProduct(productId: string, formData: FormData) {
 
     if (updateError) {
         console.error("Error updating product:", updateError);
-        return { success: false, message: "Failed to update product." };
+    } else {
+        revalidatePath(`/my-products/edit/${productId}`);
+        revalidatePath('/my-products');
+        redirect('/my-products');
     }
-
-    revalidatePath(`/my-products/edit/${productId}`);
-    revalidatePath('/my-products');
-    redirect('/my-products');
 }
 
 
@@ -77,11 +80,13 @@ export async function deleteProduct(productId: string) {
     .single();
 
   if (fetchError || !product) {
-    return { success: false, message: "Product not found." };
+    console.error("Product not found");
+    return;
   }
 
   if (product.farmer_id !== user.id) {
-    return { success: false, message: "You are not authorized to delete this product." };
+    console.error("You are not authorized to delete this product");
+    return;
   }
 
   // If authorized, proceed with deletion
@@ -89,10 +94,8 @@ export async function deleteProduct(productId: string) {
 
   if (deleteError) {
     console.error("Error deleting product:", deleteError);
-    return { success: false, message: "Failed to delete product." };
+  } else {
+    revalidatePath("/my-products");
+    revalidatePath("/market"); // Also revalidate the main market page
   }
-
-  revalidatePath("/my-products");
-  revalidatePath("/market"); // Also revalidate the main market page
-  return { success: true, message: "Product deleted successfully." };
 }
