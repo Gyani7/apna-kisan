@@ -1,4 +1,4 @@
-      'use client'
+'use client'
       
       import { useState, useRef } from 'react'
       import { useChat } from '@ai-sdk/react'
@@ -15,7 +15,7 @@
         X
       } from 'lucide-react'
       import { cn } from '@/lib/utils'
-      import { type CoreMessage } from 'ai';
+      import { type Message } from 'ai';
       
       export default function AiAssistantPage() {
         const {
@@ -46,7 +46,8 @@
           e.preventDefault()
           if (!input.trim() && !imagePreview) return
       
-          const message: CoreMessage = {
+          const message: Message = {
+              id: 'temp-id',
               role: 'user',
               content: []
           }
@@ -121,9 +122,6 @@
                       m.content.map((contentPart, partIndex) => {
                         if (contentPart.type === 'text') {
                           return <p key={partIndex}>{contentPart.text}</p>;
-                        }
-                        if (contentPart.type === 'image') {
-                          return <img key={partIndex} src={contentPart.image as string} alt="User upload" className="max-w-xs rounded-lg" />;
                         }
                         return null;
                       })
