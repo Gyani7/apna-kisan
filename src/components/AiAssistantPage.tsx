@@ -15,7 +15,7 @@
         X
       } from 'lucide-react'
       import { cn } from '@/lib/utils'
-      import { type UIMessage } from 'ai';
+      import { type CoreMessage } from 'ai';
       
       export default function AiAssistantPage() {
         const {
@@ -46,18 +46,16 @@
           e.preventDefault()
           if (!input.trim() && !imagePreview) return
       
-          const message: UIMessage = {
-              id: 'temp-id',
+          const message: CoreMessage = {
               role: 'user',
-              content: []
+              content: input
           }
       
-          if(input.trim()){
-              (message.content as any[]).push({ type: 'text', text: input })
-          }
-
           if (imagePreview) {
-            (message.content as any[]).push({ type: 'image', image: imagePreview });
+            message.content = [
+              { type: 'text', text: input },
+              { type: 'image', image: imagePreview as any }
+            ];
           }
       
           append(message);
@@ -122,6 +120,9 @@
                       m.content.map((contentPart, partIndex) => {
                         if (contentPart.type === 'text') {
                           return <p key={partIndex}>{contentPart.text}</p>;
+                        }
+                        if (contentPart.type === 'image') {
+                          return <img key={partIndex} src={contentPart.image as string} alt="User upload" className="max-w-xs rounded-lg" />;
                         }
                         return null;
                       })
