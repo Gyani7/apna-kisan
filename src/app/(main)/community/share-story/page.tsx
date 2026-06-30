@@ -1,105 +1,82 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { createSupabaseClient } from '@/lib/supabase/client';
-import withAuthorization from '@/components/withAuthorization';
+import { redirect } from 'next/navigation';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { ShareStoryForm } from '@/components/community/ShareStoryForm';
 import { UserRole } from '@/lib/types';
-import { User } from '@supabase/supabase-js';
 
-function ShareStoryPage() {
-  const [content, setContent] = useState('');
-  const [image, setImage] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
-  const { toast } = useToast();
-  const supabase = createSupabaseClient();
+export default async function ShareStoryPage() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    fetchUser();
-  }, [supabase]);
+  if (!user) {
+    return redirect('/login');
+  }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  if (!profile) {
+    return redirect('/login');
+  }
 
-    if (!user) {
-      toast({ title: 'Please log in to share a story.', variant: 'destructive' });
-      setIsSubmitting(false);
-      return;
-    }
+  const canShareStory = [
+    UserRole.Farmer,
+    UserRole.Expert,
+    UserRole.Buyer
+  ].includes(profile.role);
 
-    let imageUrl: string | undefined;
-    if (image) {
-      const { data, error } = await supabase.storage
-        .from('story-images')
-        .upload(`${user.id}/${Date.now()}_${image.name}`, image);
+  if (!canShareStory) {
+    return (
+      <div className="p-4">
+        <h1 className="text-2xl font-bold">Permission Denied</h1>
+        <p>You do not have permission to share stories.</p>
+      </div>
+    );
+  }
+
+  const handleShareStory = async (formData: FormData) => {
+    'use server';
+
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const imageFile = formData.get('image') as File;
+
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      let imageUrl = null;
+      if (imageFile) {
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('stories')
+          .upload(`${user.id}/${Date.now()}_${imageFile.name}`, imageFile);
+
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          return;
+        }
+        imageUrl = uploadData.path;
+      }
+
+      const { data, error } = await supabase.from('posts').insert([
+        {
+          title,
+          content,
+          image_url: imageUrl,
+          user_id: user.id,
+          post_type: 'story',
+        },
+      ]);
 
       if (error) {
-        console.error('Error uploading image:', error);
-        toast({ title: 'Error uploading image', variant: 'destructive' });
-        setIsSubmitting(false);
-        return;
+        console.error('Error inserting story:', error);
+      } else {
+        redirect('/community');
       }
-      const { data: publicUrlData } = supabase.storage.from('story-images').getPublicUrl(data.path);
-      imageUrl = publicUrlData.publicUrl;
     }
-
-    const { error: storyError } = await supabase.from('stories').insert({
-      author_id: user.id,
-      content,
-      image_url: imageUrl,
-    });
-
-    if (storyError) {
-      console.error('Error creating story:', storyError);
-      toast({ title: 'Error creating story', variant: 'destructive' });
-    } else {
-      toast({ title: 'Story shared successfully!' });
-      router.push('/community');
-    }
-
-    setIsSubmitting(false);
   };
 
-  return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Share Your Story</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label htmlFor="content">Your Story</label>
-            <Textarea id="content" value={content} onChange={(e) => setContent(e.target.value)} required />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="image">Add an Image</label>
-            <Input id="image" type="file" onChange={handleImageChange} accept="image/*" />
-          </div>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Sharing...' : 'Share Story'}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
-  );
+  return <ShareStoryForm onSubmit={handleShareStory} />;
 }
-
-export default withAuthorization(ShareStoryPage, [UserRole.FARMER, UserRole.EXPERT, UserRole.BUYER]);

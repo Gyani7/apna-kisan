@@ -1,4 +1,3 @@
-
 "use client";
 
 import { siteConfig } from "@/config/site";
@@ -6,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { MainNav } from "@/components/MainNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { buttonVariants } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
+import { Icons } from "@/components/Icons";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
 import { signOut } from "@/lib/auth";
@@ -36,7 +35,7 @@ export function SiteHeader() {
                   "w-9 px-0"
                 )}
               >
-                <Icons.github className="h-5 w-5" />
+                <Icons.Github className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
               </div>
             </Link>

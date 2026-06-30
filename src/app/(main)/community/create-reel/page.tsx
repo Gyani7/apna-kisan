@@ -1,108 +1,76 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { createSupabaseClient } from '@/lib/supabase/client';
-import withAuthorization from '@/components/withAuthorization';
+import { redirect } from 'next/navigation';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { CreateReelForm } from '@/components/community/CreateReelForm';
 import { UserRole } from '@/lib/types';
-import { User } from '@supabase/supabase-js';
 
-function CreateReelPage() {
-  const [caption, setCaption] = useState('');
-  const [video, setVideo] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
-  const { toast } = useToast();
-  const supabase = createSupabaseClient();
+export default async function CreateReelPage() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    fetchUser();
-  }, [supabase]);
+  if (!user) {
+    return redirect('/login');
+  }
 
-  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setVideo(e.target.files[0]);
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile) {
+    return redirect('/login');
+  }
+
+  const canCreateReel = [
+    UserRole.Farmer,
+    UserRole.Expert,
+    UserRole.Buyer
+  ].includes(profile.role);
+
+  if (!canCreateReel) {
+    return (
+      <div className="p-4">
+        <h1 className="text-2xl font-bold">Permission Denied</h1>
+        <p>You do not have permission to create reels.</p>
+      </div>
+    );
+  }
+
+  const handleCreateReel = async (formData: FormData) => {
+    'use server';
+
+    const caption = formData.get('caption') as string;
+    const videoFile = formData.get('video') as File;
+
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('reels')
+        .upload(`${user.id}/${Date.now()}_${videoFile.name}`, videoFile);
+
+      if (uploadError) {
+        console.error('Error uploading video:', uploadError);
+        return;
+      }
+
+      const { data, error } = await supabase.from('posts').insert([
+        {
+          caption,
+          video_url: uploadData.path,
+          user_id: user.id,
+          post_type: 'reel',
+        },
+      ]);
+
+      if (error) {
+        console.error('Error inserting reel:', error);
+      } else {
+        redirect('/community');
+      }
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    if (!user) {
-      toast({ title: 'Please log in to create a reel.', variant: 'destructive' });
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (!video) {
-      toast({ title: 'Please select a video to upload.', variant: 'destructive' });
-      setIsSubmitting(false);
-      return;
-    }
-
-    const { data, error } = await supabase.storage
-      .from('reels')
-      .upload(`${user.id}/${Date.now()}_${video.name}`, video);
-
-    if (error) {
-      console.error('Error uploading video:', error);
-      toast({ title: 'Error uploading video', variant: 'destructive' });
-      setIsSubmitting(false);
-      return;
-    }
-    const { data: publicUrlData } = supabase.storage.from('reels').getPublicUrl(data.path);
-    const videoUrl = publicUrlData.publicUrl;
-
-    const { error: reelError } = await supabase.from('reels').insert({
-      author_id: user.id,
-      caption,
-      video_url: videoUrl,
-    });
-
-    if (reelError) {
-      console.error('Error creating reel:', reelError);
-      toast({ title: 'Error creating reel', variant: 'destructive' });
-    } else {
-      toast({ title: 'Reel created successfully!' });
-      router.push('/community');
-    }
-
-    setIsSubmitting(false);
-  };
-
-  return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Create a Reel</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label htmlFor="video">Upload Video</label>
-            <Input id="video" type="file" onChange={handleVideoChange} accept="video/*" required />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="caption">Caption</label>
-            <Textarea id="caption" value={caption} onChange={(e) => setCaption(e.target.value)} />
-          </div>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Creating...' : 'Create Reel'}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
-  );
+  return <CreateReelForm onSubmit={handleCreateReel} />;
 }
-
-export default withAuthorization(CreateReelPage, [UserRole.FARMER, UserRole.EXPERT, UserRole.BUYER]);

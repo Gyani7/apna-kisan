@@ -1,73 +1,42 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { createSupabaseClient } from '@/lib/supabase/client';
-import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import withAuthorization from '@/components/withAuthorization';
+import { redirect } from 'next/navigation';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { UserRole } from '@/lib/types';
-import { User } from '@supabase/supabase-js';
+import { ChatList } from '@/components/ChatList';
 
-function ChatPage() {
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
-  const supabase = createSupabaseClient();
+export default async function ChatsPage() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-
-    fetchUser();
-  }, [supabase]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchConversations = async () => {
-      const { data, error } = await supabase
-        .from('conversations')
-        .select(`
-          id,
-          other_user:profiles!conversations_other_user_id_fkey(*)
-        `)
-        .or(`user_1_id.eq.${user.id},user_2_id.eq.${user.id}`);
-
-      if (error) {
-        console.error('Error fetching conversations:', error);
-      } else {
-        setConversations(data);
-      }
-      setIsLoading(false);
-    };
-
-    fetchConversations();
-  }, [supabase, user]);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
+  if (!user) {
+    return redirect('/login');
   }
 
+  const { data: conversations } = await supabase
+    .from('conversations')
+    .select('*, user1:profiles!user1_id(*), user2:profiles!user2_id(*)')
+    .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile) {
+    return redirect('/login');
+  }
+
+  const canStartConversation = [
+    UserRole.Farmer,
+    UserRole.Expert,
+    UserRole.Buyer
+  ].includes(profile.role);
+
   return (
-    <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Conversations</h1>
-      <div className="space-y-2">
-        {conversations.map((conv) => (
-          <Link href={`/chat/${conv.id}`} key={conv.id}>
-            <div className="p-3 bg-white rounded-lg flex items-center gap-3 cursor-pointer hover:bg-gray-50">
-              <Avatar>
-                <AvatarImage src={conv.other_user.avatar_url} />
-                <AvatarFallback>{conv.other_user.username?.[0].toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <p className="font-semibold">{conv.other_user.username}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
+    <ChatList
+      conversations={conversations || []}
+      currentUser={{ id: user.id, role: profile.role }}
+      canStartConversation={canStartConversation}
+    />
   );
 }
-
-export default withAuthorization(ChatPage, [UserRole.FARMER, UserRole.EXPERT, UserRole.BUYER]);

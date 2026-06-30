@@ -1,92 +1,32 @@
-
-import { SidebarNavItem } from "@/types/nav";
-
 export const siteConfig = {
   name: "Apna Kisan",
-  description:
-    "A modern AgriTech Super Platform for farmers, buyers, traders, and administrators.",
+  description: "Apna Kisan is a platform for farmers to connect and share knowledge.",
+  url: "https://apnakisan.com",
+  ogImage: "https://apnakisan.com/og.jpg",
   links: {
     twitter: "https://twitter.com/apnakisan",
-    github: "https://github.com/Gyani7/apna-kisan",
-    docs: "https://apnakisan.com/docs",
+    github: "https://github.com/apnakisan/apnakisan-x",
   },
   mainNav: [
     {
       title: "Home",
       href: "/",
-      icon: "home",
-    },
-    {
-      title: "Community",
-      href: "/community",
-      icon: "community",
-    },
-    {
-      title: "Reels",
-      href: "/reels",
-      icon: "reels",
-    },
-    {
-      title: "AI",
-      href: "/ai-assistant",
-      icon: "ai",
-    },
-    {
-      title: "Profile",
-      href: "/profile",
-      icon: "profile",
     },
   ],
-  sidebarNav: [
-    {
-      title: "Home",
-      href: "/",
-      icon: "home",
-    },
-    {
-      title: "Weather",
-      href: "/weather",
-      icon: "weather",
-    },
-    {
-      title: "Community",
-      href: "/community",
-      icon: "community",
-    },
-    {
-      title: "Village Explorer",
-      href: "/explore",
-      icon: "village",
-    },
-    {
-      title: "Market",
-      href: "/market",
-      icon: "market",
-    },
-    {
-      title: "Govt Schemes",
-      href: "/schemes",
-      icon: "schemes",
-    },
-    {
-      title: "AI Doctor",
-      href: "/disease-prediction",
-      icon: "aiDoctor",
-    },
-    {
-      title: "Messages",
-      href: "/messages",
-      icon: "messages",
-    },
-    {
-      title: "Dashboard",
-      href: "/dashboard",
-      icon: "dashboard",
-    },
-    {
-      title: "Settings",
-      href: "/profile/settings",
-      icon: "settings",
-    },
-  ] as SidebarNavItem[],
 };
+
+export type SiteConfig = typeof siteConfig;
+export type SidebarNavItem = {
+  title: string;
+  disabled?: boolean;
+  external?: boolean;
+} & (
+    | {
+        href: string;
+        items?: never;
+      }
+    | {
+        href?: string;
+        items: any[];
+      }
+  );

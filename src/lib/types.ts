@@ -1,191 +1,170 @@
- import { Heart, MessageCircle, Share2, Bookmark, MapPin, MessageSquare, CircleHelp as HelpCircle, BookOpen, Bell, MoveHorizontal as MoreHorizontal } from 'lucide-react';
-import { StaticImageData } from "next/image";
+export interface UserInfo {
+  id: string;
+  username: string;
+  avatar_url: string;
+  full_name: string;
+}
+
+export interface Post {
+  id: string;
+  userId: string;
+  title: string;
+  content: string;
+  imageUrl: string | null;
+  postType: string;
+  category: string | null;
+  tags: string[] | null;
+  slug: string;
+  excerpt: string | null;
+  readTime: number | null;
+  isFeatured: boolean;
+  likesCount: number;
+  commentsCount: number;
+  sharesCount: number;
+  createdAt: string;
+  author: UserInfo;
+  is_liked: boolean;
+  is_bookmarked: boolean;
+  type: 'post';
+}
 
 export enum UserRole {
-    ADMIN = 'admin',
-    USER = 'user',
-    PRO_USER = 'pro_user',
-    FARMER = 'farmer',
-    EXPERT = 'expert',
-    BUYER = 'buyer',
-}
-
-export enum NotificationType {
-    WELCOME = 'welcome',
-    NEW_USER = 'new_user',
-    NEW_LIKE = 'new_like',
-    NEW_COMMENT = 'new_comment',
-    NEW_ANSWER = 'new_answer',
-}
-
-export interface WelcomeNotificationMetadata {}
-export interface NewUserNotificationMetadata { new_user_id: string; }
-export interface NewLikeNotificationMetadata { post_id: string; liked_by_user_id: string; }
-export interface NewCommentNotificationMetadata { post_id: string; comment_id: string; commented_by_user_id: string; }
-export interface NewAnswerNotificationMetadata { question_id: string; answer_id: string; answered_by_user_id: string; }
-
-export type NotificationMetadata =
-    | WelcomeNotificationMetadata
-    | NewUserNotificationMetadata
-    | NewLikeNotificationMetadata
-    | NewCommentNotificationMetadata
-    | NewAnswerNotificationMetadata;
-
-
-export interface Notification {
-    id: string;
-    user_id: string;
-    message: string;
-    is_read: boolean;
-    created_at: string;
-    type: NotificationType;
-    metadata: NotificationMetadata;
+  Farmer = 'FARMER',
+  Expert = 'EXPERT',
+  Admin = 'ADMIN',
+  Buyer = 'BUYER',
+  User = 'USER',
+  ProUser = 'PRO_USER',
 }
 
 export interface Product {
   id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
   farmer_id: string;
   title: string;
-  description?: string;
-  price: number;
-  category?: string;
-  image_url?: string;
-  stock: number;
-  created_at?: string;
+  category: string;
+  image_url: string;
 }
 
-export interface Author {
+export interface Reel {
   id: string;
-  username: string;
-  full_name: string;
-  avatar_url: string;
-}
-
-export interface PostWithAuthor {
-  id: string;
-  user_id: string;
-  title: string | null;
-  content: string | null;
-  image_url: string | null;
-  post_type: 'question' | 'story' | 'reel' | 'product' | 'mandi_rate';
-  category: string | null;
-  tags: string[] | null;
-  slug: string | null;
-  excerpt: string | null;
-  read_time: number | null;
-  is_featured: boolean | null;
-  likes_count: number;
-  comments_count: number;
-  shares_count: number;
+  video_url: string;
+  caption: string;
+  author: UserInfo;
   created_at: string;
-  author: Author;
+  type: 'reel';
 }
+
+export interface Story {
+  id: string;
+  image_url: string;
+  caption: string;
+  author: UserInfo;
+  created_at: string;
+  title: string;
+  content: string;
+  slug: string;
+  thumbnail_url: string;
+  type: 'story';
+}
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  metadata: any;
+  is_read: boolean;
+  created_at: string;
+  message: string;
+}
+
+export enum NotificationType {
+  NEW_LIKE = 'new_like',
+  NEW_COMMENT = 'new_comment',
+  NEW_FOLLOWER = 'new_follower',
+  WELCOME = 'welcome',
+  NEW_USER = 'new_user',
+}
+
+export const POST_TYPE_CONFIG = {
+  question: {
+    label: 'Question',
+    notification: (metadata: any) => `New answer to your question: ${metadata.question_title}`,
+  },
+  story: {
+    label: 'Story',
+    notification: (metadata: any) => `New story from ${metadata.author_name}`,
+  },
+  reel: {
+    label: 'Reel',
+    notification: (metadata: any) => `New reel from ${metadata.author_name}`,
+  },
+};
+
+export interface NewLikeNotificationMetadata {
+  post_id: string;
+  post_type: string;
+}
+
+export type FeedItemType = Post | Reel | Story | Question;
+
+export const timeAgo = (date: string) => {
+  const now = new Date();
+  const then = new Date(date);
+  const seconds = Math.floor((now.getTime() - then.getTime()) / 1000);
+  let interval = Math.floor(seconds / 31536000);
+  if (interval > 1) {
+    return `${interval} years ago`;
+  }
+  interval = Math.floor(seconds / 2592000);
+  if (interval > 1) {
+    return `${interval} months ago`;
+  }
+  interval = Math.floor(seconds / 86400);
+  if (interval > 1) {
+    return `${interval} days ago`;
+  }
+  interval = Math.floor(seconds / 3600);
+  if (interval > 1) {
+    return `${interval} hours ago`;
+  }
+  interval = Math.floor(seconds / 60);
+  if (interval > 1) {
+    return `${interval} minutes ago`;
+  }
+  return `${Math.floor(seconds)} seconds ago`;
+};
+
+export const formatCount = (count: number) => {
+  if (count < 1000) {
+    return count;
+  }
+  if (count < 1000000) {
+    return `${(count / 1000).toFixed(1)}K`;
+  }
+  return `${(count / 1000000).toFixed(1)}M`;
+};
 
 export interface Answer {
   id: string;
   content: string;
+  author: UserInfo;
   created_at: string;
-  author: Author;
 }
 
-interface BaseFeedItem {
-    id: string;
-    created_at: string;
-    author: Author;
-    likes_count: number;
-    comments_count: number;
-    is_liked: boolean;
-    is_bookmarked: boolean;
-}
-
-export interface Question extends BaseFeedItem {
-    type: 'question';
-    title: string;
-    content: string;
-    slug: string;
-    answers: Answer[];
-}
-
-export interface Story extends BaseFeedItem {
-    type: 'story';
-    title: string;
-    content: string;
-    slug: string;
-    thumbnail_url: string | StaticImageData;
-}
-
-export interface Reel extends BaseFeedItem {
-    type: 'reel';
-    caption?: string;
-    video_url: string;
-    thumbnail_url?: string;
-}
-
-export type FeedItemType = Question | Story | Reel;
-
-export const POST_TYPE_CONFIG = {
-  question: {
-    icon: HelpCircle,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-50',
-    label: 'Question',
-    labelHi: 'सवाल'
-  },
-  article: {
-    icon: BookOpen,
-    color: 'text-green-500',
-    bgColor: 'bg-green-50',
-    label: 'Article',
-    labelHi: 'लेख'
-  },
-  notification: {
-    icon: Bell,
-    color: 'text-orange-500',
-    bgColor: 'bg-orange-50',
-    label: 'Notification',
-    labelHi: 'सूचना'
-  },
-  story: {
-    icon: BookOpen,
-    color: 'text-purple-500',
-    bgColor: 'bg-purple-50',
-    label: 'Story',
-    labelHi: 'कहानी'
-  }
-};
-
-export function timeAgo(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-  let interval = seconds / 31536000;
-  if (interval > 1) return Math.floor(interval) + "y";
-  interval = seconds / 2592000;
-  if (interval > 1) return Math.floor(interval) + "mo";
-  interval = seconds / 86400;
-  if (interval > 1) return Math.floor(interval) + "d";
-  interval = seconds / 3600;
-  if (interval > 1) return Math.floor(interval) + "h";
-  interval = seconds / 60;
-  if (interval > 1) return Math.floor(interval) + "m";
-  return Math.floor(seconds) + "s";
-}
-
-export function formatCount(count: number): string {
-  if (count >= 1000000) {
-    return (count / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-  }
-  if (count >= 1000) {
-    return (count / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-  }
-  return count.toString();
-}
-
-export interface Profile {
+export interface Question {
   id: string;
-  username: string;
-  full_name: string;
-  avatar_url: string;
-  premium: boolean;
+  title: string;
+  content: string;
+  author: UserInfo;
+  created_at: string;
+  answers: Answer[];
+  slug: string;
+  type: 'question';
+}
+
+export interface PostWithAuthor extends Post {
+  author: UserInfo;
 }

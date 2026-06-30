@@ -1,112 +1,82 @@
-'use client';
-
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { createClient } from '@/utils/supabase/client';
-import withAuthorization from '@/components/withAuthorization';
+import { redirect } from 'next/navigation';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { SellProductForm } from '@/components/SellProductForm';
 import { UserRole } from '@/lib/types';
 
-function SellPage() {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [images, setImages] = useState<File[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-  const supabase = createClient();
+export default async function SellPage() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setImages(Array.from(e.target.files));
-    }
-  };
+  if (!user) {
+    return redirect('/login');
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
 
+  if (!profile) {
+    return redirect('/login');
+  }
+
+  const canSell = [
+    UserRole.User,
+    UserRole.ProUser
+  ].includes(profile.role);
+
+  if (!canSell) {
+    return (
+      <div className="p-4">
+        <h1 className="text-2xl font-bold">Permission Denied</h1>
+        <p>You do not have permission to sell products.</p>
+      </div>
+    );
+  }
+
+  const handleSellProduct = async (formData: FormData) => {
+    'use server';
+
+    const name = formData.get('name') as string;
+    const description = formData.get('description') as string;
+    const price = parseFloat(formData.get('price') as string);
+    const imageFile = formData.get('image') as File;
+
+    const supabase = await createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast({ title: 'Please log in to sell products.', variant: 'destructive' });
-      setIsSubmitting(false);
-      return;
-    }
 
-    // 1. Upload images to Supabase Storage
-    const imageUrls: string[] = [];
-    for (const image of images) {
-      const { data, error } = await supabase.storage
-        .from('product-images')
-        .upload(`${user.id}/${Date.now()}_${image.name}`, image);
+    if (user) {
+      let imageUrl = null;
+      if (imageFile) {
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('products')
+          .upload(`${user.id}/${Date.now()}_${imageFile.name}`, imageFile);
+
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          return;
+        }
+        imageUrl = uploadData.path;
+      }
+
+      const { data, error } = await supabase.from('products').insert([
+        {
+          name,
+          description,
+          price,
+          image_url: imageUrl,
+          farmer_id: user.id,
+        },
+      ]);
 
       if (error) {
-        console.error('Error uploading image:', error);
-        toast({ title: 'Error uploading image', variant: 'destructive' });
-        setIsSubmitting(false);
-        return;
+        console.error('Error inserting product:', error);
+      } else {
+        redirect('/market');
       }
-      const { data: publicUrlData } = supabase.storage.from('product-images').getPublicUrl(data.path);
-      imageUrls.push(publicUrlData.publicUrl);
     }
-
-    // 2. Insert product data into the 'products' table
-    const { error: productError } = await supabase.from('products').insert({
-      seller_id: user.id,
-      title,
-      description,
-      price: parseFloat(price),
-      image_urls: imageUrls,
-    });
-
-    if (productError) {
-      console.error('Error creating product:', productError);
-      toast({ title: 'Error creating product', variant: 'destructive' });
-    } else {
-      toast({ title: 'Product listed successfully!' });
-      // Reset form
-      setTitle('');
-      setDescription('');
-      setPrice('');
-      setImages([]);
-    }
-
-    setIsSubmitting(false);
   };
 
-  return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Sell Your Produce</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label htmlFor="title">Product Title</label>
-            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="description">Description</label>
-            <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="price">Price (in ₹)</label>
-            <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} required />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="images">Product Images</label>
-            <Input id="images" type="file" multiple onChange={handleImageChange} accept="image/*" />
-          </div>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Listing...' : 'List Product'}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
-  );
+  return <SellProductForm onSubmit={handleSellProduct} />;
 }
-
-export default withAuthorization(SellPage, [UserRole.USER, UserRole.PRO_USER]);

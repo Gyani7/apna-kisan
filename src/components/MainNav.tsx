@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
-import { Icons } from "./icons";
+import { Icons } from "./Icons";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
@@ -15,7 +15,7 @@ export function MainNav() {
   return (
     <div className="mr-4 hidden md:flex">
       <Link href="/" className="mr-6 flex items-center space-x-2">
-        <Icons.logo className="h-6 w-6" />
+        <Icons.Leaf className="h-6 w-6" />
         <span className="hidden font-bold sm:inline-block">
           {siteConfig.name}
         </span>
@@ -28,7 +28,7 @@ export function MainNav() {
                 className="w-full pl-10 rounded-full bg-muted/50 border-none focus:ring-2 focus:ring-primary"
             />
             <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <Icons.search className="h-5 w-5 text-muted-foreground" />
+                <Icons.Search className="h-5 w-5 text-muted-foreground" />
             </div>
         </div>
       </nav>

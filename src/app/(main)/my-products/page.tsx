@@ -1,71 +1,35 @@
+import { redirect } from 'next/navigation';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { MyProducts } from '@/components/MyProducts';
+import { UserRole } from '@/lib/types';
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { Product, UserRole } from "@/lib/types";
-import { ProductCard } from "@/components/marketplace/ProductCard";
-import { redirect } from "next/navigation";
-import { Shell } from "@/components/shell";
-import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/PageHeader";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { PlusCircle } from 'lucide-react';
-
-async function MyProductsPage() {
+export default async function MyProductsPage() {
   const supabase = await createSupabaseServerClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session) {
-    redirect("/login");
+  if (!user) {
+    return redirect('/login');
   }
 
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
-    .eq('id', session.user.id)
+    .eq('id', user.id)
     .single();
 
-  if (profile?.role !== UserRole.FARMER) {
-    redirect("/");
+  if (!profile || profile.role !== UserRole.Farmer) {
+    return (
+      <div className="p-4">
+        <h1 className="text-2xl font-bold">Access Denied</h1>
+        <p>You must be a farmer to view this page.</p>
+      </div>
+    );
   }
 
-  const { data: products, error } = await supabase
+  const { data: products } = await supabase
     .from('products')
     .select('*')
-    .eq('farmer_id', session.user.id)
-    .order('created_at', { ascending: false });
+    .eq('farmer_id', user.id);
 
-  if (error) {
-    console.error('Error fetching products:', error);
-    // Handle error state, maybe show a toast or an error message
-  }
-
-  return (
-    <Shell>
-      <PageHeader>
-        <div className="flex justify-between items-center">
-          <div>
-            <PageHeaderHeading>My Products</PageHeaderHeading>
-            <PageHeaderDescription>Manage your listed products.</PageHeaderDescription>
-          </div>
-          <Link href="/my-products/add">
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
-            </Button>
-          </Link>
-        </div>
-      </PageHeader>
-      {products && products.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product as Product} />
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed rounded-lg">
-          <p className="text-lg text-muted-foreground">You haven't listed any products yet.</p>
-        </div>
-      )}
-    </Shell>
-  );
+  return <MyProducts products={products || []} />;
 }
-
-export default MyProductsPage;

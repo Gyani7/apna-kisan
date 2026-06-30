@@ -1,39 +1,28 @@
-import type { PostWithAuthor, Author } from '@/lib/types';
-import type { PostRow } from '@/lib/database.types';
+import { Post, UserInfo } from '@/lib/types';
+import { PostRow } from '@/lib/database.types';
 
-export interface RawPost extends PostRow {
-  profiles: Author | null;
-}
-
-const defaultAuthor: Author = {
-  id: '0',
-  username: 'anonymous',
-  full_name: 'Anonymous',
-  avatar_url: '/default-avatar.png',
+export type RawPost = PostRow & {
+  author: UserInfo;
 };
 
-export function mapPostToPostWithAuthor(p: RawPost): PostWithAuthor {
+export const toPost = (rawPost: RawPost): Post => {
   return {
-    id: p.id.toString(),
-    user_id: p.user_id,
-    title: p.title,
-    content: p.content,
-    image_url: p.image_url,
-    post_type: p.post_type as PostWithAuthor['post_type'],
-    category: p.category,
-    tags: p.tags,
-    slug: p.slug,
-    excerpt: p.excerpt,
-    read_time: p.read_time,
-    is_featured: p.is_featured,
-    likes_count: p.likes_count,
-    comments_count: p.comments_count,
-    shares_count: p.shares_count,
-    created_at: p.created_at,
-    author: p.profiles || defaultAuthor,
+    id: rawPost.id,
+    userId: rawPost.user_id,
+    title: rawPost.title,
+    content: rawPost.content,
+    imageUrl: rawPost.image_url,
+    postType: rawPost.post_type,
+    category: rawPost.category,
+    tags: rawPost.tags,
+    slug: rawPost.slug,
+    excerpt: rawPost.excerpt,
+    readTime: rawPost.read_time,
+    isFeatured: rawPost.is_featured,
+    likesCount: rawPost.likes_count,
+    commentsCount: rawPost.comments_count,
+    sharesCount: rawPost.shares_count,
+    createdAt: rawPost.created_at,
+    author: rawPost.author,
   };
-}
-
-export function mapPostsToPostWithAuthor(posts: (RawPost | null)[]): PostWithAuthor[] {
-  return posts.filter((p): p is RawPost => p != null).map(mapPostToPostWithAuthor);
-}
+};

@@ -1,83 +1,71 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { createSupabaseClient } from '@/lib/supabase/client';
-import withAuthorization from '@/components/withAuthorization';
+import { redirect } from 'next/navigation';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { AskQuestionForm } from '@/components/community/AskQuestionForm';
 import { UserRole } from '@/lib/types';
-import { User } from '@supabase/supabase-js';
 
-function AskQuestionPage() {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
-  const { toast } = useToast();
-  const supabase = createSupabaseClient();
+export default async function AskQuestionPage() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    fetchUser();
-  }, [supabase]);
+  if (!user) {
+    return redirect('/login');
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
 
-    if (!user) {
-      toast({ title: 'Please log in to ask a question.', variant: 'destructive' });
-      setIsSubmitting(false);
-      return;
+  if (!profile) {
+    return redirect('/login');
+  }
+
+  const canAsk = [
+    UserRole.Farmer,
+    UserRole.Expert,
+    UserRole.Buyer
+  ].includes(profile.role);
+
+  if (!canAsk) {
+    return (
+      <div className="p-4">
+        <h1 className="text-2xl font-bold">Permission Denied</h1>
+        <p>You do not have permission to ask questions.</p>
+      </div>
+    );
+  }
+
+  const handleAskQuestion = async (formData: FormData) => {
+    'use server';
+
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const category = formData.get('category') as string;
+    const tags = (formData.get('tags') as string).split(',');
+
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      const { data, error } = await supabase.from('posts').insert([
+        {
+          title,
+          content,
+          category,
+          tags,
+          user_id: user.id,
+          post_type: 'question', // Add this line
+        },
+      ]);
+
+      if (error) {
+        console.error('Error inserting question:', error);
+      } else {
+        redirect('/community');
+      }
     }
-
-    const { error } = await supabase.from('questions').insert({
-      author_id: user.id,
-      title,
-      content,
-    });
-
-    if (error) {
-      console.error('Error creating question:', error);
-      toast({ title: 'Error creating question', variant: 'destructive' });
-    } else {
-      toast({ title: 'Question posted successfully!' });
-      router.push('/community');
-    }
-
-    setIsSubmitting(false);
   };
 
-  return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Ask a Question</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label htmlFor="title">Question Title</label>
-            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="content">Details</label>
-            <Textarea id="content" value={content} onChange={(e) => setContent(e.target.value)} required />
-          </div>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Posting...' : 'Post Question'}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
-  );
+  return <AskQuestionForm onSubmit={handleAskQuestion} />;
 }
-
-export default withAuthorization(AskQuestionPage, [UserRole.FARMER, UserRole.EXPERT, UserRole.BUYER]);
