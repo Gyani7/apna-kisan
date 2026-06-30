@@ -15,7 +15,7 @@
         X
       } from 'lucide-react'
       import { cn } from '@/lib/utils'
-      import { type Message } from 'ai';
+      import { type UIMessage } from 'ai';
       
       export default function AiAssistantPage() {
         const {
@@ -46,7 +46,7 @@
           e.preventDefault()
           if (!input.trim() && !imagePreview) return
       
-          const message: Message = {
+          const message: UIMessage = {
               id: 'temp-id',
               role: 'user',
               content: []
