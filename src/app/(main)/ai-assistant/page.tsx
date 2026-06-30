@@ -1,6 +1,6 @@
+'use client'
+import AiAssistantPage from '@/components/AiAssistantPage'
 
-import AiAssistantClientPage from './client';
-
-export default function AiAssistantPage() {
-    return <AiAssistantClientPage />;
+export default function Page() {
+  return <AiAssistantPage />
 }

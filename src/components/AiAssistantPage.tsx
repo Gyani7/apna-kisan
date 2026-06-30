@@ -1,238 +1,226 @@
-'use client'
+      'use client'
+      
+      import { useState, useRef } from 'react'
+      import { useChat } from '@ai-sdk/react'
+      import { Button } from '@/components/ui/button'
+      import { Input } from '@/components/ui/input'
+      import {
+        Send,
+        Sprout,
+        Camera,
+        ShieldCheck,
+        Mic,
+        Volume2,
+        Leaf,
+        X
+      } from 'lucide-react'
+      import { cn } from '@/lib/utils'
+      import { type CoreMessage } from 'ai';
+      
+      export default function AiAssistantPage() {
+        const {
+          messages,
+          input,
+          handleInputChange,
+          append,
+          isLoading,
+          setInput
+        } = useChat();
+      
+        const [isRecording, setIsRecording] = useState(false)
+        const fileInputRef = useRef<HTMLInputElement>(null)
+        const [imagePreview, setImagePreview] = useState<string | null>(null)
+      
+        const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+          const file = event.target.files?.[0]
+          if (file) {
+            const reader = new FileReader()
+            reader.onloadend = () => {
+              setImagePreview(reader.result as string)
+            }
+            reader.readAsDataURL(file)
+          }
+        }
+      
+        const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+          e.preventDefault()
+          if (!input.trim() && !imagePreview) return
+      
+          const message: CoreMessage = {
+              role: 'user',
+              content: []
+          }
+      
+          if(input.trim()){
+              (message.content as any[]).push({ type: 'text', text: input })
+          }
 
-import { useState, useRef } from 'react'
-import { useChat } from '@ai-sdk/react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Send,
-  Sprout,
-  Camera,
-  ShieldCheck,
-  Mic,
-  Volume2,
-  Leaf,
-  X
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+          if (imagePreview) {
+            (message.content as any[]).push({ type: 'image', image: imagePreview });
+          }
+      
+          append(message);
+          setInput('');
+          setImagePreview(null);
+        }
 
-export default function AiAssistantPage() {
-  const {
-    messages,
-    append,
-    isLoading,
-  } = useChat();
-
-  const [input, setInput] = useState("");
-  const [isRecording, setIsRecording] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
+        const QuickActionButton = ({
+          icon: Icon,
+          label,
+          onClick
+        }: {
+          icon: React.ElementType
+          label: string
+          onClick?: () => void
+        }) => (
+          <Button
+            variant="outline"
+            className="flex-1 flex-col h-auto"
+            onClick={onClick}
+          >
+            <Icon className="w-6 h-6 mb-2" />
+            <span className="text-xs text-center">{label}</span>
+          </Button>
+        )
+      
+        return (
+          <div className="flex flex-col h-screen bg-gray-50">
+            <header className="flex items-center justify-between p-4 bg-white border-b">
+              <h1 className="text-xl font-bold flex items-center">
+                <Sprout className="w-6 h-6 mr-2 text-green-500" />
+                Krishi Sahayak
+              </h1>
+              <Button variant="ghost" size="icon">
+                <Volume2 />
+              </Button>
+            </header>
+      
+            <main className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((m, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    'flex gap-2',
+                    m.role === 'user' ? 'justify-end' : 'justify-start'
+                  )}
+                >
+                  {m.role !== 'user' && (
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                      <Sprout size={20} />
+                    </div>
+                  )}
+                  <div
+                    className={cn(
+                      'rounded-lg p-3 max-w-sm',
+                      m.role === 'user'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-white border'
+                    )}
+                  >
+                    {Array.isArray(m.content) ? (
+                      m.content.map((contentPart, partIndex) => {
+                        if (contentPart.type === 'text') {
+                          return <p key={partIndex}>{contentPart.text}</p>;
+                        }
+                        if (contentPart.type === 'image') {
+                          return <img key={partIndex} src={contentPart.image as string} alt="User upload" className="max-w-xs rounded-lg" />;
+                        }
+                        return null;
+                      })
+                    ) : (
+                      <p>{m.content as string}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+      
+              {isLoading && (
+                <div className="flex justify-start gap-2">
+                  <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
+                    <Sprout size={20} />
+                  </div>
+                  <div className="rounded-lg p-3 bg-white border">
+                    <div className="flex items-center">
+                      <div className="dot-flashing"></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+      
+              {messages.length === 0 && !isLoading && (
+                <div className="text-center text-gray-500">
+                  <Leaf className="w-12 h-12 mx-auto mb-4" />
+                  <h2 className="text-lg font-semibold">
+                    How can I help you today?
+                  </h2>
+                </div>
+              )}
+            </main>
+      
+            <footer className="bg-white p-4 border-t">
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <QuickActionButton
+                  icon={Camera}
+                  label="Identify Crop Disease"
+                  onClick={() => {
+                    setInput('Identify Crop Disease from this image.')
+                    fileInputRef.current?.click()
+                  }}
+                />
+                <QuickActionButton
+                  icon={ShieldCheck}
+                  label="Pesticide Recommendation"
+                  onClick={() => setInput('Can you recommend a pesticide for ')}
+                />
+              </div>
+      
+              <form onSubmit={handleFormSubmit} className="relative">
+                {imagePreview && (
+                  <div className="relative mb-2">
+                    <img
+                      src={imagePreview}
+                      alt="Image preview"
+                      className="max-w-[100px] max-h-[100px] rounded-lg"
+                    />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6"
+                      onClick={() => setImagePreview(null)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+                <Input
+                  value={input}
+                  onChange={handleInputChange}
+                  placeholder="Ask me anything about farming..."
+                  className="pr-24"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsRecording(!isRecording)}
+                  >
+                    <Mic className={cn(isRecording && 'text-red-500')} />
+                  </Button>
+                  <Button type="submit" variant="ghost" size="icon" disabled={isLoading}>
+                    <Send />
+                  </Button>
+                </div>
+              </form>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*"
+              />
+            </footer>
+          </div>
+        )
       }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!input.trim() && !imagePreview) return
-
-    const content: any[] = [{ type: 'text', text: input }]
-    if (imagePreview) {
-      content.push({ type: 'image', image: imagePreview })
-    }
-
-    append({ role: 'user', content: content })
-
-    setInput("")
-    setImagePreview(null)
-    if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-    }
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setInput(e.target.value);
-  }
-
-  return (
-    <div className='flex flex-col h-[calc(100vh-64px)] bg-[#002B24] text-white'>
-      {/* Premium Header */}
-      <div className='glass-morphism border-b border-white/10 px-4 py-4 flex items-center justify-between sticky top-0 z-20'>
-        <div className='flex items-center gap-3'>
-          <div className='w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#B8860B] p-[2px]'>
-            <div className='w-full h-full rounded-full bg-[#002B24] flex items-center justify-center'>
-              <Leaf className='w-6 h-6 text-[#FFD700]' />
-            </div>
-          </div>
-          <div>
-            <h1 className='font-bold text-lg text-white'>AI Crop Doctor</h1>
-            <div className='flex items-center gap-2'>
-              <span className='flex items-center gap-1 text-[10px] font-bold uppercase tracking-tighter text-[#FFD700]'>
-                <ShieldCheck className='w-3 h-3' /> Expert Analysis
-              </span>
-            </div>
-          </div>
-        </div>
-        <div className='flex items-center gap-2'>
-           <Button variant='ghost' size='icon' className='rounded-full hover:bg-white/10'>
-              <Volume2 className='w-5 h-5' />
-           </Button>
-        </div>
-      </div>
-
-      {/* Chat Area */}
-      <div className='flex-1 overflow-y-auto p-4 space-y-6 scrollbar-hide'>
-        {messages.length === 0 && (
-            <div className='flex flex-col items-center justify-center h-full text-white/50'>
-                <Sprout size={48} className='mb-4'/>
-                <h2 className='text-lg font-medium'>Namaste! I am your AI Crop Doctor.</h2>
-                <p className='text-sm'>Ask me anything about farming or upload a crop image.</p>
-            </div>
-        )}
-        {messages.map((m) => (
-          <div key={m.id} className={cn('flex flex-col', m.role === 'user' ? 'items-end' : 'items-start')}>
-            <div
-              className={cn(
-                'max-w-[85%] rounded-2xl p-4 shadow-xl backdrop-blur-md border',
-                m.role === 'user' 
-                  ? 'bg-white/10 border-white/20 text-white rounded-tr-none' 
-                  : 'bg-gradient-to-br from-[#2E7D32]/40 to-[#004D40]/40 border-[#2E7D32]/30 text-white rounded-tl-none'
-              )}
-            >
-              {typeof m.content === 'string' ? (
-                <p className='text-sm leading-relaxed'>{m.content}</p>
-              ) : (
-                m.content.map((content, index) => {
-                  if (content.type === 'text') {
-                    return <p key={index} className='text-sm leading-relaxed'>{content.text}</p>
-                  }
-                  if (content.type === 'image') {
-                    return <img key={index} src={content.image as string} alt="" className="w-full h-auto rounded-lg" />
-                  }
-                  return null;
-                })
-              )}
-            </div>
-          </div>
-        ))}
-        {isLoading && (
-          <div className='flex gap-2 items-center text-white/50 text-xs italic ml-2'>
-            <div className='flex gap-1'>
-              <div className='w-1 h-1 bg-white/50 rounded-full animate-bounce' />
-              <div className='w-1 h-1 bg-white/50 rounded-full animate-bounce [animation-delay:0.2s]' />
-              <div className='w-1 h-1 bg-white/50 rounded-full animate-bounce [animation-delay:0.4s]' />
-            </div>
-            AI Doctor is thinking...
-          </div>
-        )}
-      </div>
-
-      {/* Input Section */}
-      <form onSubmit={handleFormSubmit} className='p-4 glass-morphism border-t border-white/10 space-y-4'>
-        {imagePreview && (
-          <div className='relative w-24 h-24 rounded-lg overflow-hidden border-2 border-white/20'>
-            <img src={imagePreview} alt='Preview' className='w-full h-full object-cover' />
-            <Button
-              type='button'
-              size='icon'
-              variant='destructive'
-              className='absolute top-1 right-1 w-6 h-6 rounded-full'
-              onClick={() => {
-                setImagePreview(null)
-                if (fileInputRef.current) {
-                  fileInputRef.current.value = ''
-                }
-              }}
-            >
-              <X className='w-4 h-4' />
-            </Button>
-          </div>
-        )}
-
-        <div className='flex gap-2 overflow-x-auto pb-2 scrollbar-hide'>
-          <Button 
-            type='button'
-            variant='outline' 
-            size='sm' 
-            className='rounded-full bg-white/5 border-white/10 text-white/80 hover:bg-white/10 text-[10px]'
-            onClick={() => setInput('Hindi: गेहूं में पीला रतुआ का इलाज क्या है?')}
-          >
-            Hindi Help
-          </Button>
-          <Button 
-            type='button'
-            variant='outline' 
-            size='sm' 
-            className='rounded-full bg-white/5 border-white/10 text-white/80 hover:bg-white/10 text-[10px]'
-            onClick={() => setInput('Identify this disease')}
-          >
-            Disease ID
-          </Button>
-          <Button 
-            type='button'
-            variant='outline' 
-            size='sm' 
-            className='rounded-full bg-white/5 border-white/10 text-white/80 hover:bg-white/10 text-[10px]'
-            onClick={() => setInput('Treatment for Paddy blast')}
-          >
-            Paddy Treatment
-          </Button>
-        </div>
-
-        <div className='flex items-center gap-2'>
-          <input
-            type='file'
-            accept='image/*'
-            className='hidden'
-            ref={fileInputRef}
-            onChange={handleFileChange}
-          />
-          <Button 
-            type='button'
-            onClick={() => fileInputRef.current?.click()}
-            className='rounded-full w-12 h-12 bg-white/10 border border-white/20 hover:bg-white/20 text-white shrink-0'
-          >
-            <Camera className='w-5 h-5' />
-          </Button>
-          
-          <div className='relative flex-1'>
-            <Input
-              value={input}
-              onChange={handleInputChange}
-              placeholder='Ask anything or upload an image...'
-              className='w-full bg-white/10 border-white/20 text-white placeholder:text-white/40 rounded-full pr-12 focus:ring-[#FFD700]/50'
-            />
-            <Button 
-              type='submit'
-              size='icon' 
-              className='absolute right-1 top-1 rounded-full w-8 h-8 bg-[#FFD700] hover:bg-[#FBC02D] text-[#002B24]'
-              disabled={isLoading || (!input.trim() && !imagePreview)}
-            >
-              <Send className='w-4 h-4' />
-            </Button>
-          </div>
-
-          <Button 
-            type='button'
-            onClick={() => setIsRecording(!isRecording)}
-            className={cn(
-              'rounded-full w-12 h-12 shrink-0 transition-all duration-300',
-              isRecording 
-                ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
-                : 'bg-gradient-to-br from-[#FFD700] to-[#B8860B] hover:opacity-90 text-[#002B24]'
-            )}
-          >
-            <Mic className='w-5 h-5' />
-          </Button>
-        </div>
-      </form>
-    </div>
-  )
-}
+      
