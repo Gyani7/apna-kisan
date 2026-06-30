@@ -19,13 +19,11 @@ import { cn } from '@/lib/utils'
 export default function AiAssistantPage() {
   const {
     messages,
-    input,
-    handleInputChange,
-    handleSubmit,
+    append,
     isLoading,
-    setInput
-  } = useChat({ api: '/api/chat' });
+  } = useChat();
 
+  const [input, setInput] = useState("");
   const [isRecording, setIsRecording] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -50,17 +48,17 @@ export default function AiAssistantPage() {
       content.push({ type: 'image', image: imagePreview })
     }
 
-    handleSubmit(e, {
-      data: {
-        imageUrl: imagePreview
-      }
-    })
+    append({ role: 'user', content: content })
 
     setInput("")
     setImagePreview(null)
     if (fileInputRef.current) {
         fileInputRef.current.value = ''
     }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInput(e.target.value);
   }
 
   return (
