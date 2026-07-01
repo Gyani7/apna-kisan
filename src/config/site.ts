@@ -35,7 +35,7 @@ export const siteConfig = {
       href: "/menu",
       icon: "Search",
     },
-  ],
+  ] as const,
   sidebarNav: [
     {
       title: "Home",
@@ -62,7 +62,7 @@ export const siteConfig = {
       href: "/menu",
       icon: "Search",
     },
-  ]
+  ] as const
 };
 
 export type SiteConfig = typeof siteConfig;
