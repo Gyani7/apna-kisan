@@ -13,54 +13,54 @@ export const siteConfig = {
     {
       title: "Home",
       href: "/",
-      icon: "Home",
+      icon: "Leaf",
     },
     {
       title: "Community",
       href: "/community",
-      icon: "Users",
+      icon: "User",
     },
     {
       title: "Sell",
       href: "/sell",
-      icon: "PlusCircle",
+      icon: "Search",
     },
     {
       title: "Mandi",
       href: "/mandi-rates",
-      icon: "Landmark",
+      icon: "BookOpen",
     },
     {
       title: "Menu",
       href: "/menu",
-      icon: "Menu",
+      icon: "Search",
     },
   ],
   sidebarNav: [
     {
       title: "Home",
       href: "/",
-      icon: "Home",
+      icon: "Leaf",
     },
     {
       title: "Community",
       href: "/community",
-      icon: "Users",
+      icon: "User",
     },
     {
       title: "Sell",
       href: "/sell",
-      icon: "PlusCircle",
+      icon: "Search",
     },
     {
       title: "Mandi",
       href: "/mandi-rates",
-      icon: "Landmark",
+      icon: "BookOpen",
     },
     {
       title: "Menu",
       href: "/menu",
-      icon: "Menu",
+      icon: "Search",
     },
   ]
 };
