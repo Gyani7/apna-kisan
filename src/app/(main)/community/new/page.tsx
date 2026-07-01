@@ -5,11 +5,13 @@ import { useState } from 'react';
 import { createSupabaseClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
 import { Icons } from '@/components/icons';
 
 export default function NewPostPage() {
+  const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const supabase = createSupabaseClient();
@@ -28,9 +30,11 @@ export default function NewPostPage() {
       });
     }
 
+    const slug = title.toLowerCase().replace(/\s+/g, '-');
+
     const { error } = await supabase
       .from('posts')
-      .insert([{ content, user_id: user.id }]);
+      .insert([{ title, content, user_id: user.id, post_type: 'story', slug }]);
 
     setIsLoading(false);
 
@@ -50,13 +54,18 @@ export default function NewPostPage() {
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Create a New Post</h1>
       <div className="grid gap-4">
+        <Input
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
         <Textarea
           placeholder="What's on your mind?"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={5}
         />
-        <Button onClick={handlePost} disabled={isLoading || !content.trim()}>
+        <Button onClick={handlePost} disabled={isLoading || !content.trim() || !title.trim()}>
           {isLoading && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}Post
         </Button>
       </div>
