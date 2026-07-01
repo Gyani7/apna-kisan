@@ -1,9 +1,11 @@
-import { Smartphone, User, BookOpen, LucideProps } from 'lucide-react';
+import { Smartphone, User, BookOpen, LucideProps, Leaf, Search } from 'lucide-react';
 
 export const Icons = {
     Smartphone,
     User,
     BookOpen,
+    Leaf,
+    Search,
     Spinner: (props: LucideProps) => (
         <svg
             xmlns="http://www.w3.org/2000/svg"
