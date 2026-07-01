@@ -10,63 +10,63 @@
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
- 
+
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
- 
-    --primary: 100 60% 30%;
+
+    --primary: 120 60% 30%; /* Dark Green */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 40 100% 50%;
+    --secondary: 100 80% 50%; /* Lighter Green */
     --secondary-foreground: 20 10% 15%;
- 
+
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
- 
-    --accent: 200 100% 50%;
+
+    --accent: 100 100% 50%;
     --accent-foreground: 222.2 47.4% 11.2%;
- 
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 100 60% 30%;
- 
-    --radius: 1rem;
+    --ring: 120 60% 30%;
+
+    --radius: 1.5rem; /* 2xl */
   }
- 
+
   .dark {
-    --background: 20 10% 10%;
+    --background: 20 10% 5%;
     --foreground: 0 0% 98%;
- 
-    --card: 24 6% 14%;
+
+    --card: 120 20% 10%; /* Dark Greenish Card */
     --card-foreground: 0 0% 98%;
- 
-    --popover: 20 10% 10%;
+
+    --popover: 20 10% 5%;
     --popover-foreground: 0 0% 98%;
- 
-    --primary: 100 60% 40%;
+
+    --primary: 120 60% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 40 100% 60%;
+    --secondary: 100 80% 60%;
     --secondary-foreground: 20 10% 10%;
- 
-    --muted: 24 6% 14%;
+
+    --muted: 120 10% 15%;
     --muted-foreground: 215 20.2% 65.1%;
- 
-    --accent: 200 100% 60%;
+
+    --accent: 100 100% 60%;
     --accent-foreground: 0 0% 100%;
- 
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
- 
-    --border: 24 6% 20%;
-    --input: 24 6% 20%;
-    --ring: 100 60% 40%;
+
+    --border: 120 10% 20%;
+    --input: 120 10% 20%;
+    --ring: 120 60% 40%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
@@ -79,9 +79,9 @@
 
 @layer components {
   .glass-card {
-    @apply bg-card/60 backdrop-blur-lg border rounded-xl shadow-lg;
+    @apply bg-card/60 backdrop-blur-xl border rounded-2xl shadow-lg dark:shadow-green-900/20;
   }
   .premium-button {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 transform hover:scale-105 shadow-lg;
+    @apply bg-gradient-to-tr from-primary to-secondary text-primary-foreground hover:from-primary/90 hover:to-secondary/90 transition-all duration-300 transform hover:scale-105 shadow-lg;
   }
 }

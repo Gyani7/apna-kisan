@@ -110,7 +110,7 @@ export default function ConversationPage({ params }: { params: { conversation_id
           onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
         />
         <Button onClick={handleSendMessage} disabled={isLoading}>
-          {isLoading ? <Icons.spinner className="h-4 w-4 animate-spin" /> : 'Send'}
+          {isLoading ? <Icons.Spinner className="h-4 w-4 animate-spin" /> : 'Send'}
         </Button>
       </div>
     </div>

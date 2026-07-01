@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { createSupabaseClient } from '@/lib/supabase/client';
-import { Notification, NotificationType, POST_TYPE_CONFIG, NewLikeNotificationMetadata } from '@/lib/types';
+import { Notification, NotificationType, NewLikeNotificationMetadata } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { User } from '@supabase/supabase-js';
+import { Leaf, BookOpen } from 'lucide-react';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -77,14 +78,15 @@ export default function NotificationsPage() {
   };
 
   const renderNotificationContent = (notification: Notification) => {
-    const Icon = POST_TYPE_CONFIG.notification.icon;
     let content = <p>{notification.message}</p>;
     let link = '#';
+    let Icon = BookOpen;
 
     switch (notification.type) {
         case NotificationType.NEW_LIKE:
             link = `/post/${(notification.metadata as NewLikeNotificationMetadata).post_id}`;
             content = <p>Your post was liked</p>;
+            Icon = Leaf;
             break;
         case NotificationType.WELCOME:
             content = <p>Welcome to Apna Kisan!</p>;
@@ -99,8 +101,8 @@ export default function NotificationsPage() {
     return (
         <Link href={link} className="w-full">
             <div className="flex items-start space-x-4">
-                <div className={`${POST_TYPE_CONFIG.notification.bgColor} p-2 rounded-full`}>
-                  <Icon className={`${POST_TYPE_CONFIG.notification.color} w-6 h-6`} />
+                <div className="bg-primary p-2 rounded-full">
+                  <Icon className="text-white w-6 h-6" />
                 </div>
                 <div>
                     {content}
