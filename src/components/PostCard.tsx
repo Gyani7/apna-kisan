@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FeedItemType, timeAgo, formatCount } from '@/lib/types';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import { useAuth } from '@/components/AuthProvider';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from '@/components/ui/use-toast';
 
-const supabase = createBrowserClient();
+const supabase = createSupabaseClient();
 
 async function toggleLike(postId: string, userId: string) {
     await supabase.rpc('toggle_like', { post_id: postId, user_id: userId });
