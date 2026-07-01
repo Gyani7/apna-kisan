@@ -24,7 +24,7 @@ export function LeftSidebar() {
         <span className="ml-3 text-xl font-bold text-primary">{siteConfig.name}</span>
       </div>
       <nav className="flex-1 px-4 py-4 space-y-3">
-        {siteConfig.sidebarNav.map((item: NavItem) => {
+        {siteConfig.sidebarNav.map((item) => {
           const Icon = Icons[item.icon];
           const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
           return (
@@ -46,7 +46,7 @@ export function LeftSidebar() {
       </nav>
        <div className="px-4 py-6">
             <Button size="lg" className="w-full premium-button rounded-full">
-                <Icons.Plus className="w-5 h-5 mr-2" />
+                <Icons.Leaf className="w-5 h-5 mr-2" />
                 Create Post
             </Button>
         </div>
