@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { MainNav } from "@/components/MainNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { buttonVariants } from "@/components/ui/button";
-import { Icons } from "@/components/Icons";
+import { Icons } from "@/components/icons";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
 import { signOut } from "@/lib/auth";
