@@ -6,9 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { notFound } from "next/navigation";
 import { removeItem } from "./actions";
+import { Database } from "@/lib/database.types";
+
+type CartItem = Database['public']['Tables']['cart_items']['Row'] & {
+  products: Database['public']['Tables']['products']['Row'] | null;
+};
 
 export default async function CartPage() {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
@@ -22,7 +27,8 @@ export default async function CartPage() {
       quantity,
       products (*)
     `)
-    .eq('user_id', session.user.id);
+    .eq('user_id', session.user.id)
+    .returns<CartItem[]>();
 
   if (error) {
     console.error("Error fetching cart items:", error);
@@ -30,7 +36,7 @@ export default async function CartPage() {
   }
 
   const totalPrice = cartItems?.reduce((acc, item) => {
-    const productPrice = item.products?.[0]?.price || 0;
+    const productPrice = item.products?.price || 0;
     return acc + productPrice * item.quantity;
   }, 0) || 0;
 
@@ -54,10 +60,10 @@ export default async function CartPage() {
             <TableBody>
               {cartItems.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell>{item.products?.[0]?.title}</TableCell>
-                  <TableCell>₹{item.products?.[0]?.price}</TableCell>
+                  <TableCell>{item.products?.title}</TableCell>
+                  <TableCell>₹{item.products?.price}</TableCell>
                   <TableCell>{item.quantity}</TableCell>
-                  <TableCell>₹{(item.products?.[0]?.price || 0) * item.quantity}</TableCell>
+                  <TableCell>₹{(item.products?.price || 0) * item.quantity}</TableCell>
                   <TableCell>
                     <form action={async () => { 
                       'use server';
