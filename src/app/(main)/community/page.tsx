@@ -25,7 +25,7 @@ async function Stories() {
                 <CardTitle className="text-premium-gold">Farmer Stories</CardTitle>
             </CardHeader>
             <CardContent className="flex space-x-4 overflow-x-auto p-4">
-                {profiles.map((profile) => (
+                {(profiles as any[]).map((profile) => (
                     <div key={profile.id} className="flex flex-col items-center space-y-2">
                         <Avatar className="h-16 w-16 border-2 border-premium-gold">
                             <AvatarImage src={profile.avatar_url} alt={profile.name} />
@@ -71,7 +71,7 @@ async function VillageHub({ user }: { user: any }) {
                 <div>
                     <h3 className="font-semibold text-lg text-premium-white mb-2">Top Farmers</h3>
                     <div className="space-y-3">
-                        {topFarmers && topFarmers.map((farmer: any, index: number) => (
+                        {topFarmers && (topFarmers as any[]).map((farmer: any, index: number) => (
                             <div key={index} className="flex items-center space-x-3">
                                 <Crown className="text-premium-gold h-6 w-6" />
                                 <Avatar className="h-10 w-10">
@@ -88,7 +88,7 @@ async function VillageHub({ user }: { user: any }) {
                 </div>
                 <div>
                     <h3 className="font-semibold text-lg text-premium-white mb-2">Village Rankings</h3>
-                    <p className="text-premium-white/80">You are currently ranked #{currentUserProfile?.rank || 'N/A'} in your village.</p>
+                    <p className="text-premium-white/80">You are currently ranked #{(currentUserProfile as any)?.rank || 'N/A'} in your village.</p>
                 </div>
                 <div>
                     <h3 className="font-semibold text-lg text-premium-white mb-2">Best Performing Crop</h3>
@@ -121,16 +121,16 @@ async function CommunityInsights() {
                 <div>
                     <h3 className="font-semibold text-lg text-premium-white mb-2 flex items-center"><Flame className="mr-2 text-premium-gold" /> Trending Discussions</h3>
                     <ul className="list-disc list-inside text-premium-white/80 space-y-1">
-                        {insights.trending_discussions?.map((discussion: string, index: number) => <li key={index}>{discussion}</li>) || <li>No trending discussions.</li>}
+                        {(insights as any).trending_discussions?.map((discussion: string, index: number) => <li key={index}>{discussion}</li>) || <li>No trending discussions.</li>}
                     </ul>
                 </div>
                 <div>
                     <h3 className="font-semibold text-lg text-premium-white mb-2 flex items-center"><MessageCircle className="mr-2 text-premium-gold" /> Live Q&A</h3>
-                    <p className="text-premium-white/80">{insights.live_qa || 'No live Q&A currently.'}</p>
+                    <p className="text-premium-white/80">{(insights as any).live_qa || 'No live Q&A currently.'}</p>
                 </div>
                 <div>
                     <h3 className="font-semibold text-lg text-premium-white mb-2 flex items-center"><BarChart2 className="mr-2 text-premium-gold" /> Success Stories</h3>
-                    <p className="text-premium-white/80">{insights.success_stories || 'No success stories yet.'}</p>
+                    <p className="text-premium-white/80">{(insights as any).success_stories || 'No success stories yet.'}</p>
                 </div>
             </CardContent>
         </Card>

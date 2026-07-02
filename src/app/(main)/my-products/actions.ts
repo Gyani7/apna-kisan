@@ -22,7 +22,7 @@ export async function updateProduct(productId: string, formData: FormData) {
         return;
     }
 
-    if (product.farmer_id !== user.id) {
+    if ((product as any).farmer_id !== user.id) {
         console.error("You are not authorized to edit this product.");
         return;
     }
@@ -39,9 +39,9 @@ export async function updateProduct(productId: string, formData: FormData) {
         return;
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase
         .from('products')
-        .update({
+        .update as any)({
             title,
             description,
             price,
@@ -84,7 +84,7 @@ export async function deleteProduct(productId: string) {
     };
   }
 
-  if (product.farmer_id !== user.id) {
+  if ((product as any).farmer_id !== user.id) {
     console.error("You are not authorized to delete this product");
     return {
         success: false,

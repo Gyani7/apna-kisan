@@ -67,7 +67,7 @@ export default async function CartPage() {
                   <TableCell>
                     <form action={async () => { 
                       'use server';
-                      await removeItem(item.id);
+                      await removeItem(String(item.id));
                     }}>
                       <Button variant="destructive" size="sm">Remove</Button>
                     </form>

@@ -33,15 +33,9 @@ export default function NewPostPage() {
 
     const slug = title.toLowerCase().replace(/\s+/g, '-');
 
-    const postData: Database['public']['Tables']['posts']['Insert'] = {
-      title,
-      content,
-      user_id: user.id,
-      post_type: 'story',
-      slug,
-    };
-
-    const { error } = await supabase.from('posts').insert([postData]);
+    const { error } = await supabase
+      .from('posts')
+      .insert([{ title, content, user_id: user.id, post_type: 'story', slug }] as any);
 
     setIsLoading(false);
 

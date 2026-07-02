@@ -22,7 +22,7 @@ export async function addProduct(formData: FormData) {
     farmer_id: user.id,
   };
 
-  const { error } = await supabase.from("products").insert([productData]);
+  const { error } = await (supabase.from("products").insert as any)([productData]);
 
   if (error) {
     console.error("Error adding product:", error);
