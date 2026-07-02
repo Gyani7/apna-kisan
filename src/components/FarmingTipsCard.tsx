@@ -2,21 +2,30 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Leaf } from 'lucide-react'
-import type { FarmingTipRow } from '@/lib/database.types'
+import { Database } from '@/lib/database.types'
 import { createSupabaseClient } from '@/lib/supabase/client'
 
 const supabase = createSupabaseClient();
 
 export function FarmingTipsCard() {
-  const [tip, setTip] = useState<FarmingTipRow | null>(null)
+  const [tip, setTip] = useState<Database['public']['Tables']['farming_tips']['Row'] | null>(null)
 
   useEffect(() => {
     const fetchRandomTip = async () => {
       const { data, error } = await supabase.rpc('get_random_farming_tip')
       if (error) {
         console.error('Error fetching farming tip:', error)
-      } else {
+      } else if (data && data.length > 0) {
         setTip(data[0])
+      } else {
+        // Set a fallback tip if no tip is returned from the database
+        setTip({
+          id: 0,
+          title: 'No tips available',
+          content: 'Please check back later for farming tips.',
+          is_active: false,
+          created_at: new Date().toISOString(),
+        });
       }
     }
 
