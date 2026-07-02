@@ -62,18 +62,33 @@ export interface Database {
       products: {
         Row: {
           id: number
-          name: string
+          title: string
+          description: string
           price: number
+          stock: number
+          category: string
+          image_url: string
+          farmer_id: string
         }
         Insert: {
           id?: number
-          name: string
+          title: string
+          description: string
           price: number
+          stock: number
+          category: string
+          image_url: string
+          farmer_id: string
         }
         Update: {
           id?: number
-          name?: string
+          title?: string
+          description?: string
           price?: number
+          stock?: number
+          category?: string
+          image_url?: string
+          farmer_id?: string
         }
       }
     }
