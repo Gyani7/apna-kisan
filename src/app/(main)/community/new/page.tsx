@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
 import { Icons } from '@/components/icons';
+import { Database } from '@/lib/database.types';
 
 export default function NewPostPage() {
   const [title, setTitle] = useState('');
@@ -32,9 +33,15 @@ export default function NewPostPage() {
 
     const slug = title.toLowerCase().replace(/\s+/g, '-');
 
-    const { error } = await supabase
-      .from('posts')
-      .insert([{ title, content, user_id: user.id, post_type: 'story', slug }]);
+    const postData: Database['public']['Tables']['posts']['Insert'] = {
+      title,
+      content,
+      user_id: user.id,
+      post_type: 'story',
+      slug,
+    };
+
+    const { error } = await supabase.from('posts').insert([postData]);
 
     setIsLoading(false);
 
