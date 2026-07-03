@@ -5,9 +5,10 @@ import { PageHeader, PageHeaderHeading } from "@/components/PageHeader";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
+import { Database } from "@/lib/database.types";
 
 export default async function OrdersPage() {
-  const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient<Database>();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
