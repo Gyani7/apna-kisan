@@ -1,31 +1,27 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+'use client';
+import { Sun, Cloud, CloudRain } from "lucide-react";
+
+const forecastData = [
+    { day: "Mon", temp: "30°", icon: <Sun/> },
+    { day: "Tue", temp: "28°", icon: <Cloud/> },
+    { day: "Wed", temp: "25°", icon: <CloudRain/> },
+    { day: "Thu", temp: "31°", icon: <Sun/> },
+    { day: "Fri", temp: "29°", icon: <Cloud/> },
+]
 
 export function Forecast() {
-  // Mock data
-  const forecast = [
-    { day: "Mon", temp: 33, icon: "/placeholder.svg?text=☀️" },
-    { day: "Tue", temp: 34, icon: "/placeholder.svg?text=☀️" },
-    { day: "Wed", temp: 32, icon: "/placeholder.svg?text=☁️" },
-    { day: "Thu", temp: 31, icon: "/placeholder.svg?text=🌧️" },
-    { day: "Fri", temp: 30, icon: "/placeholder.svg?text=🌧️" },
-    { day: "Sat", temp: 32, icon: "/placeholder.svg?text=☁️" },
-    { day: "Sun", temp: 33, icon: "/placeholder.svg?text=☀️" },
-  ];
-
-  return (
-    <Card>
-        <CardHeader>
-            <CardTitle>7-Day Forecast</CardTitle>
-        </CardHeader>
-      <CardContent className="grid grid-cols-7 gap-2">
-        {forecast.map((day) => (
-          <div key={day.day} className="text-center">
-            <p className="font-bold">{day.day}</p>
-            <img src={day.icon} alt="weather icon" className="w-10 h-10 mx-auto" />
-            <p>{day.temp}°C</p>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  );
+    return (
+        <div className="bg-[#1E293B]/60 p-6 rounded-2xl">
+        <h3 className="text-lg font-bold mb-4">5-Day Forecast</h3>
+        <div className="flex justify-between">
+            {forecastData.map(item => (
+                <div key={item.day} className="flex flex-col items-center">
+                    <p className="text-gray-400">{item.day}</p>
+                    <div className="my-2">{item.icon}</div>
+                    <p>{item.temp}</p>
+                </div>
+            ))}
+        </div>
+      </div>
+    )
 }

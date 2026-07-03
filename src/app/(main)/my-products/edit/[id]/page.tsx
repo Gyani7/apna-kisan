@@ -52,12 +52,12 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
         <CardContent>
           <form action={updateProductWithId} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="title">Product Title</Label>
-              <Input id="title" name="title" defaultValue={product.title} required />
+              <Label htmlFor="name">Product Name</Label>
+              <Input id="name" name="name" defaultValue={product.name} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <Textarea id="description" name="description" defaultValue={product.description} required />
+              <Textarea id="description" name="description" defaultValue={product.description || ''} required />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -65,17 +65,13 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
                 <Input id="price" name="price" type="number" step="0.01" defaultValue={product.price} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="stock">Stock</Label>
-                <Input id="stock" name="stock" type="number" defaultValue={product.stock} required />
+                <Label htmlFor="unit">Unit</Label>
+                <Input id="unit" name="unit" type="text" defaultValue={product.unit || ''} required />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
-              <Input id="category" name="category" defaultValue={product.category} required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="image_url">Image URL</Label>
-              <Input id="image_url" name="image_url" defaultValue={product.image_url} required />
+              <Input id="category" name="category" defaultValue={product.category || ''} required />
             </div>
             <Button type="submit">Update Product</Button>
           </form>

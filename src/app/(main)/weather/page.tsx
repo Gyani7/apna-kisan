@@ -1,57 +1,52 @@
-import { weatherData as getWeatherData } from "@/lib/supabase/app-features";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { WeatherData } from "@/lib/weather";
+'use client';
+import { BottomNav } from '@/components/BottomNav';
+import { WeatherHeader, CurrentWeather, WeatherInfo, Forecast } from '@/components/weather';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.5,
+    },
+  },
+};
 
 export default function WeatherPage() {
-  const weather: WeatherData = getWeatherData;
-
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold mb-8">Weather Forecast</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Current Weather</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p><strong>Temperature:</strong> {weather.current.temperature}°C</p>
-            <p><strong>Humidity:</strong> {weather.current.humidity}%</p>
-            <p><strong>Wind:</strong> {weather.current.wind_speed} km/h</p>
-            <p><strong>Precipitation:</strong> {weather.current.precipitation} mm</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Hourly Forecast</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul>
-              {weather.hourly.map((hour) => (
-                <li key={hour.time}>
-                  <strong>{hour.time}:</strong> {hour.temperature}°C, {hour.condition}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>7-Day Forecast</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul>
-              {weather.daily.map((day) => (
-                <li key={day.date}>
-                  <strong>{day.date}:</strong> {day.max_temp}°C / {day.min_temp}°C, {day.condition}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
+    <div className="bg-[#0B1220] min-h-screen text-white">
+        <WeatherHeader />
+        <main className="p-4 pb-24">
+            <motion.div 
+                className="space-y-8"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
+                <motion.div variants={itemVariants}>
+                    <CurrentWeather />
+                </motion.div>
+                <motion.div variants={itemVariants}>
+                    <WeatherInfo />
+                </motion.div>
+                <motion.div variants={itemVariants}>
+                    <Forecast />
+                </motion.div>
+            </motion.div>
+        </main>
+      <BottomNav />
     </div>
   );
 }

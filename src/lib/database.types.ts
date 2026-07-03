@@ -10,93 +10,129 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      posts: {
+      products: {
         Row: {
-          id: number
+          id: string
           created_at: string
-          title: string
-          content: string
-          user_id: string
-          post_type: string
-          slug: string
+          name: string
+          description: string
+          price: number
+          category: string
+          unit: string
+          farmer_id: string
         }
         Insert: {
-          id?: number
+          id?: string
           created_at?: string
-          title: string
-          content: string
-          user_id: string
-          post_type: string
-          slug: string
+          name: string
+          description: string
+          price: number
+          category: string
+          unit: string
+          farmer_id: string
         }
         Update: {
-          id?: number
+          id?: string
           created_at?: string
-          title?: string
-          content?: string
-          user_id?: string
-          post_type?: string
-          slug?: string
+          name?: string
+          description?: string
+          price?: number
+          category?: string
+          unit?: string
+          farmer_id?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "products_farmer_id_fkey"
+            columns: ["farmer_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       cart_items: {
         Row: {
-          id: number
+          id: string
+          created_at: string
           user_id: string
-          product_id: number
+          product_id: string
           quantity: number
         }
         Insert: {
-          id?: number
+          id?: string
+          created_at?: string
           user_id: string
-          product_id: number
+          product_id: string
           quantity: number
         }
         Update: {
-          id?: number
+          id?: string
+          created_at?: string
           user_id?: string
-          product_id?: number
+          product_id?: string
           quantity?: number
         }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["product_id"]
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
-      products: {
+      profiles: {
         Row: {
-          id: number
-          title: string
-          description: string
-          price: number
-          stock: number
-          category: string
-          image_url: string
-          farmer_id: string
+          id: string
+          updated_at: string | null
+          username: string | null
+          full_name: string | null
+          avatar_url: string | null
+          website: string | null
+          premium: boolean | null
         }
         Insert: {
-          id?: number
-          title: string
-          description: string
-          price: number
-          stock: number
-          category: string
-          image_url: string
-          farmer_id: string
+          id: string
+          updated_at?: string | null
+          username?: string | null
+          full_name?: string | null
+          avatar_url?: string | null
+          website?: string | null
+          premium?: boolean | null
         }
         Update: {
-          id?: number
-          title?: string
-          description?: string
-          price?: number
-          stock?: number
-          category?: string
-          image_url?: string
-          farmer_id?: string
+          id?: string
+          updated_at?: string | null
+          username?: string | null
+          full_name?: string | null
+          avatar_url?: string | null
+          website?: string | null
+          premium?: boolean | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_random_farming_tip: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
