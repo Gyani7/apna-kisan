@@ -14,7 +14,7 @@
     "lint:direct": "eslint .",
     "type-check": "tsc --noEmit",
     "test": "jest",
-    "generate-types": "supabase gen types typescript --project-id fslvfxbfrwrzthhlioat > src/lib/database.types.ts"
+    "generate-types": "supabase gen types typescript --project-id fslvfxbfrwrzthhlioat --schema public > src/lib/database.types.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.33",
@@ -84,7 +84,7 @@
     "autoprefixer": "^10.5.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.4",
-    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-.jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.34.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "jest": "^25.0.0",

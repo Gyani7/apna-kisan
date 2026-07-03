@@ -28,16 +28,18 @@ export async function createProduct(productData: unknown) {
 
   const { name, description, price, category, unit } = parseResult.data;
 
+  const productToInsert: Database['public']['Tables']['products']['Insert'] = {
+    name,
+    description,
+    price,
+    category,
+    unit,
+    farmer_id: session.user.id,
+  };
+
   const { data, error } = await supabase
     .from('products')
-    .insert([{
-      name,
-      description,
-      price,
-      category,
-      unit,
-      farmer_id: session.user.id,
-    }])
+    .insert([productToInsert])
     .select();
 
   if (error) {
@@ -64,15 +66,17 @@ export async function updateProduct(productId: string, productData: unknown) {
 
   const { name, description, price, category, unit } = parseResult.data;
 
+  const productToUpdate: Database['public']['Tables']['products']['Update'] = {
+    name,
+    description,
+    price,
+    category,
+    unit,
+  };
+
   const { data, error } = await supabase
     .from('products')
-    .update({
-      name,
-      description,
-      price,
-      category,
-      unit,
-    })
+    .update(productToUpdate)
     .eq('id', productId)
     .eq('farmer_id', session.user.id)
     .select();
