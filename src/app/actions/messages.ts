@@ -28,7 +28,7 @@ export async function createConversation(recipientId: string) {
 
   const { data: newConversationData, error: newConversationError } = await supabase
     .from("conversations")
-    .insert([{ user1: user.id, user2: recipientId }])
+    .insert([{ user1: user.id, user2: recipientId }] as any)
     .select("id")
     .single();
   
