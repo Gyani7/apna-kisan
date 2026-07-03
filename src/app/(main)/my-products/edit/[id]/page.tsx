@@ -9,12 +9,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { updateProduct } from "@/app/(main)/my-products/actions";
+import { Database } from "@/lib/database.types";
 
 interface EditProductPageProps {
   params: {
     id: string;
   };
 }
+
+type Product = Database["public"]["Tables"]["products"]["Row"];
 
 export default async function EditProductPage({ params }: EditProductPageProps) {
   const supabase = await createSupabaseServerClient();
@@ -28,7 +31,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     .from("products")
     .select("*")
     .eq("id", params.id)
-    .single();
+    .single<Product>();
 
   if (!product || product.farmer_id !== user.id) {
     notFound();
