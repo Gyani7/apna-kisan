@@ -13,22 +13,26 @@ export async function createConversation(recipientId: string) {
 
   const user = session.user;
 
-  const { data: conversation, error } = await supabase
+  const { data, error } = await supabase
     .from("conversations")
     .select("id")
     .or(`user1.eq.${user.id},user2.eq.${user.id}`)
     .or(`user1.eq.${recipientId},user2.eq.${recipientId}`)
     .single();
 
+  const conversation = data as any;
+
   if (conversation) {
     return redirect(`/messages/${conversation.id}`);
   }
 
-  const { data: newConversation, error: newConversationError } = await supabase
+  const { data: newConversationData, error: newConversationError } = await supabase
     .from("conversations")
     .insert([{ user1: user.id, user2: recipientId }])
     .select("id")
     .single();
+  
+  const newConversation = newConversationData as any;
 
   if (newConversationError) {
     console.error("Error creating conversation:", newConversationError);
