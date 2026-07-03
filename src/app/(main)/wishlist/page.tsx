@@ -15,13 +15,15 @@ export default async function WishlistPage() {
     notFound();
   }
 
-  const { data: wishlistItems, error } = await supabase
+  const { data, error } = await supabase
     .from("wishlist_items")
     .select(`
       id,
       products (*)
     `)
     .eq("user_id", session.user.id);
+
+  const wishlistItems = data as any[];
 
   if (error) {
     console.error("Error fetching wishlist items:", error);
@@ -37,7 +39,7 @@ export default async function WishlistPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {wishlistItems.map((item) => (
             <div key={item.id} className="relative">
-              {item.products && <ProductCard product={item.products[0]} />}
+              {item.products && <ProductCard product={item.products} />}
               <form action={async () => { 
                 'use server';
                 await removeItemFromWishlist(item.id);
