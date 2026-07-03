@@ -37,7 +37,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     notFound();
   }
 
-  const updateProductWithId = updateProduct.bind(null, product.id);
+  const updateProductWithId = updateProduct.bind(null, String(product.id));
 
   return (
     <Shell>
