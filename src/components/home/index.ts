@@ -1,2 +1,24 @@
+'use client';
+
 export * from './WelcomeHeader';
 export * from './LatestActivity';
+export * from './CategorySlider';
+export * from './CommunityFeed';
+export * from './CommunityPostBox';
+export * from './DailyInfoGrid';
+export * from './GovernmentSchemes';
+export * from './HeroBanner';
+export * from './HeroSection';
+export * from './HomeHeader';
+export * from './InfoCard';
+export * from './KisanReels';
+export * from './LiveWeather';
+export * from './MandiBhav';
+export * from './NearbyShops';
+export * from './NewsFeed';
+export * from './PostCard';
+export * from './QuickActions';
+export * from './StickyHeader';
+export * from './SuccessStories';
+export * from './VillageExplorer';
+export * from './WeatherSummary';
