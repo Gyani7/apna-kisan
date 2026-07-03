@@ -1,7 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import { Bell, Settings } from 'lucide-react';
-import { AgriConnectLogo } from '../AgriConnectLogo';
+import AgriConnectLogo from '../AgriConnectLogo';
 
 export function HomeHeader() {
   return (
