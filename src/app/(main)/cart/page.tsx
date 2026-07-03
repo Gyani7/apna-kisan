@@ -60,7 +60,7 @@ export default async function CartPage() {
             <TableBody>
               {cartItems.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell>{item.products?.name}</TableCell>
+                  <TableCell>{item.products?.title}</TableCell>
                   <TableCell>₹{item.products?.price}</TableCell>
                   <TableCell>{item.quantity}</TableCell>
                   <TableCell>₹{(item.products?.price || 0) * item.quantity}</TableCell>
