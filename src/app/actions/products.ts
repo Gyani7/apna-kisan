@@ -2,6 +2,7 @@
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { Database } from "@/lib/database.types";
 
 const productSchema = z.object({
   name: z.string().min(2),
@@ -12,7 +13,7 @@ const productSchema = z.object({
 });
 
 export async function createProduct(productData: unknown) {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
@@ -48,7 +49,7 @@ export async function createProduct(productData: unknown) {
 }
 
 export async function updateProduct(productId: string, productData: unknown) {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
