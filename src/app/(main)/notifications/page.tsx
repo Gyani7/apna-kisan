@@ -7,13 +7,12 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { User } from '@supabase/supabase-js';
 import { Leaf, BookOpen } from 'lucide-react';
-import { Database } from '@/lib/database.types';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const supabase = createSupabaseClient<Database>();
+  const supabase = createSupabaseClient();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -37,7 +36,7 @@ export default function NotificationsPage() {
       if (error) {
         console.error('Error fetching notifications:', error);
       } else if (data) {
-        setNotifications(data as unknown as Notification[]);
+        setNotifications(data as Notification[]);
       }
       setLoading(false);
     };
@@ -47,9 +46,9 @@ export default function NotificationsPage() {
 
   const handleNotificationClick = async (notification: Notification) => {
     if (!notification.is_read) {
-      const { error } = await supabase
+      const { error } = await (supabase
         .from('notifications')
-        .update({ is_read: true })
+        .update as any)({ is_read: true })
         .eq('id', notification.id);
 
       if (error) {
@@ -65,9 +64,9 @@ export default function NotificationsPage() {
   const markAllAsRead = async () => {
     if (!user) return;
 
-    const { error } = await supabase
+    const { error } = await (supabase
       .from('notifications')
-      .update({ is_read: true })
+      .update as any)({ is_read: true })
       .eq('user_id', user.id)
       .eq('is_read', false);
 
