@@ -37,7 +37,7 @@ export async function createProduct(productData: unknown) {
         category,
         stock,
         farmer_id: session.user.id,
-      },
+      } as any,
     ])
     .select();
 
@@ -63,7 +63,7 @@ export async function updateProduct(productId: string, productData: unknown) {
     return { success: false, message: "Invalid data", errors: parseResult.error.flatten() };
   }
 
-  const { title, description, price, category, stock } = parseResult.data;
+  const { title, description, price, category, stock } = parseResult..data;
 
   const { data, error } = await supabase
     .from('products')
