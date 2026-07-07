@@ -1,4 +1,3 @@
-
 /** @type {import('tailwindcss').Config} */
 const { fontFamily } = require("tailwindcss/defaultTheme")
 
@@ -23,10 +22,10 @@ module.exports = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
+        background: "#0F172A",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
+          DEFAULT: "#22C55E",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
@@ -50,29 +49,15 @@ module.exports = {
           foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
+          DEFAULT: "#1E293B",
           foreground: "hsl(var(--card-foreground))",
         },
-        brand: {
-          DEFAULT: "#0C4A6E",
-          100: "#E0F2FE",
-          200: "#BAE6FD",
-          300: "#7DD3FC",
-          400: "#38BDF8",
-          500: "#0EA5E9",
-          600: "#0284C7",
-          700: "#0369A1",
-          800: "#075985",
-          900: "#0C4A6E",
-        },
-        glass: "rgba(255, 255, 255, 0.2)",
-        'dark-glass': "rgba(0, 0, 0, 0.3)",
       },
       borderRadius: {
-        lg: `var(--radius)`,
-        md: `calc(var(--radius) - 2px)`,
-        sm: `calc(var(--radius) - 4px)`,
-        "2xl": `calc(var(--radius) + 4px)`,
+        lg: `18px`,
+        md: `12px`,
+        sm: `6px`,
+        xl: `24px`,
       },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
@@ -87,30 +72,14 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
-        "fade-in-up": {
-          "0%": {
-            opacity: "0",
-            transform: "translateY(10px)",
-          },
-          "100%": {
-            opacity: "1",
-            transform: "translateY(0)",
-          },
-        },
-        "gradient-animation": {
-          "0%": { 'background-position': "0% 50%" },
-          "50%": { 'background-position': "100% 50%" },
-          "100%": { 'background-position': "0% 50%" },
-        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in-up": "fade-in-up 0.4s ease-out forwards",
-        "gradient-animation": "gradient-animation 15s ease infinite",
       },
-      backgroundImage: {
-        'gradient-green': 'linear-gradient(to right, #4CAF50, #81C784, #4CAF50)',
+      boxShadow: {
+        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        'soft-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
       }
     },
   },

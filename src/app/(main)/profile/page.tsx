@@ -1,52 +1,49 @@
-'use client';
-import { BottomNav } from '@/components/BottomNav';
-import { Achievements, Progress, ProfileHeader, Stats } from '@/components/profile';
-import { motion } from 'framer-motion';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      duration: 0.5,
-    },
-  },
-};
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import PostCard from "@/components/community/PostCard";
 
 export default function ProfilePage() {
   return (
-    <div className="bg-[#0B1220] min-h-screen text-white">
-        <ProfileHeader />
-        <main className="p-4 pb-24">
-            <motion.div 
-                className="space-y-8"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-            >
-                <motion.div variants={itemVariants}>
-                    <Stats />
-                </motion.div>
-                <motion.div variants={itemVariants}>
-                    <Achievements />
-                </motion.div>
-                <motion.div variants={itemVariants}>
-                    <Progress />
-                </motion.div>
-            </motion.div>
-        </main>
-      <BottomNav />
+    <div className="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col items-center gap-4">
+            <Avatar className="w-24 h-24 border-4 border-primary">
+                <AvatarImage src="/placeholder-user.jpg" />
+                <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+            <div className="text-center">
+                <h1 className="text-2xl font-bold">Username</h1>
+                <p className="text-muted-foreground">@username</p>
+            </div>
+            <div className="flex items-center gap-4">
+                <div className="text-center">
+                    <div className="font-bold">1.2k</div>
+                    <div className="text-sm text-muted-foreground">Followers</div>
+                </div>
+                <div className="text-center">
+                    <div className="font-bold">450</div>
+                    <div className="text-sm text-muted-foreground">Following</div>
+                </div>
+            </div>
+            <Button>Edit Profile</Button>
+        </div>
+        <Tabs defaultValue="posts" className="mt-8">
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="posts">My Posts</TabsTrigger>
+                <TabsTrigger value="saved">Saved Posts</TabsTrigger>
+            </TabsList>
+            <TabsContent value="posts">
+                <div className="mt-8 space-y-6">
+                    <PostCard />
+                    <PostCard />
+                </div>
+            </TabsContent>
+            <TabsContent value="saved">
+                <div className="mt-8 space-y-6">
+                    <PostCard />
+                </div>
+            </TabsContent>
+        </Tabs>
     </div>
   );
 }
