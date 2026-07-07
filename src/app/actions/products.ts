@@ -10,6 +10,7 @@ const productSchema = z.object({
   price: z.number().min(0),
   category: z.string().min(2),
   unit: z.string(),
+  stock: z.number().min(0),
 });
 
 export async function createProduct(productData: unknown) {
@@ -26,7 +27,7 @@ export async function createProduct(productData: unknown) {
     return { success: false, message: "Invalid data", errors: parseResult.error.flatten() };
   }
 
-  const { name, description, price, category, unit } = parseResult.data;
+  const { name, description, price, category, unit, stock } = parseResult.data;
 
   const productToInsert: Database['public']['Tables']['products']['Insert'] = {
     name,
@@ -34,6 +35,7 @@ export async function createProduct(productData: unknown) {
     price,
     category,
     unit,
+    stock,
     farmer_id: session.user.id,
   };
 
@@ -64,7 +66,7 @@ export async function updateProduct(productId: string, productData: unknown) {
     return { success: false, message: "Invalid data", errors: parseResult.error.flatten() };
   }
 
-  const { name, description, price, category, unit } = parseResult.data;
+  const { name, description, price, category, unit, stock } = parseResult.data;
 
   const productToUpdate: Database['public']['Tables']['products']['Update'] = {
     name,
@@ -72,6 +74,7 @@ export async function updateProduct(productId: string, productData: unknown) {
     price,
     category,
     unit,
+    stock,
   };
 
   const { data, error } = await supabase

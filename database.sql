@@ -31,6 +31,7 @@ CREATE TABLE products (
   price REAL NOT NULL,
   unit TEXT,
   category TEXT,
+  stock INTEGER NOT NULL DEFAULT 0,  -- Add this line
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

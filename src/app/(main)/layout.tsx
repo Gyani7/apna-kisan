@@ -1,5 +1,5 @@
 import HomeHeader from "@/components/home/HomeHeader";
-import BottomNav from "@/components/BottomNav";
+import { BottomNav } from "@/components/BottomNav";
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   return (

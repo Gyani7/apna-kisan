@@ -23,7 +23,7 @@ export default async function CartPage() {
   const { data: cartItems, error } = await supabase
     .from('cart_items')
     .select(`
-      id,
+      cart_id,
       quantity,
       products (*)
     `)
@@ -59,7 +59,7 @@ export default async function CartPage() {
             </TableHeader>
             <TableBody>
               {cartItems.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow key={item.cart_id}>
                   <TableCell>{item.products?.name}</TableCell>
                   <TableCell>₹{item.products?.price}</TableCell>
                   <TableCell>{item.quantity}</TableCell>
@@ -67,7 +67,7 @@ export default async function CartPage() {
                   <TableCell>
                     <form action={async () => { 
                       'use server';
-                      await removeItem(String(item.id));
+                      await removeItem(String(item.cart_id));
                     }}>
                       <Button variant="destructive" size="sm">Remove</Button>
                     </form>
