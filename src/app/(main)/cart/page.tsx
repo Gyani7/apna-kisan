@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { notFound } from "next/navigation";
 import { removeItem } from "./actions";
-import { Database } from "@/lib/database.types";
+import type { Database } from "@/lib/database.types";
 
 type CartItem = Database['public']['Tables']['cart_items']['Row'] & {
   products: Database['public']['Tables']['products']['Row'] | null;

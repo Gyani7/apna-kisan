@@ -2,7 +2,7 @@
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { z } from "zod";
-import { Database } from "@/lib/database.types";
+import type { Database } from "@/lib/database.types";
 
 const productSchema = z.object({
   name: z.string().min(2),
@@ -29,7 +29,7 @@ export async function createProduct(productData: unknown) {
 
   const { name, description, price, category, unit, stock } = parseResult.data;
 
-  const productToInsert: Database['public']['Tables']['products']['Insert'] = {
+  const productToInsert = {
     name,
     description,
     price,
@@ -37,7 +37,7 @@ export async function createProduct(productData: unknown) {
     unit,
     stock,
     farmer_id: session.user.id,
-  };
+  } as Database['public']['Tables']['products']['Insert'];
 
   const { data, error } = await supabase
     .from('products')
