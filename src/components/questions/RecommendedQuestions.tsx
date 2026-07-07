@@ -27,7 +27,7 @@ export default function RecommendedQuestions({ questionText, userState, currentQ
       const result = await getRecommendedQuestions(questionText, userState);
       if (result.success) {
         // Filter out the current question from the recommendations
-        const filteredRecs = result.recommendations.filter(rec => rec.id !== currentQuestionId);
+        const filteredRecs = result.recommendations.filter((rec: Recommendation) => rec.id !== currentQuestionId);
         setRecommendations(filteredRecs || []);
       }
       setIsLoading(false);

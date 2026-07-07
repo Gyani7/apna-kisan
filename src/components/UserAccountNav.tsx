@@ -13,11 +13,11 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { User } from 'lucide-react';
 import { useAuth } from './AuthProvider';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createSupabaseClient } from '@/lib/supabase/client';
 
 export function UserAccountNav() {
-  const { user, profile, loading } = useAuth();
-  const supabase = createBrowserClient();
+  const { user, loading } = useAuth();
+  const supabase = createSupabaseClient();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -36,8 +36,8 @@ export function UserAccountNav() {
         >
           <Avatar className="h-8 w-8">
             <AvatarImage
-              src={profile?.avatar_url || ''}
-              alt={profile?.full_name || ''}
+              src={user?.photoURL || ''}
+              alt={user?.displayName || ''}
             />
             <AvatarFallback>
               <User className="h-4 w-4" />
@@ -48,7 +48,7 @@ export function UserAccountNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuItem className="flex items-center justify-start gap-2">
           <div className="flex flex-col space-y-1 leading-none">
-            {profile?.full_name && <p className="font-medium">{profile.full_name}</p>}
+            {user?.displayName && <p className="font-medium">{user.displayName}</p>}
             {user?.email && (
               <p className="w-[200px] truncate text-sm text-muted-foreground">
                 {user.email}

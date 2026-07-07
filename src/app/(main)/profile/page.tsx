@@ -2,6 +2,36 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import PostCard from "@/components/community/PostCard";
+import { FeedItemType } from "@/lib/types";
+
+// Mock data for PostCard
+const mockPost: FeedItemType = {
+  id: 'mock-1',
+  type: 'post',
+  userId: '1',
+  title: 'Welcome to Apna Kisan!',
+  content: 'This is a sample post. We are happy to have you here. Explore the community, ask questions, and share your knowledge!',
+  imageUrl: null,
+  postType: 'text',
+  category: 'welcome',
+  tags: ['community', 'welcome'],
+  slug: 'welcome-to-apna-kisan',
+  excerpt: 'A welcome message.',
+  readTime: 2,
+  isFeatured: true,
+  likesCount: 250,
+  commentsCount: 42,
+  sharesCount: 18,
+  createdAt: new Date().toISOString(),
+  author: {
+    id: 'admin-1',
+    username: 'ApnaKisanAdmin',
+    avatar_url: '/placeholder-user.jpg',
+    full_name: 'Apna Kisan Admin',
+  },
+  is_liked: false,
+  is_bookmarked: false,
+};
 
 export default function ProfilePage() {
   return (
@@ -34,13 +64,13 @@ export default function ProfilePage() {
             </TabsList>
             <TabsContent value="posts">
                 <div className="mt-8 space-y-6">
-                    <PostCard />
-                    <PostCard />
+                    <PostCard post={mockPost}/>
+                    <PostCard post={mockPost}/>
                 </div>
             </TabsContent>
             <TabsContent value="saved">
                 <div className="mt-8 space-y-6">
-                    <PostCard />
+                    <PostCard post={mockPost}/>
                 </div>
             </TabsContent>
         </Tabs>

@@ -1,8 +1,8 @@
 
-import { PostCard } from "@/components/home/PostCard";
+import PostCard, { PostCardProps } from "@/components/home/PostCard";
 
 // Placeholder for user's posts
-const userPosts = [
+const userPosts: PostCardProps[] = [
   { id: 1, author: 'Vijay Kumar', time: '2 hours ago', content: 'Wheat crop is ready for harvest!', likes: 15, comments: 4, type: 'post' },
   { id: 2, author: 'Vijay Kumar', time: '1 day ago', content: 'Sharing my success story with organic farming.', likes: 32, comments: 7, type: 'story' },
 ];

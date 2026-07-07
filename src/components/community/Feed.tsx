@@ -1,5 +1,5 @@
 
-import { PostCard } from './PostCard';
+import PostCard from './PostCard';
 import { ProductCard } from '../marketplace/ProductCard';
 import { StoryCard } from '../stories/StoryCard';
 import { ReelCard } from '../reels/ReelCard';

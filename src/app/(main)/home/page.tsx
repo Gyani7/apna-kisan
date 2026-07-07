@@ -3,6 +3,37 @@ import { Card, CardContent } from "@/components/ui/card";
 import { JSX, SVGProps } from "react";
 import CreatePost from "@/components/community/CreatePost";
 import PostCard from "@/components/community/PostCard";
+import { FeedItemType } from "@/lib/types";
+
+// Mock data for PostCard
+const mockPost: FeedItemType = {
+  id: 'mock-1',
+  type: 'post',
+  userId: '1',
+  title: 'Welcome to Apna Kisan!',
+  content: 'This is a sample post. We are happy to have you here. Explore the community, ask questions, and share your knowledge!',
+  imageUrl: null,
+  postType: 'text',
+  category: 'welcome',
+  tags: ['community', 'welcome'],
+  slug: 'welcome-to-apna-kisan',
+  excerpt: 'A welcome message.',
+  readTime: 2,
+  isFeatured: true,
+  likesCount: 250,
+  commentsCount: 42,
+  sharesCount: 18,
+  createdAt: new Date().toISOString(),
+  author: {
+    id: 'admin-1',
+    username: 'ApnaKisanAdmin',
+    avatar_url: '/placeholder-user.jpg',
+    full_name: 'Apna Kisan Admin',
+  },
+  is_liked: false,
+  is_bookmarked: false,
+};
+
 
 export default function Page() {
   return (
@@ -24,7 +55,7 @@ export default function Page() {
             <Button variant="link" className="text-primary">View All</Button>
           </div>
           <div className="mt-6 grid grid-cols-4 gap-4 md:grid-cols-8">
-            {[ 
+            {[
               { name: "Fasal", icon: TractorIcon },
               { name: "Organic", icon: LeafIcon },
               { name: "Mandi Bhav", icon: TrendingUpIcon },
@@ -92,9 +123,9 @@ export default function Page() {
         <div className="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <CreatePost />
           <div className="mt-8 space-y-6">
-            <PostCard />
-            <PostCard />
-            <PostCard />
+            <PostCard post={mockPost} />
+            <PostCard post={mockPost} />
+            <PostCard post={mockPost} />
           </div>
         </div>
       </section>

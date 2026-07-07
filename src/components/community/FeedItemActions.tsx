@@ -7,12 +7,16 @@ import { FeedItemType } from "@/lib/types";
 export function FeedItemActions({ item }: { item: FeedItemType }) {
     const getActionCounts = () => {
         switch(item.type) {
+            case 'post':
+                return { likes: item.likesCount, comments: item.commentsCount };
             case 'question':
-                return { likes: item.likes_count, comments: item.answers.length };
+                return { likes: 0, comments: item.answers.length };
             case 'reel':
-                return { likes: item.likes_count, comments: 0 }; // Assuming reels don't have comments for now
+                return { likes: 0, comments: 0 };
+            case 'story':
+                return { likes: 0, comments: 0 };
             default:
-                return { likes: 0, comments: 0 }; // Stories might not have likes/comments yet
+                return { likes: 0, comments: 0 };
         }
     }
 

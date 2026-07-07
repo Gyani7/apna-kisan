@@ -3,13 +3,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, MessageSquare, Share2, MoreHorizontal, HelpCircle, BookOpen, MessageSquareText } from "lucide-react";
 
-interface PostCardProps {
-  author: string;
-  time: string;
-  content: string;
-  likes: number;
-  comments: number;
-  type: 'post' | 'question' | 'story';
+export interface PostCardProps {
+    id: number;
+    author: string;
+    time: string;
+    content: string;
+    likes: number;
+    comments: number;
+    type: 'post' | 'question' | 'story';
 }
 
 const typeDetails = {
@@ -18,7 +19,7 @@ const typeDetails = {
     story: { icon: BookOpen, color: 'text-purple-500', label: 'Kahani' }
 };
 
-export function PostCard({ author, time, content, likes, comments, type }: PostCardProps) {
+export default function PostCard({ author, time, content, likes, comments, type }: PostCardProps) {
     const { icon: Icon, color, label } = typeDetails[type];
 
   return (

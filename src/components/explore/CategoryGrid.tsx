@@ -1,5 +1,5 @@
 'use client';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
 import { Crop, Leaf, LineChart, Tractor, TestTube2, Droplets, Landmark, Milk } from 'lucide-react';
 
@@ -14,7 +14,7 @@ const categories = [
   { name: 'Pashu', icon: <Milk size={48} />, description: 'Dairy Animal Husbandry', href: '/explore/animal-husbandry' },
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
@@ -23,7 +23,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
     hidden: { scale: 0, opacity: 0 },
     visible: { 
         scale: 1, 

@@ -11,10 +11,9 @@ export async function POST(req: NextRequest) {
     return new NextResponse(JSON.stringify({ message: 'Unauthorized' }), { status: 401 });
   }
 
-  const { data, error } = await supabase
-    .from('cart_items')
-    .insert([{ user_id: user.id, product_id: productId, quantity }])
-    .select();
+  const { data, error } = await supabase.functions.invoke('add-to-cart', {
+    body: { userId: user.id, productId, quantity },
+  });
 
   if (error) {
     console.error('Error adding to cart:', error);

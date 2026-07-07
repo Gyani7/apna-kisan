@@ -20,11 +20,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isGitHubLoading, setIsGitHubLoading] = React.useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false);
   const [authMethod, setAuthMethod] = React.useState<"email" | "phone">("email");
-  const { setGuestId } = useGuest();
+  const isGuest = useGuest();
   const router = useRouter();
 
   const handleGuestMode = () => {
-    setGuestId("guest");
     router.push('/');
   };
 

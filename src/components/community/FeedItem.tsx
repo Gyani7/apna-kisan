@@ -22,10 +22,12 @@ export function FeedItem({ item }: { item: FeedItemType }) {
         }
     };
 
+    const createdAt = 'createdAt' in item ? item.createdAt : item.created_at;
+
     return (
         <Card className="overflow-hidden">
             <div className="p-4">
-                <AuthorHeader author={item.author} createdAt={item.created_at} />
+                <AuthorHeader author={item.author} createdAt={createdAt} />
             </div>
             {renderContent()}
             <div className="p-4 border-t">

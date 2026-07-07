@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { Check, ShieldCheck, Upload, FileText, Map, Award, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const supabase = createBrowserClient();
+const supabase = createSupabaseClient();
 
 type DocType = 'Aadhaar' | 'Land Records' | 'KCC Card' | 'Farmer ID';
 type VerificationStatus = 'pending' | 'approved' | 'rejected' | 'none';

@@ -1,6 +1,6 @@
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { PostCard } from "./PostCard";
+import PostCard from "./PostCard";
 
 export async function PostList() {
   const supabase = createSupabaseServerClient();

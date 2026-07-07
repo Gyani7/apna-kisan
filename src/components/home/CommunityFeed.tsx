@@ -1,15 +1,15 @@
 
-import { PostCard } from "./PostCard";
+import PostCard, { PostCardProps } from "./PostCard";
 import { Button } from "@/components/ui/button";
 import { useState, useCallback } from 'react';
 
-const initialPosts = [
+const initialPosts: PostCardProps[] = [
     { id: 1, author: 'Vijay Kumar', time: '2 hours ago', content: 'Wheat crop is ready for harvest!', likes: 15, comments: 4, type: 'post' },
     { id: 2, author: 'Sunita Devi', time: '5 hours ago', content: 'What is the best fertilizer for cotton?', likes: 8, comments: 12, type: 'question' },
     { id: 3, author: 'Ramesh Singh', time: '1 day ago', content: 'Sharing my success story with organic farming.', likes: 32, comments: 7, type: 'story' },
   ];
 
-const morePosts = [
+const morePosts: PostCardProps[] = [
     { id: 4, author: 'Geeta Verma', time: '2 days ago', content: 'New government scheme for solar pumps.', likes: 25, comments: 9, type: 'story' },
     { id: 5, author: 'Anil Yadav', time: '3 days ago', content: 'How to protect crops from locusts?', likes: 12, comments: 18, type: 'question' },
 ];

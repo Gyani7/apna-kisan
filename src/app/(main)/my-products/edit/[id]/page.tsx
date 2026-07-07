@@ -33,7 +33,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     .eq("id", params.id)
     .single<Product>();
 
-  if (!product || product.farmer_id !== user.id) {
+  if (!product || product.seller_id !== user.id) {
     notFound();
   }
 
@@ -53,7 +53,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
           <form action={updateProductWithId} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="name">Product Name</Label>
-              <Input id="name" name="name" defaultValue={product.name} required />
+              <Input id="name" name="name" defaultValue={product.title} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
@@ -66,7 +66,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
               </div>
               <div className="space-y-2">
                 <Label htmlFor="unit">Unit</Label>
-                <Input id="unit" name="unit" type="text" defaultValue={product.unit || ''} required />
+                <Input id="unit" name="unit" type="text" defaultValue={product.description || ''} required />
               </div>
             </div>
             <div className="space-y-2">

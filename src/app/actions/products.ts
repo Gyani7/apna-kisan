@@ -37,12 +37,11 @@ export async function createProduct(productData: unknown) {
     unit,
     stock,
     farmer_id: session.user.id,
-  } as Database['public']['Tables']['products']['Insert'];
+  };
 
-  const { data, error } = await supabase
-    .from('products')
-    .insert([productToInsert])
-    .select();
+  const { data, error } = await supabase.functions.invoke('create-product', {
+    body: { product: productToInsert },
+  });
 
   if (error) {
     console.error('Error creating product:', error);
@@ -68,7 +67,7 @@ export async function updateProduct(productId: string, productData: unknown) {
 
   const { name, description, price, category, unit, stock } = parseResult.data;
 
-  const productToUpdate: Database['public']['Tables']['products']['Update'] = {
+  const productToUpdate = {
     name,
     description,
     price,
@@ -77,12 +76,9 @@ export async function updateProduct(productId: string, productData: unknown) {
     stock,
   };
 
-  const { data, error } = await supabase
-    .from('products')
-    .update(productToUpdate)
-    .eq('id', productId)
-    .eq('farmer_id', session.user.id)
-    .select();
+  const { data, error } = await supabase.functions.invoke('update-product', {
+    body: { productId, product: productToUpdate },
+  });
 
   if (error) {
     console.error('Error updating product:', error);

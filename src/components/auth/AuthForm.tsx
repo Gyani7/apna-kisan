@@ -9,7 +9,7 @@ export function AuthForm() {
   return (
     <div className="space-y-4">
       <Button onClick={signInWithGoogle} className="w-full">
-        <Icons.google className="mr-2 h-4 w-4" />
+        <Icons.Google className="mr-2 h-4 w-4" />
         Continue with Google
       </Button>
     </div>

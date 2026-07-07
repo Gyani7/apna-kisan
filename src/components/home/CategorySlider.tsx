@@ -1,5 +1,5 @@
 
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { Wheat, Leaf, TrendingUp, Tractor, Dna, Droplets, Landmark, CloudSun, GitBranchPlus, Banknote } from 'lucide-react';
 
 const categories = [
@@ -15,7 +15,7 @@ const categories = [
   { name: 'Loans', icon: Banknote, color: '#4CAF50' },
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
@@ -23,7 +23,7 @@ const containerVariants = {
     }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: { 
         y: 0, 

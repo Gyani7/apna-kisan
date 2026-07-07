@@ -13,7 +13,7 @@ export async function updateProduct(productId: string, formData: FormData) {
 
     const { data: product, error: fetchError } = await supabase
         .from("products")
-        .select("farmer_id")
+        .select("seller_id")
         .eq("id", productId)
         .single();
 
@@ -22,7 +22,7 @@ export async function updateProduct(productId: string, formData: FormData) {
         return;
     }
 
-    if ((product as any).farmer_id !== user.id) {
+    if ((product as any).seller_id !== user.id) {
         console.error("You are not authorized to edit this product.");
         return;
     }
@@ -30,11 +30,9 @@ export async function updateProduct(productId: string, formData: FormData) {
     const title = formData.get('title') as string;
     const description = formData.get('description') as string;
     const price = parseFloat(formData.get('price') as string);
-    const stock = parseInt(formData.get('stock') as string, 10);
     const category = formData.get('category') as string;
-    const image_url = formData.get('image_url') as string;
 
-    if (!title || !description || isNaN(price) || isNaN(stock) || !category) {
+    if (!title || !description || isNaN(price) || !category) {
         console.error("Invalid form data.");
         return;
     }
@@ -45,9 +43,7 @@ export async function updateProduct(productId: string, formData: FormData) {
             title,
             description,
             price,
-            stock,
             category,
-            image_url,
         })
         .eq('id', productId);
 
@@ -72,7 +68,7 @@ export async function deleteProduct(productId: string) {
   // First, verify that the user owns the product
   const { data: product, error: fetchError } = await supabase
     .from("products")
-    .select("farmer_id")
+    .select("seller_id")
     .eq("id", productId)
     .single();
 
@@ -84,7 +80,7 @@ export async function deleteProduct(productId: string) {
     };
   }
 
-  if ((product as any).farmer_id !== user.id) {
+  if ((product as any).seller_id !== user.id) {
     console.error("You are not authorized to delete this product");
     return {
         success: false,
